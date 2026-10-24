@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<title>Spending Mandates — Mandate Gateway</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      font-size: 20px;
+      line-height: 1;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      background: #E5E5E2;
+      height: 2px;
+      border-radius: 9999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      background: #242424;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "on-primary-fixed": "#1b1c1c",
+            "on-surface": "#1a1c1b",
+            "on-primary": "#ffffff",
+            "on-tertiary": "#ffffff",
+            "secondary-fixed": "#f2e0c3",
+            "surface-dim": "#dadad8",
+            "tertiary": "#0d0700",
+            "tertiary-fixed-dim": "#d3c5aa",
+            "surface-container": "#f0f0ee",
+            "primary-fixed-dim": "#c8c6c5",
+            "on-tertiary-fixed": "#221b09",
+            "surface": "#f5f5f3",
+            "on-secondary-fixed-variant": "#514530",
+            "secondary": "#a99a80",
+            "secondary-container": "#f2e0c3",
+            "inverse-surface": "#2f3130",
+            "on-tertiary-container": "#93866e",
+            "outline-variant": "#e7e7e3",
+            "error": "#ba1a1a",
+            "primary": "#242424",
+            "charcoal": "#242424",
+            "on-error-container": "#93000a",
+            "surface-container-high": "#e8e8e5",
+            "surface-container-lowest": "#ffffff",
+            "tertiary-container": "#271f0e",
+            "surface-container-highest": "#e2e3df",
+            "on-secondary": "#ffffff",
+            "surface-tint": "#5f5e5e",
+            "secondary-fixed-dim": "#d5c4a9",
+            "surface-bright": "#fafaf9",
+            "outline": "#747878",
+            "on-primary-container": "#898787",
+            "error-container": "#ffdad6",
+            "on-secondary-container": "#6f634c",
+            "tertiary-fixed": "#f0e1c5",
+            "inverse-primary": "#c8c6c5",
+            "on-error": "#ffffff",
+            "background": "#f5f5f3",
+            "inverse-on-surface": "#f1f1ef",
+            "surface-container-low": "#f8f8f6",
+            "primary-fixed": "#e5e2e1",
+            "on-tertiary-fixed-variant": "#4f4631",
+            "on-primary-fixed-variant": "#474746",
+            "on-secondary-fixed": "#231a08",
+            "primary-container": "#242424",
+            "on-background": "#1a1c1b",
+            "surface-variant": "#e2e3e1",
+            "on-surface-variant": "#6b6e6f"
+          },
+          fontFamily: {
+            "display": ["Manrope", "sans-serif"],
+            "headline-lg": ["Manrope", "sans-serif"],
+            "headline-md": ["Manrope", "sans-serif"],
+            "headline-sm": ["Manrope", "sans-serif"],
+            "title-md": ["Manrope", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "code-sm": ["Inter", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f5f5f3] font-body-md text-body-md text-on-surface antialiased">
+<!-- SIDEBAR NAVIGATION -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-[#e7e7e3] z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 min-h-0">
+<!-- App Brand -->
+<div class="h-20 px-6 flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<img alt="Mandate Gateway Logo" class="h-7 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTIQEp-IS9gvFsW2ah5XZEMllzh2SBpkwgt9jBeZpEHlojdaOSUiOd_TTHewlw6hZYEsfj7B6qjsJmQv4fx0ZaxWmuXDklwqQ0Q9qmA7xwbflAdZI4mrQCXXFNw4bPhMcCmGkt2s2AuUexf-W4EpHNS8LknSBv-SX0t2FDBxFEqC7rA8Lq-dZQoYR_0eKT180k4v8ceH3ByU45yxc7ivPX2iPKkVSxfjsfmBcmEBvZcM2pr3j9NQd8bg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-display font-semibold text-[13px] tracking-tight text-charcoal truncate">MANDATE GATEWAY</span>
+<span class="font-label-sm text-[10px] tracking-widest text-secondary uppercase truncate">Autonomous Ledger</span>
+</div>
+</div>
+</div>
+<!-- Environment tag -->
+<div class="px-6 pb-4">
+<div class="flex items-center justify-between py-1.5 px-2.5 rounded border border-[#e7e7e3] bg-[#fbfbf9] text-[11px] text-on-surface-variant">
+<span class="flex items-center gap-1.5 font-code-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Enforcement v2.4
+          </span>
+<span class="font-mono text-[10px] text-on-surface-variant font-medium">PCI 4.0</span>
+</div>
+</div>
+<!-- Navigation links -->
+<nav class="flex-1 px-4 space-y-0.5 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">grid_view</span>
+<span>Overview</span>
+</a>
+<a aria-current="page" class="flex items-center justify-between px-3 py-2 rounded-lg bg-charcoal text-white font-medium text-[13px] transition-colors" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[19px]">verified_user</span>
+<span>Mandates</span>
+</div>
+<span class="font-mono text-[11px] px-1.5 py-0.2 rounded bg-white/20 text-white">4</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">smart_toy</span>
+<span>Shopping Agent</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[19px]">shopping_bag</span>
+<span>Purchase Requests</span>
+</div>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">credit_card</span>
+<span>Payment Methods</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">badge</span>
+<span>Agent Passport</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">history</span>
+<span>Activity &amp; Audit</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">shield</span>
+<span>Security Center</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:text-charcoal hover:bg-[#f5f5f3] transition-colors text-[13px]" href="#">
+<span class="material-symbols-outlined text-[19px]">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+</div>
+<!-- Account Footer -->
+<div class="p-4 border-t border-[#e7e7e3]">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5 min-w-0">
+<img alt="Elena Vance" class="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-[#e7e7e3]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2D3f8-QvkKo7Iep79rwSRjqJSxlO1LNDFKOeQWUFCr2X0OcRZKqHzk3eutzQTCES5Fg0_FRJBYKHObO5NAT5D_0RSxNR71xMq8_Y2AMHIbV6b9dXMb3LSv2sKjoM2T5CkSfz1DCVRccy77T8Smg6vzxMkKM9qxEX5GPor0vGul7__cKEKdJNrFR4Wyig0VbRRc4h1deGJ_keampTAhyAKvCpYZB75WJZlI2lP0qHIcYtSQIyAiTXdww"/>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13px] text-charcoal leading-tight truncate">Elena Vance</span>
+<span class="text-[11px] text-on-surface-variant truncate">Sovereign Account</span>
+</div>
+</div>
+<button aria-label="Account options" class="text-on-surface-variant hover:text-charcoal transition-colors" type="button">
+<span class="material-symbols-outlined text-[18px]">more_vert</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- MAIN VIEWPORT -->
+<div class="pl-64">
+<!-- Top Minimal Bar -->
+<header class="h-16 px-10 border-b border-[#e7e7e3] bg-[#f5f5f3]/80 backdrop-blur-md sticky top-0 z-40 flex items-center justify-between">
+<div class="flex items-center gap-2 font-mono text-[11px] text-on-surface-variant tracking-wider uppercase">
+<span>Gateway</span>
+<span class="text-[#c4c7c7]">/</span>
+<span class="text-charcoal font-medium">Autonomous Clearance Rules</span>
+</div>
+<div class="flex items-center gap-5">
+<div class="hidden md:flex items-center gap-2 text-xs font-mono text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>SANDBOX READY</span>
+</div>
+<div class="h-4 w-px bg-[#e7e7e3]"></div>
+<button class="text-on-surface-variant hover:text-charcoal transition-colors flex items-center gap-1.5 text-xs font-mono" type="button">
+<span class="material-symbols-outlined text-[17px]">search</span>
+<span class="hidden sm:inline">⌘K</span>
+</button>
+<button aria-label="Notifications" class="text-on-surface-variant hover:text-charcoal transition-colors relative" type="button">
+<span class="material-symbols-outlined text-[19px]">notifications</span>
+<span class="absolute -top-1 -right-1 w-1.5 h-1.5 rounded-full bg-secondary"></span>
+</button>
+</div>
+</header>
+<main class="w-full max-w-6xl mx-auto px-8 md:px-12 py-12 md:py-16">
+<!-- ========================================================= -->
+<!-- 1. EDITORIAL PAGE HEADER: CLEAN, AIRY, MINIMALIST       -->
+<!-- ========================================================= -->
+<section class="mb-14 pb-10 border-b border-[#e7e7e3]">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="max-w-2xl">
+<span class="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary font-medium block mb-3">Policy Management</span>
+<h1 class="font-display text-4xl md:text-5xl font-semibold tracking-tight text-charcoal leading-[1.1]">Spending Mandates</h1>
+<p class="font-body-md text-base text-on-surface-variant mt-3 font-normal leading-relaxed">
+              Deterministic, tamper-proof execution boundaries translating natural intent into immutable ledger clearance rules.
+            </p>
+</div>
+<div class="flex items-center gap-3 flex-shrink-0">
+<button class="px-5 py-2.5 rounded-lg border border-[#e7e7e3] bg-white hover:bg-[#fafaf9] text-charcoal text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-2" onclick="document.getElementById('builder-section').scrollIntoView({behavior: 'smooth'})" type="button">
+<span class="material-symbols-outlined text-[16px] text-secondary">tune</span>
+<span>Policy Builder</span>
+</button>
+<button class="px-6 py-2.5 rounded-lg bg-charcoal hover:bg-black text-white text-xs font-mono uppercase tracking-wider transition-colors inline-flex items-center gap-2 shadow-sm" onclick="document.getElementById('builder-section').scrollIntoView({behavior: 'smooth'}); document.getElementById('intent-textarea').focus();" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+<span>Create Mandate</span>
+</button>
+</div>
+</div>
+</section>
+<!-- ========================================================= -->
+<!-- 2. EXISTING ACTIVE MANDATES: CLEAN OPEN LIST VIEW        -->
+<!-- ========================================================= -->
+<section class="mb-20">
+<div class="flex items-baseline justify-between mb-6">
+<div>
+<h2 class="font-display text-xl font-semibold text-charcoal tracking-tight">Active Policies</h2>
+<p class="text-xs text-on-surface-variant mt-0.5">Enforced on-wire across autonomous shopper runtimes</p>
+</div>
+<div class="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
+<span>4 ENFORCED</span>
+<span class="text-[#c4c7c7]">•</span>
+<span class="text-secondary font-medium">ALL HEALTHY</span>
+</div>
+</div>
+<!-- Open List Container with Hairline Dividers -->
+<div class="border-t border-[#e7e7e3]">
+<!-- Mandate Row 1 -->
+<div class="py-5 border-b border-[#e7e7e3] hover:bg-white/40 transition-colors">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+<!-- Name & ID -->
+<div class="md:col-span-4">
+<div class="flex items-center gap-2.5">
+<span class="w-2 h-2 rounded-full bg-charcoal flex-shrink-0"></span>
+<div class="min-w-0">
+<span class="font-display font-semibold text-[15px] text-charcoal block leading-snug truncate">Home Office &amp; Ergonomics</span>
+<span class="font-mono text-[11px] text-on-surface-variant">MND-88F9 • Instant ≤ ₹3,000</span>
+</div>
+</div>
+</div>
+<!-- Scope & Categories -->
+<div class="md:col-span-3">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Scope</span>
+<span class="text-xs text-charcoal">Amazon IN, Croma, Reliance</span>
+</div>
+<!-- Budget Utilization -->
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Budget</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm font-semibold text-charcoal">₹ 4,890</span>
+<span class="font-mono text-[11px] text-on-surface-variant">/ ₹ 25,000</span>
+</div>
+</div>
+<!-- Agent Binding & Expiry -->
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Agent / Expiry</span>
+<span class="text-xs text-charcoal block">Claude 3.5 Sonnet</span>
+<span class="font-mono text-[11px] text-secondary">Exp. 30 Nov 2024</span>
+</div>
+<!-- Actions -->
+<div class="md:col-span-1 flex items-center justify-end gap-1">
+<button class="text-xs font-mono uppercase tracking-wider text-charcoal hover:text-secondary px-2 py-1 rounded transition-colors" type="button">Manage</button>
+</div>
+</div>
+</div>
+<!-- Mandate Row 2 -->
+<div class="py-5 border-b border-[#e7e7e3] hover:bg-white/40 transition-colors">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+<div class="md:col-span-4">
+<div class="flex items-center gap-2.5">
+<span class="w-2 h-2 rounded-full bg-charcoal flex-shrink-0"></span>
+<div class="min-w-0">
+<span class="font-display font-semibold text-[15px] text-charcoal block leading-snug truncate">Developer Tools &amp; Cloud Subscriptions</span>
+<span class="font-mono text-[11px] text-on-surface-variant">MND-410C • Pre-approved billing</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-3">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Scope</span>
+<span class="text-xs text-charcoal">GitHub, AWS, JetBrains, OpenAI</span>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Budget</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm font-semibold text-charcoal">₹ 21,400</span>
+<span class="font-mono text-[11px] text-on-surface-variant">/ ₹ 50,000</span>
+</div>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Agent / Expiry</span>
+<span class="text-xs text-charcoal block">Perplexity Buy</span>
+<span class="font-mono text-[11px] text-secondary">Exp. 31 Dec 2024</span>
+</div>
+<div class="md:col-span-1 flex items-center justify-end gap-1">
+<button class="text-xs font-mono uppercase tracking-wider text-charcoal hover:text-secondary px-2 py-1 rounded transition-colors" type="button">Manage</button>
+</div>
+</div>
+</div>
+<!-- Mandate Row 3 -->
+<div class="py-5 border-b border-[#e7e7e3] hover:bg-white/40 transition-colors">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+<div class="md:col-span-4">
+<div class="flex items-center gap-2.5">
+<span class="w-2 h-2 rounded-full bg-charcoal flex-shrink-0"></span>
+<div class="min-w-0">
+<span class="font-display font-semibold text-[15px] text-charcoal block leading-snug truncate">Executive Travel &amp; Lodging Allowance</span>
+<span class="font-mono text-[11px] text-on-surface-variant">MND-990A • Dual biometric sign</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-3">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Scope</span>
+<span class="text-xs text-charcoal">MakeMyTrip, Vistara, Marriott</span>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Budget</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm font-semibold text-charcoal">₹ 68,000</span>
+<span class="font-mono text-[11px] text-on-surface-variant">/ ₹ 1,50,000</span>
+</div>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Agent / Expiry</span>
+<span class="text-xs text-charcoal block">Claude 3.5 Sonnet</span>
+<span class="font-mono text-[11px] text-secondary">Exp. 15 Jan 2025</span>
+</div>
+<div class="md:col-span-1 flex items-center justify-end gap-1">
+<button class="text-xs font-mono uppercase tracking-wider text-charcoal hover:text-secondary px-2 py-1 rounded transition-colors" type="button">Manage</button>
+</div>
+</div>
+</div>
+<!-- Mandate Row 4 (Paused Status Demo) -->
+<div class="py-5 border-b border-[#e7e7e3] opacity-60 hover:opacity-100 hover:bg-white/40 transition-all">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+<div class="md:col-span-4">
+<div class="flex items-center gap-2.5">
+<span class="w-2 h-2 rounded-full border border-charcoal flex-shrink-0"></span>
+<div class="min-w-0">
+<span class="font-display font-semibold text-[15px] text-charcoal block leading-snug truncate">Quarterly Book &amp; Research Library</span>
+<span class="font-mono text-[11px] text-on-surface-variant">MND-120E • Paused</span>
+</div>
+</div>
+</div>
+<div class="md:col-span-3">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Scope</span>
+<span class="text-xs text-charcoal">Amazon, Barnes &amp; Noble, MIT Press</span>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Budget</span>
+<div class="flex items-baseline gap-1.5">
+<span class="font-mono text-sm font-semibold text-charcoal">₹ 8,420</span>
+<span class="font-mono text-[11px] text-on-surface-variant">/ ₹ 15,000</span>
+</div>
+</div>
+<div class="md:col-span-2">
+<span class="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Agent / Expiry</span>
+<span class="text-xs text-charcoal block">OpenAI Operator</span>
+<span class="font-mono text-[11px] text-secondary">Paused by User</span>
+</div>
+<div class="md:col-span-1 flex items-center justify-end gap-1">
+<button class="text-xs font-mono uppercase tracking-wider text-charcoal hover:text-secondary px-2 py-1 rounded transition-colors" type="button">Resume</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ========================================================= -->
+<!-- 3. GUIDED POLICY BUILDER: OPEN, EDITORIAL MULTI-STEP FLOW -->
+<!-- ========================================================= -->
+<section class="pt-6" id="builder-section">
+<!-- Section Header with Stepper in Editorial Style -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#e7e7e3]">
+<div>
+<span class="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary font-medium block mb-2">Policy Compiler</span>
+<h2 class="font-display text-2xl md:text-3xl font-semibold text-charcoal tracking-tight">Draft New Mandate</h2>
+<p class="text-sm text-on-surface-variant mt-1.5">State your authorization boundaries in plain language; review the synthesized rules below.</p>
+</div>
+<!-- Minimalist Stepper (No cards) -->
+<div class="flex items-center gap-6 text-xs font-mono">
+<div class="flex items-center gap-2 text-charcoal font-semibold">
+<span class="w-5 h-5 rounded-full bg-charcoal text-white flex items-center justify-center text-[11px]">1</span>
+<span>INTENT</span>
+</div>
+<div class="w-8 h-px bg-[#e7e7e3]"></div>
+<div class="flex items-center gap-2 text-charcoal font-semibold">
+<span class="w-5 h-5 rounded-full bg-[#a99a80] text-white flex items-center justify-center text-[11px]">2</span>
+<span>PARAMETERS</span>
+</div>
+<div class="w-8 h-px bg-[#e7e7e3]"></div>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="w-5 h-5 rounded-full border border-[#c4c7c7] flex items-center justify-center text-[11px]">3</span>
+<span>SIGN &amp; DEPLOY</span>
+</div>
+</div>
+</div>
+<!-- AIRY BUILDER BODY: Two Columns, Open Spacing, Zero Card Nesting -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pt-10 items-start">
+<!-- Left Column (7 cols): Clean form controls with generous whitespace -->
+<div class="lg:col-span-7 space-y-12">
+<!-- STEP 1: Plain Language Intent -->
+<div>
+<div class="flex items-baseline justify-between mb-3">
+<label class="font-mono text-xs uppercase tracking-wider text-charcoal font-medium" for="intent-textarea">
+                  01 / Natural Language Spending Intent
+                </label>
+<span class="font-mono text-[11px] text-secondary">NLP Parser Active</span>
+</div>
+<!-- Clean open textarea with minimal 1px border -->
+<div class="relative">
+<textarea class="w-full bg-white border border-[#e7e7e3] focus:border-charcoal rounded-xl p-5 text-sm md:text-base text-charcoal leading-relaxed outline-none transition-colors resize-none placeholder:text-on-surface-variant/60 font-body-md" id="intent-textarea" rows="4">Allow my shopping agent to buy computer accessories and ergonomic gear from approved merchants (Amazon India, Croma, Reliance Digital) for up to ₹5,000 per single order, with a ₹25,000 monthly total budget, until 30 November. Flag anything above ₹3,000 for my manual review.</textarea>
+<div class="flex items-center justify-between mt-2 px-1">
+<span class="font-mono text-[11px] text-on-surface-variant">Parsed 4 limits, 3 merchants, 2 categories</span>
+<button class="font-mono text-xs text-charcoal hover:text-secondary font-medium transition-colors inline-flex items-center gap-1" id="reparse-btn" type="button">
+<span class="material-symbols-outlined text-[15px]">sync</span>
+<span>Recompile Rules</span>
+</button>
+</div>
+</div>
+<!-- Quick Presets -->
+<div class="mt-4 flex flex-wrap items-center gap-2">
+<span class="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mr-1">Presets:</span>
+<button class="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm" onclick="setPreset('office')" type="button">
+                  Home Office
+                </button>
+<button class="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm" onclick="setPreset('software')" type="button">
+                  SaaS Subscriptions
+                </button>
+<button class="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm" onclick="setPreset('groceries')" type="button">
+                  Office Pantry
+                </button>
+<button class="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm" onclick="setPreset('learning')" type="button">
+                  Research &amp; Books
+                </button>
+</div>
+</div>
+<!-- STEP 2: Rule Parameterization (Divided Rows, No Boxed Enclosures) -->
+<div class="pt-4 border-t border-[#e7e7e3] space-y-10">
+<div>
+<span class="font-mono text-xs uppercase tracking-wider text-charcoal font-medium block mb-1">
+                  02 / Synthesized Constraints
+                </span>
+<p class="text-xs text-on-surface-variant">Deterministic boundaries compiled from the natural intent prompt.</p>
+</div>
+<!-- Financial Thresholds Row -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-2">
+<div class="space-y-1">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Single Order Cap</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display text-2xl font-semibold text-charcoal">₹ 5,000</span>
+<span class="font-mono text-[11px] text-secondary">INR</span>
+</div>
+<span class="text-xs text-on-surface-variant">Hard stop rejection</span>
+</div>
+<div class="space-y-1">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Monthly Budget</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display text-2xl font-semibold text-charcoal">₹ 25,000</span>
+<span class="font-mono text-[11px] text-secondary">/ 30d</span>
+</div>
+<span class="text-xs text-on-surface-variant">Resets 01 Dec 2024</span>
+</div>
+<div class="space-y-1">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Currency</span>
+<div class="flex items-baseline gap-1">
+<span class="font-display text-2xl font-semibold text-charcoal">INR</span>
+<span class="font-mono text-[11px] text-secondary">₹</span>
+</div>
+<span class="text-xs text-on-surface-variant">Strict domestic settlement</span>
+</div>
+</div>
+<!-- Human Review Spectrum Slider -->
+<div class="py-4 border-y border-[#e7e7e3]">
+<div class="flex items-baseline justify-between mb-4">
+<div>
+<span class="font-mono text-[11px] uppercase tracking-wider text-charcoal font-medium block">Approval Escalation Trigger</span>
+<span class="text-xs text-on-surface-variant">Transactions above this value require explicit biometric sign-off</span>
+</div>
+<span class="font-mono text-base font-semibold text-charcoal" id="slider-val-display">₹ 3,000</span>
+</div>
+<div class="py-2">
+<input class="w-full cursor-pointer" id="threshold-slider" max="5000" min="1000" step="250" type="range" value="3000"/>
+<div class="flex justify-between items-center font-mono text-[11px] text-on-surface-variant mt-3">
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>₹0 – ₹3,000: Auto-Approved</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-charcoal"></span>₹3,001 – ₹5,000: Push Verification</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-error"></span>&gt; ₹5,000: Blocked</span>
+</div>
+</div>
+</div>
+<!-- Whitelisted Merchants -->
+<div class="space-y-3">
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant">Whitelisted Merchants (3)</span>
+<button class="font-mono text-xs text-charcoal hover:text-secondary font-medium transition-colors" type="button">+ Add Vendor</button>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#e7e7e3] text-xs text-charcoal">
+<span>Amazon India</span>
+<button class="text-on-surface-variant hover:text-charcoal" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#e7e7e3] text-xs text-charcoal">
+<span>Croma Electronics</span>
+<button class="text-on-surface-variant hover:text-charcoal" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#e7e7e3] text-xs text-charcoal">
+<span>Reliance Digital</span>
+<button class="text-on-surface-variant hover:text-charcoal" type="button"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+</div>
+</div>
+<!-- Permitted Categories vs Forbidden -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+<div class="space-y-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-secondary font-medium block">Permitted Scope</span>
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2.5 py-1 rounded bg-white border border-[#e7e7e3] text-xs text-charcoal">Electronics</span>
+<span class="px-2.5 py-1 rounded bg-white border border-[#e7e7e3] text-xs text-charcoal">Computer Accessories</span>
+<span class="px-2.5 py-1 rounded bg-white border border-[#e7e7e3] text-xs text-charcoal">Office Ergonomics</span>
+</div>
+</div>
+<div class="space-y-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-error font-medium block">Hard Prohibitions</span>
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2.5 py-1 rounded border border-[#f3d0d0] bg-[#fff8f8] text-xs text-error">Gaming Consoles</span>
+<span class="px-2.5 py-1 rounded border border-[#f3d0d0] bg-[#fff8f8] text-xs text-error">Gift Cards / Vouchers</span>
+<span class="px-2.5 py-1 rounded border border-[#f3d0d0] bg-[#fff8f8] text-xs text-error">Crypto / Assets</span>
+</div>
+</div>
+</div>
+<!-- Agents & Validity Period -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-4 border-t border-[#e7e7e3]">
+<div class="space-y-3">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Authorized Shoppers</span>
+<div class="space-y-2">
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded text-charcoal accent-charcoal border-[#c4c7c7] focus:ring-0" type="checkbox"/>
+<span class="text-xs text-charcoal font-medium">Claude Shopping (Sonnet 3.5)</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer">
+<input checked="" class="w-4 h-4 rounded text-charcoal accent-charcoal border-[#c4c7c7] focus:ring-0" type="checkbox"/>
+<span class="text-xs text-charcoal font-medium">Perplexity Buy Agent</span>
+</label>
+</div>
+</div>
+<div class="space-y-1">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Effective Window</span>
+<span class="font-mono text-xs text-charcoal block">01 Nov 2024 → 30 Nov 2024</span>
+<span class="text-xs text-on-surface-variant block">Auto-expires at 23:59:59 IST • 30 days active</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column (5 cols): Editorial Policy Summary & Confirmation -->
+<div class="lg:col-span-5 space-y-8 sticky top-24">
+<div class="pb-6 border-b border-[#e7e7e3]">
+<span class="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary font-medium block mb-2">Policy Summary</span>
+<h3 class="font-display text-xl font-semibold text-charcoal">Deterministic Specification</h3>
+<p class="text-xs text-on-surface-variant mt-1 font-mono">SPEC: RFC-088F • HASH: 0x9E31...B72F</p>
+</div>
+<!-- Natural Language Execution Preview -->
+<div class="space-y-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Natural Language Interpretation</span>
+<p class="text-sm text-charcoal leading-relaxed font-body-md">
+                Authorized shoppers <span class="font-semibold">Claude</span> and <span class="font-semibold">Perplexity</span> may independently clear computer accessories up to <span class="font-semibold">₹3,000</span>. Orders between <span class="font-semibold">₹3,001</span> and <span class="font-semibold">₹5,000</span> require manual push approval. Everything above ₹5,000 is automatically blocked at the ledger gateway.
+              </p>
+</div>
+<!-- Spectrum Breakdown: Clean Minimal Lines -->
+<div class="space-y-4 pt-4 border-t border-[#e7e7e3]">
+<span class="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Clearance Tiers</span>
+<div class="flex items-start justify-between gap-4 py-2">
+<div>
+<span class="text-xs font-semibold text-charcoal block">Tier 1 • Autonomous Clearance</span>
+<span class="text-xs text-on-surface-variant">≤ ₹3,000.00 • Instant wire settlement</span>
+</div>
+<span class="font-mono text-xs text-secondary font-semibold uppercase">Auto-Pass</span>
+</div>
+<div class="flex items-start justify-between gap-4 py-2 border-t border-[#e7e7e3]">
+<div>
+<span class="text-xs font-semibold text-charcoal block">Tier 2 • Discretionary Escalation</span>
+<span class="text-xs text-on-surface-variant">₹3,001 – ₹5,000 • iOS biometrics required</span>
+</div>
+<span class="font-mono text-xs text-charcoal font-semibold uppercase">1-Tap Sign</span>
+</div>
+<div class="flex items-start justify-between gap-4 py-2 border-t border-[#e7e7e3]">
+<div>
+<span class="text-xs font-semibold text-charcoal block">Tier 3 • Hard Stop Block</span>
+<span class="text-xs text-on-surface-variant">&gt; ₹5,000 or unlisted vendor domain</span>
+</div>
+<span class="font-mono text-xs text-error font-semibold uppercase">Refused</span>
+</div>
+</div>
+<!-- Architectural Guarantee Note -->
+<div class="pt-4 border-t border-[#e7e7e3] space-y-1">
+<div class="flex items-center gap-2 text-xs font-mono text-charcoal">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+<span>Deterministic Zero-Hallucination Guard</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">
+                Rules compile into static ledger filters. LLM hallucinations cannot bypass spending caps or modify whitelisted merchant domains.
+              </p>
+</div>
+<!-- Action Controls -->
+<div class="pt-6 space-y-3">
+<button class="w-full py-3.5 px-6 rounded-lg bg-charcoal hover:bg-black text-white text-xs font-mono uppercase tracking-wider transition-all shadow-sm flex items-center justify-center gap-2" id="confirm-mandate-btn" type="button">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+<span>Sign &amp; Deploy Mandate</span>
+</button>
+<div class="flex items-center justify-between pt-1">
+<button class="text-xs font-mono uppercase tracking-wider text-on-surface-variant hover:text-charcoal transition-colors" type="button">
+                  Save as Draft
+                </button>
+<button class="text-xs font-mono uppercase tracking-wider text-on-surface-variant hover:text-charcoal transition-colors" onclick="resetDefaults()" type="button">
+                  Reset Form
+                </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Interactive Logic -->
+<script>
+    const slider = document.getElementById('threshold-slider');
+    const sliderDisplay = document.getElementById('slider-val-display');
+
+    if (slider && sliderDisplay) {
+      slider.addEventListener('input', function(e) {
+        const val = parseInt(e.target.value, 10);
+        sliderDisplay.textContent = '₹ ' + val.toLocaleString('en-IN');
+      });
+    }
+
+    function setPreset(type) {
+      const area = document.getElementById('intent-textarea');
+      if (!area) return;
+
+      if (type === 'office') {
+        area.value = "Allow my shopping agent to buy computer accessories and ergonomic gear from approved merchants (Amazon India, Croma, Reliance Digital) for up to ₹5,000 per single order, with a ₹25,000 monthly total budget, until 30 November. Flag anything above ₹3,000 for my manual review.";
+      } else if (type === 'software') {
+        area.value = "Permit autonomous developer tool subscriptions up to ₹2,500/month across GitHub, JetBrains, and OpenAI. Hard stop at ₹10,000 cumulative monthly total. Flag any annual billing plan for human review.";
+      } else if (type === 'groceries') {
+        area.value = "Approve weekly office kitchen supplies on Blinkit and Zepto up to ₹2,000 per order, max ₹8,000 per month. Strictly prohibit tobacco, alcohol, and gift vouchers.";
+      } else if (type === 'learning') {
+        area.value = "Allow buying technical books and educational courses on Amazon and Coursera up to ₹4,000 per checkout. No games or media subscription passes.";
+      }
+    }
+
+    function resetDefaults() {
+      setPreset('office');
+      if (slider) {
+        slider.value = 3000;
+        sliderDisplay.textContent = '₹ 3,000';
+      }
+    }
+
+    const reparseBtn = document.getElementById('reparse-btn');
+    if (reparseBtn) {
+      reparseBtn.addEventListener('click', function() {
+        const originalText = reparseBtn.innerHTML;
+        reparseBtn.innerHTML = '<span class="material-symbols-outlined text-[15px] animate-spin">refresh</span><span>Compiling...</span>';
+        setTimeout(() => {
+          reparseBtn.innerHTML = originalText;
+        }, 500);
+      });
+    }
+
+    const confirmBtn = document.getElementById('confirm-mandate-btn');
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', function() {
+        const originalHTML = confirmBtn.innerHTML;
+        confirmBtn.innerHTML = '<span class="material-symbols-outlined text-[16px] animate-spin">sync</span><span>Signing with Sovereign Key...</span>';
+        confirmBtn.disabled = true;
+
+        setTimeout(() => {
+          confirmBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">done</span><span>Mandate Activated on Ledger</span>';
+          confirmBtn.classList.replace('bg-charcoal', 'bg-[#a99a80]');
+          setTimeout(() => {
+            confirmBtn.innerHTML = originalHTML;
+            confirmBtn.classList.replace('bg-[#a99a80]', 'bg-charcoal');
+            confirmBtn.disabled = false;
+          }, 2400);
+        }, 900);
+      });
+    }
+  </script>
+</body></html>

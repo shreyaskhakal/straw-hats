@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    position: static !important;
+    background-color: #fafaf8;
+    color: #141514;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+@layer components {
+  /* Global Page Title & Header Typography System */
+  .page-title {
+    @apply font-display text-[28px] md:text-[32px] font-semibold text-primary tracking-tight leading-tight;
+  }
+  .page-eyebrow {
+    @apply font-label-sm text-[11px] font-semibold uppercase tracking-[0.16em] text-secondary;
+  }
+  .page-subtitle {
+    @apply font-body-md text-[14px] text-on-surface-variant max-w-2xl leading-relaxed mt-1;
+  }
+  .section-title {
+    @apply font-title-md text-[18px] md:text-[20px] font-semibold text-primary tracking-tight;
+  }
+  .card-title {
+    @apply font-title-md text-[15px] md:text-[16px] font-semibold text-on-surface tracking-tight;
+  }
+
+  /* Global Button Standards */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-primary hover:bg-neutral-800 text-on-primary font-title-md text-[13px] font-medium transition-colors shadow-sm cursor-pointer;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-outline-variant/40 bg-surface-container-lowest hover:bg-surface-container text-on-surface font-title-md text-[13px] font-medium transition-colors cursor-pointer;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/30 hover:bg-surface-container-high text-on-surface font-title-md text-[12.5px] transition-colors cursor-pointer;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-error/40 text-error hover:bg-error hover:text-white font-title-md text-[13px] font-medium transition-colors cursor-pointer;
+  }
+
+  /* Global Form Controls */
+  .input-standard {
+    @apply w-full h-10 px-3.5 rounded-lg border border-outline-variant/30 bg-surface-container-low text-on-surface text-[13.5px] font-body-md focus:outline-none focus:border-primary transition-colors;
+  }
+  .select-standard {
+    @apply h-10 px-3 pr-8 rounded-lg border border-outline-variant/30 bg-surface-container-lowest text-on-surface text-[13px] font-body-md appearance-none focus:outline-none focus:border-primary cursor-pointer;
+  }
+
+  /* Global Badges */
+  .badge-status {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-label-sm text-[11px] font-semibold;
+  }
+}
+
+/* Material Symbols Outlined Default Styling */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+/* Subtle cryptographic coordinate hairline grid */
+.crypto-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(169, 154, 128, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(169, 154, 128, 0.05) 1px, transparent 1px);
+}
+
+/* Glass card specular ambient border highlight */
+.glass-card-glow {
+  box-shadow: 
+    0 20px 45px -15px rgba(13, 13, 13, 0.07),
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset,
+    0 1px 3px 0 rgba(0, 0, 0, 0.03);
+}
+
+.glow-sphere {
+  filter: blur(120px);
+}
+
+/* Interactive Spotlight */
+.hero-spotlight {
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 40%), rgba(255, 255, 255, 0.08), transparent 45%);
+  pointer-events: none !important;
+}
+
+/* 3D Tilt Card Container */
+.tilt-card {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Volumetric Light Sweep Keyframes */
+@keyframes godRayDrift {
+  0% { transform: rotate(-14deg) translateY(0px) scale(1); opacity: 0.75; }
+  50% { transform: rotate(-8deg) translateY(-25px) scale(1.08); opacity: 0.95; }
+  100% { transform: rotate(-14deg) translateY(0px) scale(1); opacity: 0.75; }
+}
+
+@keyframes godRayDriftSecondary {
+  0% { transform: rotate(-6deg) translateY(0px) scale(1); opacity: 0.5; }
+  50% { transform: rotate(-10deg) translateY(18px) scale(1.05); opacity: 0.75; }
+  100% { transform: rotate(-6deg) translateY(0px) scale(1); opacity: 0.5; }
+}
+
+.animate-godray {
+  animation: godRayDrift 16s ease-in-out infinite;
+  pointer-events: none !important;
+}
+
+.animate-godray-subtle {
+  animation: godRayDriftSecondary 20s ease-in-out infinite;
+  pointer-events: none !important;
+}
+
+/* Staged Hero Entrance Animations */
+@keyframes heroFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-eyebrow {
+  animation: heroFadeSlideUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+}
+
+.animate-hero-headline {
+  animation: heroFadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+}
+
+.animate-hero-subtitle {
+  animation: heroFadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+.animate-hero-ctas {
+  animation: heroFadeSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.42s both;
+}
+
+.animate-hero-bento {
+  animation: heroFadeSlideUp 0.95s cubic-bezier(0.16, 1, 0.3, 1) 0.55s both;
+}
+
+/* Gentle Floating Motion for Enclave Telemetry Feed Overlay */
+@keyframes floatSubtle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-float-subtle {
+  animation: floatSubtle 4.5s ease-in-out infinite;
+}
+
+/* Specular Shimmer Sweep across Architectural Image */
+@keyframes specularSweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.22;
+  }
+  38% {
+    transform: translateX(220%) skewX(-20deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.animate-shimmer-sweep {
+  animation: specularSweep 7s ease-in-out infinite;
+}
+
+/* Subtle Status Beacon Pulse */
+@keyframes pulseSubtle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Ripple effect on click */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.35) 10%, transparent 10.01%);
+  background-size: 1000% 1000%;
+  background-position: 50% 50%;
+  opacity: 0;
+  transition: opacity 0.4s, background-size 0.5s;
+}
+
+.btn-ripple:active::after {
+  opacity: 1;
+  background-size: 0% 0%;
+  transition: 0s;
+}
+
+/* Scroll reveal helper with safe visible fallback */
+.reveal-on-scroll {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-on-scroll.scroll-hidden {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-revealed {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #E7E7E3;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c4c7c7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-eyebrow,
+  .animate-hero-headline,
+  .animate-hero-subtitle,
+  .animate-hero-ctas,
+  .animate-hero-bento,
+  .animate-float-subtle,
+  .animate-shimmer-sweep,
+  .animate-godray,
+  .animate-godray-subtle,
+  .animate-pulse-subtle,
+  .reveal-on-scroll {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .tilt-card {
+    transform: none !important;
+  }
+}

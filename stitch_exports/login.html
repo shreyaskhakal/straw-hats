@@ -1,0 +1,508 @@
+<!DOCTYPE html><html class="h-full" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_blank" name="shell-type">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      body {
+        overscroll-behavior: none;
+      }
+    }
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Subtle cryptographic coordinate hairline grid */
+    .crypto-grid {
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(169, 154, 128, 0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(169, 154, 128, 0.05) 1px, transparent 1px);
+    }
+    
+    /* Glass card specular ambient border highlight */
+    .glass-card-glow {
+      box-shadow: 
+        0 20px 45px -15px rgba(13, 13, 13, 0.07),
+        0 0 0 1px rgba(255, 255, 255, 0.75) inset,
+        0 1px 3px 0 rgba(0, 0, 0, 0.03);
+    }
+    
+    .glow-sphere {
+      filter: blur(120px);
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .motion-safe-transition {
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container": "#eeeeec",
+            "secondary-container": "#f2e0c3",
+            "tertiary-container": "#271f0e",
+            "error-container": "#ffdad6",
+            "inverse-surface": "#2f3130",
+            "surface-container-highest": "#e2e3e1",
+            "on-tertiary-container": "#93866e",
+            "inverse-on-surface": "#f1f1ef",
+            "tertiary-fixed-dim": "#d3c5aa",
+            "on-surface": "#1a1c1b",
+            "secondary-fixed": "#f2e0c3",
+            "surface-container-low": "#f4f4f2",
+            "primary-fixed-dim": "#c8c6c5",
+            "on-primary": "#ffffff",
+            "on-tertiary-fixed": "#221b09",
+            "on-background": "#1a1c1b",
+            "inverse-primary": "#c8c6c5",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-container": "#898787",
+            "secondary": "#695d46",
+            "primary-fixed": "#e5e2e1",
+            "on-primary-fixed-variant": "#474746",
+            "on-secondary-fixed-variant": "#514530",
+            "primary-container": "#202020",
+            "outline": "#747878",
+            "on-error": "#ffffff",
+            "on-primary-fixed": "#1b1c1c",
+            "error": "#ba1a1a",
+            "on-secondary-container": "#6f634c",
+            "on-tertiary": "#ffffff",
+            "on-error-container": "#93000a",
+            "primary": "#080808",
+            "tertiary-fixed": "#f0e1c5",
+            "on-secondary-fixed": "#231a08",
+            "on-surface-variant": "#444748",
+            "surface-bright": "#f9f9f7",
+            "surface-variant": "#e2e3e1",
+            "tertiary": "#0d0700",
+            "surface-container-high": "#e8e8e6",
+            "on-tertiary-fixed-variant": "#4f4631",
+            "background": "#f9f9f7",
+            "secondary-fixed-dim": "#d5c4a9",
+            "surface-tint": "#5f5e5e",
+            "surface-dim": "#dadad8",
+            "outline-variant": "#c4c7c7",
+            "on-secondary": "#ffffff",
+            "surface": "#f9f9f7",
+            // Sovereign Trust additions
+            "sovereign-taupe": "#a99a80",
+            "sovereign-gold": "#c5b292",
+            "sovereign-dark": "#0d0d0d"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "2xl": "1rem",
+            "3xl": "1.5rem",
+            "full": "9999px"
+          },
+          fontFamily: {
+            "label-md": ["Inter"],
+            "headline-sm": ["Manrope"],
+            "title-md": ["Manrope"],
+            "headline-md": ["Manrope"],
+            "body-lg": ["Inter"],
+            "body-sm": ["Inter"],
+            "label-sm": ["Inter"],
+            "code-sm": ["Inter"],
+            "body-md": ["Inter"],
+            "display": ["Manrope"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#f7f6f3] text-on-surface font-body-md antialiased min-h-screen relative flex flex-col justify-between overflow-x-hidden selection:bg-secondary-container selection:text-primary">
+<!-- Atmospheric Background Ambient Layer -->
+<div aria-hidden="true" class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<!-- Cryptographic Coordinate Grid -->
+<div class="absolute inset-0 crypto-grid opacity-60"></div>
+<!-- Floating Light Orbs (Taupe, Muted Gold & Graphite Mist) -->
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[640px] h-[360px] bg-gradient-to-br from-[#eedfc8]/45 via-[#dcd2be]/25 to-transparent rounded-full glow-sphere"></div>
+<div class="absolute top-1/3 -left-40 w-[420px] h-[420px] bg-[#e4ded0]/35 rounded-full glow-sphere"></div>
+<div class="absolute -bottom-20 -right-20 w-[500px] h-[500px] bg-[#d9d0bf]/30 rounded-full glow-sphere"></div>
+<!-- Fine Architectural Vignette Lines -->
+<div class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-neutral-300/40 to-transparent"></div>
+<div class="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-neutral-300/40 to-transparent"></div>
+</div>
+<!-- Top Minimalist Brand Header -->
+<header class="relative z-10 w-full pt-8 pb-4 px-6 max-w-6xl mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 rounded-xl bg-white/70 backdrop-blur-md border border-white/80 shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex items-center justify-center p-1.5 transition-transform duration-300 hover:scale-105">
+<svg class="w-full h-full text-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewBox="0 0 24 24">
+<path d="M12 2L3 7v6c0 5.5 3.8 10.7 9 12 5.2-1.3 9-6.5 9-12V7l-9-5z"></path>
+<path d="M9 12l2 2 4-4"></path>
+</svg>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<span class="font-headline-sm text-sm md:text-base font-semibold tracking-wider uppercase text-primary">Mandate Gateway</span>
+<span class="text-[10px] font-mono tracking-widest px-1.5 py-0.5 rounded-full bg-stone-200/60 border border-stone-300/40 text-neutral-700">v2.4-PROD</span>
+</div>
+<span class="text-[11px] text-neutral-500 font-medium tracking-tight">Sovereign Agent Payment Clearance</span>
+</div>
+</div>
+<!-- Live Gateway Network Telemetry Indicator -->
+<div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/60 backdrop-blur-md border border-neutral-200/50 shadow-sm text-xs font-mono text-neutral-600">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-[11px]">Enclave Active</span>
+<span class="text-neutral-300">|</span>
+<span class="text-[11px] text-neutral-400">41ms</span>
+</div>
+</header>
+<!-- Central Authentication Canvas -->
+<main class="relative z-10 flex-1 flex items-center justify-center px-4 py-6 md:py-10">
+<div class="w-full max-w-[460px] perspective-1000" id="cardContainer">
+<!-- Precision Frosted Glassmorphism Card -->
+<div class="relative bg-white/70 backdrop-blur-2xl rounded-2xl md:rounded-3xl border border-white/80 p-7 md:p-9 glass-card-glow transition-all duration-300 ease-out" id="authCard">
+<!-- Subtle Specular Lighting Accent Bar -->
+<div class="absolute top-0 left-6 right-6 h-[1.5px] bg-gradient-to-r from-transparent via-[#c5b292]/80 to-transparent"></div>
+<!-- Monogram Badge & Security Tag -->
+<div class="flex items-center justify-between mb-6">
+<div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-neutral-900/[0.04] border border-neutral-900/[0.06]">
+<span class="material-symbols-outlined text-[13px] text-sovereign-taupe">lock_clock</span>
+<span class="text-[10px] font-semibold tracking-widest uppercase text-neutral-700 font-mono">Zero-Knowledge Enclave</span>
+</div>
+<span class="text-[11px] font-mono text-neutral-400">ed25519-TLS</span>
+</div>
+<!-- Header Content -->
+<div class="mb-7">
+<h1 class="font-headline-md text-2xl md:text-[26px] tracking-tight font-semibold text-neutral-900">
+            Welcome back
+          </h1>
+<p class="font-body-sm text-[13px] text-neutral-600 mt-1.5 leading-relaxed">
+            Deterministic policy clearance and rule enforcement for autonomous spending agents.
+          </p>
+</div>
+<!-- Authentication Form -->
+<form class="flex flex-col gap-4" id="loginForm" onsubmit="event.preventDefault(); handleAuth();">
+<!-- Identity Hash / Work Email Input -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-sm text-[12px] font-medium text-neutral-700 flex items-center justify-between" for="email">
+<span class="">Business / Identity Hash</span>
+<span class="text-[11px] font-mono text-neutral-400 font-normal">Sovereign Vault ID</span>
+</label>
+<div class="relative group flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-neutral-400 text-[18px] group-focus-within:text-neutral-900 transition-colors pointer-events-none">alternate_email</span>
+<input class="w-full h-11 pl-10 pr-4 bg-white/60 hover:bg-white/80 focus:bg-white/95 backdrop-blur-sm rounded-xl border border-neutral-300/70 focus:border-neutral-800 text-neutral-900 placeholder:text-neutral-400 text-sm transition-all duration-200 outline-none focus:ring-2 focus:ring-neutral-800/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]" id="email" name="email" placeholder="elena.vance@sovereign.io" required="" type="email">
+</div>
+</div>
+<!-- Master Passphrase Input with Entropy Gauge -->
+<div class="flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<label class="font-label-sm text-[12px] font-medium text-neutral-700" for="passphrase">
+                Master Passphrase
+              </label>
+<button class="text-[11px] font-mono text-neutral-500 hover:text-neutral-900 transition-colors flex items-center gap-1" onclick="togglePassphraseEntropy()" type="button">
+<span class="material-symbols-outlined text-[12px]">analytics</span>
+<span class="">Audit Entropy</span>
+</button>
+</div>
+<div class="relative group flex items-center">
+<span class="material-symbols-outlined absolute left-3.5 text-neutral-400 text-[18px] group-focus-within:text-neutral-900 transition-colors pointer-events-none">key</span>
+<input class="w-full h-11 pl-10 pr-11 bg-white/60 hover:bg-white/80 focus:bg-white/95 backdrop-blur-sm rounded-xl border border-neutral-300/70 focus:border-neutral-800 text-neutral-900 placeholder:text-neutral-400 text-sm font-mono tracking-wider transition-all duration-200 outline-none focus:ring-2 focus:ring-neutral-800/10 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]" id="passphrase" name="passphrase" placeholder="••••••••••••••••••••••••" required="" type="password">
+<button aria-label="Toggle password visibility" class="absolute right-2.5 p-1 text-neutral-400 hover:text-neutral-800 rounded-lg hover:bg-neutral-100/50 transition-colors" id="togglePasswordBtn" onclick="togglePasswordVisibility()" type="button">
+<span class="material-symbols-outlined text-[18px]" id="eyeIcon">visibility</span>
+</button>
+</div>
+<!-- Dynamic Live Entropy Gauge -->
+<div class="flex items-center gap-2 mt-1">
+<div class="flex-1 h-1 bg-neutral-200/80 rounded-full overflow-hidden flex">
+<div class="h-full bg-sovereign-taupe transition-all duration-300 w-3/4 rounded-full" id="entropyFill"></div>
+</div>
+<span class="text-[10px] font-mono text-neutral-400 uppercase tracking-wider" id="entropyText">Strong</span>
+</div>
+</div>
+<!-- Options Row -->
+<div class="flex items-center justify-between pt-1 text-xs">
+<label class="flex items-center gap-2.5 cursor-pointer select-none group">
+<input class="w-4 h-4 rounded-md border-neutral-300 bg-white/70 text-neutral-900 focus:ring-neutral-800/20 focus:ring-offset-0 cursor-pointer transition-colors" id="rememberDevice" type="checkbox">
+<span class="text-neutral-600 group-hover:text-neutral-900 transition-colors">Remember terminal</span>
+</label>
+<a class="text-neutral-500 hover:text-neutral-900 transition-colors font-medium" href="#recovery">
+              Forgot passphrase?
+            </a>
+</div>
+<!-- Primary Sovereign Button -->
+<button class="mt-2 w-full h-11 bg-neutral-900 hover:bg-black text-white rounded-xl text-sm font-medium tracking-wide shadow-md shadow-neutral-900/10 hover:shadow-lg hover:shadow-neutral-900/20 active:scale-[0.99] transition-all duration-150 flex items-center justify-center gap-2 border border-neutral-800" id="signInBtn" type="button" data-screen-target="{{DATA:SCREEN:SCREEN_33}}" onclick="window.location.href='{{DATA:SCREEN:SCREEN_33}}'">
+<span class="">Sign In to Gateway</span>
+<span class="material-symbols-outlined text-[17px]">lock_open</span>
+</button>
+<!-- Divider -->
+<div class="relative flex items-center justify-center my-1.5">
+<div class="w-full h-px bg-neutral-200/80"></div>
+<span class="absolute bg-white/80 backdrop-blur-sm px-3 text-[10px] uppercase font-mono tracking-widest text-neutral-400">Sandbox Fastpath</span>
+</div>
+<!-- Quick Demo Access Pill Button -->
+<button class="w-full p-2.5 rounded-xl bg-neutral-100/70 hover:bg-white hover:shadow-sm border border-neutral-200/60 transition-all duration-200 flex items-center justify-between group text-left" onclick="window.location.href='{{DATA:SCREEN:SCREEN_33}}'" type="button" data-screen-target="{{DATA:SCREEN:SCREEN_33}}">
+<div class="flex items-center gap-2.5 min-w-0">
+<div class="w-7 h-7 rounded-lg bg-neutral-200/60 group-hover:bg-neutral-900 group-hover:text-white text-neutral-700 flex items-center justify-center shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+</div>
+<div class="truncate">
+<div class="flex items-center gap-1.5">
+<span class="text-xs font-semibold text-neutral-800">Quick Demo Access</span>
+<span class="text-[9px] px-1.5 py-0.2 bg-secondary-container text-on-secondary-container rounded font-medium">Preconfigured</span>
+</div>
+<p class="text-[11px] text-neutral-500 truncate">Elena Vance (Controller) • Synthetic Ledger</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-neutral-400 group-hover:text-neutral-800 text-[18px] group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+</button>
+</form>
+<!-- Institutional Trust Micro-Notice -->
+<div class="mt-5 pt-4 border-t border-neutral-200/50 flex items-start gap-2.5 text-neutral-500">
+<span class="material-symbols-outlined text-sovereign-taupe text-[17px] shrink-0 mt-0.5">verified_user</span>
+<p class="text-[11px] leading-relaxed">
+            Deterministic Policy Engine evaluates autonomous vendor bounds prior to cryptographic key release.
+          </p>
+</div>
+<!-- How It Works Link Trigger -->
+<div class="mt-3.5 flex justify-center">
+<button class="text-[12px] text-neutral-500 hover:text-neutral-900 flex items-center gap-1.5 transition-colors group" onclick="openZeroTrustModal()" type="button">
+<span class="material-symbols-outlined text-[15px] text-sovereign-taupe group-hover:rotate-12 transition-transform">help</span>
+<span class="">How zero-trust AI purchasing works</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Global Footer Cryptographic Signatures & Legal -->
+<footer class="relative z-10 w-full py-5 px-6 max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-neutral-500">
+<div class="flex items-center gap-2 font-mono text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-sovereign-taupe"></span>
+<span class="">Deterministic Policy Engine • Zero plain-text credential leakage • Hardware Enclave Ready</span>
+</div>
+<div class="flex items-center gap-4 text-[12px]">
+<a class="hover:text-neutral-900 transition-colors" href="#terms">Terms of Service</a>
+<span class="text-neutral-300">•</span>
+<a class="hover:text-neutral-900 transition-colors" href="#security">Security Architecture</a>
+<span class="text-neutral-300">•</span>
+<a class="hover:text-neutral-900 transition-colors" href="#privacy">Privacy Policy</a>
+</div>
+</footer>
+<!-- Interactive Slide-Over Drawer for "How It Works" -->
+<div aria-hidden="true" class="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm transition-opacity duration-300 opacity-0 pointer-events-none" id="zeroTrustModal" onclick="handleModalBackdropClick(event)">
+<div class="w-full max-w-md h-full bg-white/95 backdrop-blur-2xl shadow-2xl p-6 md:p-8 flex flex-col justify-between transform translate-x-full transition-transform duration-300 ease-out overflow-y-auto border-l border-white" id="modalPanel" onclick="event.stopPropagation()">
+<div class="flex flex-col">
+<!-- Modal Top Bar -->
+<div class="flex items-center justify-between pb-4 mb-6 border-b border-neutral-100">
+<div class="flex items-center gap-2.5">
+<div class="w-7 h-7 rounded-lg bg-neutral-900 text-white flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">policy</span>
+</div>
+<span class="font-headline-sm text-base text-neutral-900 font-semibold">Zero-Trust AI Mandates</span>
+</div>
+<button class="p-1 rounded-lg text-neutral-400 hover:text-neutral-800 hover:bg-neutral-100 transition-colors" onclick="closeZeroTrustModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Visual Schema: Autonomous Settlement Pipeline -->
+<div class="p-4 rounded-xl bg-neutral-50/80 border border-neutral-200/60 mb-6 flex flex-col gap-3">
+<div class="flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+<span class="">[AGENT-INTENT]</span>
+<span class="material-symbols-outlined text-[13px] text-neutral-400">arrow_forward</span>
+<span class="">[GATEWAY-POLICY]</span>
+<span class="material-symbols-outlined text-[13px] text-neutral-400">arrow_forward</span>
+<span class="">[VIRTUAL-CARD]</span>
+</div>
+<div class="h-1.5 w-full bg-neutral-200 rounded-full overflow-hidden flex">
+<div class="h-full bg-secondary w-1/3"></div>
+<div class="h-full bg-neutral-900 w-1/3"></div>
+<div class="h-full bg-sovereign-taupe w-1/3"></div>
+</div>
+<span class="text-[11px] text-neutral-500 leading-normal">
+            Real-time cryptographic verification under sovereign deterministic constraints.
+          </span>
+</div>
+<!-- 3-Tier Security Architecture Description -->
+<div class="space-y-5">
+<div class="flex gap-3.5">
+<div class="w-6 h-6 rounded-full bg-neutral-900 text-white font-mono text-[11px] font-semibold flex items-center justify-center shrink-0 mt-0.5">1</div>
+<div>
+<h4 class="font-title-md text-sm text-neutral-900 font-semibold">Agent Non-Custodial Keys</h4>
+<p class="font-body-sm text-xs text-neutral-600 mt-1 leading-relaxed">
+                Autonomous browser or API agents hold short-lived scoped signing credentials. They never possess raw balance debit keys.
+              </p>
+</div>
+</div>
+<div class="flex gap-3.5">
+<div class="w-6 h-6 rounded-full bg-neutral-900 text-white font-mono text-[11px] font-semibold flex items-center justify-center shrink-0 mt-0.5">2</div>
+<div>
+<h4 class="font-title-md text-sm text-neutral-900 font-semibold">Threshold Rule Assertion</h4>
+<p class="font-body-sm text-xs text-neutral-600 mt-1 leading-relaxed">
+                Every procurement request triggers local deterministic verification: category code limits, vendor sanity checks, max spend ceilings, and time windows.
+              </p>
+</div>
+</div>
+<div class="flex gap-3.5">
+<div class="w-6 h-6 rounded-full bg-neutral-900 text-white font-mono text-[11px] font-semibold flex items-center justify-center shrink-0 mt-0.5">3</div>
+<div>
+<h4 class="font-title-md text-sm text-neutral-900 font-semibold">Atomic Virtual Tokens</h4>
+<p class="font-body-sm text-xs text-neutral-600 mt-1 leading-relaxed">
+                Upon passing authorization, Mandate Gateway mints a single-use virtual settlement card bound precisely to the authorized line item amount.
+              </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Modal Bottom Actions -->
+<div class="pt-6 border-t border-neutral-100">
+<button class="w-full h-11 bg-neutral-100 hover:bg-neutral-200/80 text-neutral-800 rounded-xl text-sm font-medium transition-colors" onclick="closeZeroTrustModal()" type="button">
+          Return to Authentication
+        </button>
+</div>
+</div>
+</div>
+<!-- Micro-Interactions Script -->
+<script>
+    // Password visibility toggle
+    function togglePasswordVisibility() {
+      const input = document.getElementById('passphrase');
+      const icon = document.getElementById('eyeIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    // Quick Sandbox fill
+    function fillDemoCredentials() {
+      const emailInput = document.getElementById('email');
+      const passInput = document.getElementById('passphrase');
+      const entropy = document.getElementById('entropyFill');
+      const entropyText = document.getElementById('entropyText');
+
+      emailInput.value = 'elena.vance@sovereign.io';
+      passInput.value = 'sec::vault_sig::9842::enclave';
+      entropy.style.width = '100%';
+      entropy.classList.remove('bg-sovereign-taupe');
+      entropy.classList.add('bg-neutral-900');
+      entropyText.textContent = 'Deterministic 256-bit';
+      entropyText.classList.add('text-neutral-800');
+
+      const btn = document.getElementById('signInBtn');
+      btn.classList.add('ring-2', 'ring-sovereign-taupe');
+      setTimeout(() => btn.classList.remove('ring-2', 'ring-sovereign-taupe'), 350);
+    }
+
+    function togglePassphraseEntropy() {
+      const passVal = document.getElementById('passphrase').value;
+      const entropyBar = document.getElementById('entropyFill');
+      const entropyText = document.getElementById('entropyText');
+      if (!passVal) {
+        entropyBar.style.width = '25%';
+        entropyText.textContent = 'Initial';
+      } else {
+        const pct = Math.min(100, Math.max(20, passVal.length * 7));
+        entropyBar.style.width = pct + '%';
+        entropyText.textContent = pct > 75 ? 'Optimal' : 'Moderate';
+      }
+    }
+
+    // Modal triggers
+    function openZeroTrustModal() {
+      const modal = document.getElementById('zeroTrustModal');
+      const panel = document.getElementById('modalPanel');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      panel.classList.remove('translate-x-full');
+    }
+
+    function closeZeroTrustModal() {
+      const modal = document.getElementById('zeroTrustModal');
+      const panel = document.getElementById('modalPanel');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      panel.classList.add('translate-x-full');
+    }
+
+    function handleModalBackdropClick(event) {
+      if (event.target.id === 'zeroTrustModal') {
+        closeZeroTrustModal();
+      }
+    }
+
+    // Submit handler animation
+    function handleAuth() {
+      const btn = document.getElementById('signInBtn');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span><span>Validating Sovereign Enclave...</span>`;
+      
+      setTimeout(() => {
+        btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">verified</span><span>Clearance Granted</span>`;
+        btn.classList.remove('bg-neutral-900');
+        btn.classList.add('bg-emerald-700', 'border-emerald-600');
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
+          btn.classList.remove('bg-emerald-700', 'border-emerald-600');
+          btn.classList.add('bg-neutral-900');
+        }, 1500);
+      }, 800);
+    }
+
+    // Live entropy bar response
+    document.getElementById('passphrase')?.addEventListener('input', (e) => {
+      const entropyBar = document.getElementById('entropyFill');
+      const entropyText = document.getElementById('entropyText');
+      const len = e.target.value.length;
+      if (len === 0) {
+        entropyBar.style.width = '0%';
+        entropyText.textContent = 'Empty';
+      } else if (len < 8) {
+        entropyBar.style.width = '30%';
+        entropyText.textContent = 'Weak';
+      } else if (len < 16) {
+        entropyBar.style.width = '70%';
+        entropyText.textContent = 'Good';
+      } else {
+        entropyBar.style.width = '100%';
+        entropyText.textContent = 'Vault-Grade';
+      }
+    });
+
+    // Subtle 3D Card tilt on mouse hover (responsive & graceful)
+    const card = document.getElementById('authCard');
+    const container = document.getElementById('cardContainer');
+
+    if (window.matchMedia('(hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        const rotateX = (-y / rect.height) * 4;
+        const rotateY = (x / rect.width) * 4;
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      });
+
+      container.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg)';
+      });
+    }
+  </script>
+
+
+</body></html>

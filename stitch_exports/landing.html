@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<title>Mandate Gateway — Sovereign Intelligence Payment Arbitration</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+tailwind.config={
+  darkMode:"class",
+  theme:{
+    extend:{
+      colors:{
+        "tertiary":"#0d0700",
+        "on-primary-fixed":"#1b1c1c",
+        "surface-container":"#eeeeec",
+        "on-tertiary":"#ffffff",
+        "on-secondary-fixed":"#231a08",
+        "surface-container-high":"#e8e8e6",
+        "tertiary-container":"#271f0e",
+        "on-primary":"#ffffff",
+        "surface":"#f9f9f7",
+        "surface-bright":"#f9f9f7",
+        "on-background":"#1a1c1b",
+        "primary-fixed-dim":"#c8c6c5",
+        "on-surface-variant":"#444748",
+        "tertiary-fixed":"#f0e1c5",
+        "on-error-container":"#93000a",
+        "surface-variant":"#e2e3e1",
+        "on-secondary":"#ffffff",
+        "on-primary-container":"#898787",
+        "on-surface":"#1a1c1b",
+        "inverse-surface":"#2f3130",
+        "surface-tint":"#5f5e5e",
+        "tertiary-fixed-dim":"#d3c5aa",
+        "secondary-fixed":"#f2e0c3",
+        "secondary-container":"#f2e0c3",
+        "secondary":"#695d46",
+        "error":"#ba1a1a",
+        "primary-fixed":"#e5e2e1",
+        "primary":"#080808",
+        "inverse-on-surface":"#f1f1ef",
+        "secondary-fixed-dim":"#d5c4a9",
+        "on-primary-fixed-variant":"#474746",
+        "on-tertiary-fixed-variant":"#4f4631",
+        "surface-dim":"#dadad8",
+        "outline-variant":"#c4c7c7",
+        "primary-container":"#202020",
+        "outline":"#747878",
+        "error-container":"#ffdad6",
+        "on-tertiary-container":"#93866e",
+        "on-secondary-container":"#6f634c",
+        "surface-container-highest":"#e2e3e1",
+        "on-secondary-fixed-variant":"#514530",
+        "background":"#f9f9f7",
+        "surface-container-lowest":"#ffffff",
+        "on-tertiary-fixed":"#221b09",
+        "inverse-primary":"#c8c6c5",
+        "on-error":"#ffffff",
+        "surface-container-low":"#f4f4f2"
+      },
+      borderRadius:{
+        DEFAULT:"0.25rem",
+        lg:"0.5rem",
+        xl:"0.75rem",
+        full:"9999px"
+      },
+      spacing:{
+        margin:"2.5rem",
+        "space-2xl":"3rem",
+        "margin-mobile":"1.25rem",
+        "space-xs":"0.25rem",
+        "space-lg":"1.5rem",
+        "space-xl":"2rem",
+        "space-sm":"0.5rem",
+        "space-md":"1rem",
+        "gutter-mobile":"1rem",
+        gutter:"1.5rem"
+      },
+      fontFamily:{
+        "headline-lg-mobile":["Manrope"],
+        "body-md":["Inter"],
+        "display-mobile":["Manrope"],
+        "headline-md":["Manrope"],
+        "headline-lg":["Manrope"],
+        "code-sm":["Inter"],
+        display:["Manrope"],
+        "headline-sm":["Manrope"],
+        "body-sm":["Inter"],
+        "label-sm":["Inter"],
+        "body-lg":["Inter"],
+        "label-md":["Inter"],
+        "title-md":["Manrope"]
+      },
+      fontSize:{
+        "headline-lg-mobile":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],
+        "body-md":["14px",{lineHeight:"22px",letterSpacing:"0em",fontWeight:"400"}],
+        "display-mobile":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],
+        "headline-md":["24px",{lineHeight:"32px",letterSpacing:"-0.015em",fontWeight:"600"}],
+        "headline-lg":["32px",{lineHeight:"40px",letterSpacing:"-0.02em",fontWeight:"600"}],
+        "code-sm":["12px",{lineHeight:"16px",letterSpacing:"-0.01em",fontWeight:"400"}],
+        display:["44px",{lineHeight:"52px",letterSpacing:"-0.025em",fontWeight:"600"}],
+        "headline-sm":["20px",{lineHeight:"28px",letterSpacing:"-0.01em",fontWeight:"500"}],
+        "body-sm":["13px",{lineHeight:"18px",letterSpacing:"0.005em",fontWeight:"400"}],
+        "label-sm":["11px",{lineHeight:"14px",letterSpacing:"0.04em",fontWeight:"600"}],
+        "body-lg":["16px",{lineHeight:"26px",letterSpacing:"-0.005em",fontWeight:"400"}],
+        "label-md":["12px",{lineHeight:"16px",letterSpacing:"0.02em",fontWeight:"500"}],
+        "title-md":["16px",{lineHeight:"24px",letterSpacing:"-0.01em",fontWeight:"600"}]
+      }
+    }
+  }
+}
+</script>
+<style id="global-scroll-fix">
+html, body {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  position: static !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+#root, main, .page-wrapper {
+  min-height: 100vh !important;
+  height: auto !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+</style>
+<style>
+@layer base {
+  html, body { margin: 0; padding: 0; }
+  main > :first-child { margin-top: 0 !important; }
+  main > :last-child { margin-bottom: 0 !important; }
+}
+
+/* Dialedweb Scroll Reveal Base */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-on-scroll.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-100 { transition-delay: 100ms; }
+.reveal-delay-200 { transition-delay: 200ms; }
+.reveal-delay-300 { transition-delay: 300ms; }
+
+/* Interactive Spotlight */
+.hero-spotlight {
+  background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 40%), rgba(255, 255, 255, 0.08), transparent 45%);
+  pointer-events: none !important;
+}
+
+/* 3D Tilt Card Container */
+.tilt-card {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Hypnotic Volumetric Light Sweep */
+@keyframes godRayDrift {
+  0% { transform: rotate(-14deg) translateY(0px) scale(1); opacity: 0.75; }
+  50% { transform: rotate(-8deg) translateY(-25px) scale(1.08); opacity: 0.95; }
+  100% { transform: rotate(-14deg) translateY(0px) scale(1); opacity: 0.75; }
+}
+@keyframes godRayDriftSecondary {
+  0% { transform: rotate(-6deg) translateY(0px) scale(1); opacity: 0.5; }
+  50% { transform: rotate(-10deg) translateY(18px) scale(1.05); opacity: 0.75; }
+  100% { transform: rotate(-6deg) translateY(0px) scale(1); opacity: 0.5; }
+}
+.animate-godray {
+  animation: godRayDrift 16s ease-in-out infinite;
+  pointer-events: none !important;
+}
+.animate-godray-subtle {
+  animation: godRayDriftSecondary 20s ease-in-out infinite;
+  pointer-events: none !important;
+}
+
+/* Ripple effect on click */
+.btn-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.btn-ripple::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.35) 10%, transparent 10.01%);
+  background-size: 1000% 1000%;
+  background-position: 50% 50%;
+  opacity: 0;
+  transition: opacity 0.4s, background-size 0.5s;
+}
+.btn-ripple:active::after {
+  opacity: 1;
+  background-size: 0% 0%;
+  transition: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-on-scroll {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .animate-godray, .animate-godray-subtle, .animate-ping, .animate-pulse {
+    animation: none !important;
+  }
+  .tilt-card {
+    transform: none !important;
+  }
+}
+</style>
+</head>
+<body class="bg-background font-body-md text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-secondary-container selection:text-on-secondary-fixed">
+<!-- Scroll Progress Bar -->
+<div class="fixed top-0 left-0 right-0 h-[2.5px] z-[60] bg-transparent pointer-events-none">
+<div class="h-full bg-gradient-to-r from-secondary via-secondary-fixed-dim to-secondary-fixed w-0 transition-[width] duration-75 ease-out shadow-[0_0_8px_rgba(213,196,169,0.8)]" id="scroll-progress-bar"></div>
+</div>
+<!-- Header -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface/85 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.03)] transition-all" id="main-header">
+<div class="h-20 max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between gap-6">
+<a class="flex items-center gap-3 group" data-path="landing-page" href="#">
+<div class="w-9 h-9 rounded-lg bg-primary-container text-on-primary flex items-center justify-center transition-transform group-hover:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">shield</span>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-title-md font-semibold tracking-tight text-primary">Mandate Gateway</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Sovereign Intelligence</span>
+</div>
+</a>
+<nav class="hidden md:flex items-center gap-8" data-active-classes="text-primary font-medium">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="product" href="#product-preview">Product</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="how-it-works" href="#how-it-works">How It Works</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="security" href="#security">Security</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-colors" data-path="policy-engine" href="#policy-decisions">Policy Engine</a>
+</nav>
+<div class="flex items-center gap-4">
+<button aria-label="Toggle color mode" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all" id="theme-toggle-btn" type="button">
+<span class="material-symbols-outlined text-[20px]" id="theme-icon">light_mode</span>
+</button>
+<a class="hidden sm:inline-flex font-body-md text-body-md text-on-surface-variant hover:text-on-surface px-3 py-2 transition-colors" data-path="sign-in" href="/login">Sign In</a>
+<a class="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container text-primary font-label-md text-label-md hover:bg-surface-container-high transition-colors" data-path="dashboard" href="/dashboard">
+<span class="">Open Specs</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+<a class="btn-ripple font-label-md text-label-md bg-primary-container text-on-primary px-4 py-2.5 rounded-lg transition-all hover:bg-primary shadow-[0_1px_4px_rgba(0,0,0,0.12)] hover:shadow-[0_2px_8px_rgba(0,0,0,0.2)] flex items-center gap-1.5 cursor-pointer" data-path="get-started" href="/mandates">
+<span class="">Get Started</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+<a class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 ml-1 hover:bg-primary-container transition-colors shadow-sm" data-path="user-profile" href="/agent" title="Go to Decision Matrix">
+<span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+</a>
+</div>
+</div>
+</header>
+<main class="w-full pt-20 bg-background flex-grow max-w-7xl mx-auto px-6 lg:px-12">
+<div class="flex flex-col w-full">
+<!-- Dialedweb Cinematic Dark Sanctuary: Hero Stage -->
+<section class="relative w-full bg-primary text-on-primary pb-20 pt-10 sm:pt-14 selection:bg-secondary-container selection:text-on-secondary-fixed rounded-3xl" id="hero-stage" style="--mouse-x: 91.72297297297297%; --mouse-y: 58.04066543438078%;">
+<!-- Interactive Spotlight Layer updated via JS mousemove -->
+<div class="hero-spotlight absolute inset-0 z-0 pointer-events-none"></div>
+<!-- Atmospheric God-Rays & Volumetric Light Shafts (Dialedweb signature) with gentle floating motion -->
+<div class="pointer-events-none absolute -top-40 -left-20 w-[680px] h-[780px] bg-gradient-to-br from-white/15 via-white/[0.04] to-transparent blur-3xl animate-godray"></div>
+<div class="pointer-events-none absolute top-0 left-1/4 w-[420px] h-[550px] bg-gradient-to-br from-white/10 via-secondary-fixed-dim/[0.04] to-transparent blur-2xl animate-godray-subtle"></div>
+<div class="pointer-events-none absolute -right-24 top-1/3 w-[500px] h-[600px] bg-gradient-to-bl from-white/[0.06] via-transparent to-transparent blur-3xl"></div>
+<!-- Fine Architectural Grid Backdrop -->
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4.5rem_4.5rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_60%,transparent_100%)] pointer-events-none"></div>
+<!-- Vertical Floating Dialedweb Accent Label on Right Flank -->
+<aside class="hidden xl:flex absolute right-6 top-52 flex-col items-center gap-6 text-on-primary-container z-20 pointer-events-none opacity-80">
+<span class="font-code-sm text-code-sm tracking-[0.3em] uppercase text-on-surface-variant/70 [writing-mode:vertical-rl] select-none">
+          Invariant · Enclave v4.2
+        </span>
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed-dim animate-ping"></span>
+<span class="font-title-md text-title-md font-bold text-on-primary/90 tracking-tighter">W.</span>
+</aside>
+<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<!-- Floating Glass Nav Pill (Dialedweb Sub-Bar Archetype) -->
+<div class="flex items-center justify-between mx-auto max-w-4xl px-4 py-2.5 rounded-full bg-primary-container/80 backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.6)] mb-12 sm:mb-16">
+<div class="flex items-center gap-2.5 pl-2">
+<div class="w-7 h-7 rounded-full bg-surface-container-lowest/15 flex items-center justify-center text-on-primary shadow-inner">
+<span class="material-symbols-outlined text-[15px]">token</span>
+</div>
+<span class="font-title-md text-title-md font-semibold tracking-tight text-on-primary">
+              Mandate<span class="text-secondary-fixed-dim">.gw</span>
+</span>
+</div>
+<nav class="hidden md:flex items-center gap-7">
+<a class="font-label-md text-label-md text-on-primary-container hover:text-on-primary transition-colors" href="#how-it-works">How It Works</a>
+<a class="font-label-md text-label-md text-on-primary-container hover:text-on-primary transition-colors" href="#policy-decisions">Policy Engine</a>
+<a class="font-label-md text-label-md text-on-primary-container hover:text-on-primary transition-colors" href="#specification">Specification</a>
+<a class="font-label-md text-label-md text-on-primary-container hover:text-on-primary transition-colors" href="#security">Security Enclave</a>
+</nav>
+<button class="inline-flex items-center gap-2 pl-3.5 pr-2 py-1.5 rounded-full bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 border border-white/15 transition-all text-on-primary font-label-md text-label-md group cursor-pointer" id="inspect-protocol-btn" type="button">
+<span class="">Inspect Protocol</span>
+<span class="w-5 h-5 rounded-full bg-on-primary text-primary flex items-center justify-center transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+<span class="material-symbols-outlined text-[13px] font-bold">north_east</span>
+</span>
+</button>
+</div>
+<!-- Monumental Centered Headline Group (Dialedweb Core Hero) -->
+<div class="text-center max-w-4xl mx-auto flex flex-col items-center">
+<!-- Eyebrow Pill with Pulse Beacon -->
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-surface-container-lowest/10 border border-white/10 backdrop-blur-md mb-6 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-[0.14em] text-on-primary/90">
+              Sovereign AI Payment Arbitration Engine
+            </span>
+</div>
+<!-- Monumental Hero Typography with Atmospheric Scale -->
+<h1 class="font-display text-[38px] sm:text-[54px] lg:text-[66px] leading-[1.08] font-bold text-on-primary tracking-[-0.035em] mb-6 max-w-4xl">
+            Deterministic Web &amp; Policy Clearance That Makes Autonomous Agents Safe to Spend
+          </h1>
+<!-- Subtitle -->
+<p class="font-body-lg text-body-lg text-on-primary-container max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+            Set immutable spending limits, inspect shopping carts in zero-knowledge sandboxes, and eliminate rogue multi-agent payment leakage before card credentials ever touch the wire.
+          </p>
+<!-- Dialedweb Signature Dual Pill CTA -->
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+<button class="btn-ripple w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-4 pl-2 pr-6 py-2 rounded-full bg-surface-container-lowest text-primary hover:bg-surface-container-lowest/90 font-label-md text-label-md transition-all shadow-[0_12px_32px_rgba(255,255,255,0.18)] hover:scale-[1.02] cursor-pointer" id="deploy-mandate-cta" type="button">
+<span class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</span>
+<span class="font-semibold tracking-tight text-sm">Deploy Mandate Enclave</span>
+</button>
+<a class="btn-ripple w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest/5 hover:bg-surface-container-lowest/10 border border-white/15 text-on-primary font-label-md text-label-md transition-all" href="#policy-decisions">
+<span class="">Explore Policy Engine</span>
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+</a>
+</div>
+</div>
+<!-- Bento Showcase Section: Direct Dialedweb Portfolio Grid Adaptation with 3D Tilt Hover -->
+<div class="mt-16 sm:mt-20 grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch" id="product-preview">
+<!-- Card 1 (Left): Hardware Agent Procurement Enclave -->
+<div class="tilt-card lg:col-span-3 flex flex-col justify-between rounded-3xl bg-surface-container-lowest/[0.04] border border-white/10 backdrop-blur-md p-6 overflow-hidden relative group hover:border-white/20 transition-all shadow-[0_16px_40px_rgba(0,0,0,0.4)]">
+<div class="flex items-center justify-between mb-4">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Sub-Agent Alpha-04</span>
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-code-sm text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                Cleared ₹4,200
+              </span>
+</div>
+<div class="relative my-4 rounded-2xl overflow-hidden bg-primary-container/80 p-4 border border-white/5">
+<div class="h-44 w-full rounded-xl bg-cover bg-center flex flex-col justify-end p-3.5 relative overflow-hidden transition-transform duration-500 group-hover:scale-[1.03]" data-alt="A sleek minimalist dark anodized matte titanium workstation laptop placed upon textured volcanic black stone, with dim cool volumetric studio edge lighting and faint blue terminal typography reflected on the screen, institutional high-end luxury tech photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuArinkxgNsErT582JErS0YyseQ4flVu0HxGkUTDCxs2EF9mSGrJCjC3ROcQLgNlF_DHxGR8o-HALnNc4THnMG9QfrIfjZICix2HXx4ybFomAa8MwsaWJEZafh9sCXtEBwOZJqne9u6TLygCzhXd8oQMnawow97bMw7fh0s20br1CV3f8fNi2vQSpcKAd19OQ6-ySvKpzcUW7nQFNEjRJ7gnZhRiI-D60BWIcLyIbQJpLl3uudP8mR6CFg')">
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-transparent to-transparent opacity-80"></div>
+<div class="relative z-10 flex items-center justify-between">
+<span class="font-title-md text-title-md font-semibold text-on-primary">Keychron Q1 Max</span>
+<span class="font-code-sm text-code-sm text-on-primary-container">#HW-8902</span>
+</div>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1.5">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[18px]">verified</span>
+<p class="font-title-md text-title-md text-on-primary">Hardware Procurement</p>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary-container">Autonomous engineer desk refresh. Pre-approved merchant whitelist active with strict invoice cryptographic hashing.</p>
+</div>
+</div>
+<!-- Card 2 (Center Heroic Showcase): Real-Time Agent Clearance Matrix -->
+<div class="tilt-card lg:col-span-6 flex flex-col justify-between rounded-3xl bg-surface-container-lowest/[0.04] border border-white/10 backdrop-blur-md p-6 lg:p-7 relative overflow-hidden group hover:border-white/20 transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<div class="flex items-center justify-between mb-4 z-10 relative">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></div>
+<span class="font-label-md text-label-md tracking-wider uppercase text-on-primary">Live Secure Enclave Stream</span>
+</div>
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest/10 border border-white/10 font-code-sm text-code-sm text-on-primary">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span class="">SGX Isolated</span>
+</div>
+</div>
+<!-- Sculpture Visual Centerpiece (Image 9) -->
+<div class="relative my-2 rounded-2xl overflow-hidden aspect-[16/10] bg-surface-container/10 border border-white/5">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A wide monumental cinematic studio photograph of an abstract architectural sculpture made from curved smoked glass, dark translucent graphite, and precision brushed titanium." src="https://lh3.googleusercontent.com/aida/AEtjO1XAZIqc9Ypfau1g_VNSU1NUnAjAyG2et6ycxFKSW9-Bnc1fM9sXK3CSoBThhLDTMGX97wkgxdq0VMWEbJLS-R1TuxJwJSof4Y6seemtwgSqj-_Tv98z6x2N9vb7prdz2xlJJZDCS8VcymAX6xKxTekWyJyDaPuD4L3QMc88ziNnYEEeC2PoHYxTe1guaAsTH7AnTMNWEec1K0vyIYVZWVRsDi1BmDpSYjYID-tjfZWuL6qu9ghRY_eqfvRa"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/30 to-transparent"></div>
+<!-- Overlaid Enclave Telemetry Feed -->
+<div class="absolute inset-x-4 bottom-4 p-4 rounded-xl bg-primary-container/85 backdrop-blur-xl border border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xl">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-secondary-fixed/20 text-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">psychology</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-on-primary">Claude-Shopping-v3.5</span>
+<span class="font-code-sm text-[10px] text-secondary-fixed-dim bg-white/5 px-1.5 py-0.5 rounded">PID #8491</span>
+</div>
+<p class="font-code-sm text-code-sm text-on-primary-container">Cart: 1x Dell 4K Ultrasharp • $649.00 USD</p>
+</div>
+</div>
+<div class="flex items-center gap-2 sm:self-center">
+<div class="flex flex-col items-end mr-1">
+<span class="font-code-sm text-[10px] text-emerald-400">RULE-04 PASS</span>
+<span class="font-label-sm text-[11px] text-on-primary">Ephemeral Token Minted</span>
+</div>
+<div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-on-primary-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[18px]">format_image_left</span>
+<span class="font-body-sm text-body-sm">Zero exposure of master institutional credit lines</span>
+</div>
+<span class="font-code-sm text-code-sm text-on-surface-variant font-mono transition-colors" id="live-hash">HASH: 9e88b...bc4aa</span>
+</div>
+</div>
+<!-- Card 3 (Right Stack): Dialedweb Stacked Metric Units -->
+<div class="lg:col-span-3 flex flex-col gap-5">
+<!-- Top Right Card: Metric & Fast Explore -->
+<div class="tilt-card flex-1 rounded-3xl bg-surface-container-lowest/[0.04] border border-white/10 backdrop-blur-md p-6 flex flex-col justify-between hover:border-white/20 transition-all shadow-[0_16px_40px_rgba(0,0,0,0.4)]" style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px);">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Arbitration Reliability</span>
+<button class="w-8 h-8 rounded-full bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 flex items-center justify-center text-on-primary transition-all cursor-pointer" onclick="openSpecDrawer()" title="View Invariant Logs" type="button">
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+</button>
+</div>
+<div class="my-6">
+<div class="font-display text-[42px] leading-tight font-bold text-on-primary tracking-tight">
+<span class="stat-counter" data-decimals="2" data-suffix="%" data-target="99.98">99.98%</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-primary-container mt-1">Cryptographic policy invariant execution rate over 1.2M transactions.</p>
+</div>
+<div class="flex items-center gap-2 pt-3 border-t border-white/10">
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+<span class="font-label-sm text-label-sm text-on-primary"><span class="stat-counter" data-decimals="0" data-suffix="ms" data-target="14">14ms</span> Average Arbitration Latency</span>
+</div>
+</div>
+<!-- Bottom Right Card: Attestation Seal -->
+<div class="tilt-card flex-1 rounded-3xl bg-surface-container-lowest/[0.04] border border-white/10 backdrop-blur-md p-6 flex flex-col justify-between hover:border-white/20 transition-all shadow-[0_16px_40px_rgba(0,0,0,0.4)]" style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px);">
+<div>
+<div class="flex items-center justify-between mb-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-primary-container">Hardware Security</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-[20px]">encrypted</span>
+</div>
+<p class="font-title-md text-title-md font-semibold text-on-primary mb-2">Zero Master-Card Exposure</p>
+<p class="font-body-sm text-body-sm text-on-primary-container">Single-use synthetic cards dissolve 180 seconds after settlement.</p>
+</div>
+<div class="mt-4 p-3 rounded-xl bg-primary-container/60 border border-white/5 flex items-center justify-between">
+<span class="font-code-sm text-[11px] text-on-primary font-mono tracking-tight" id="enclave-key-display">ENCLAVE_PUB_KEY: 0x48...9B7</span>
+<button class="text-on-surface-variant hover:text-on-primary text-xs flex items-center gap-1 cursor-pointer transition-colors" id="copy-key-btn" title="Copy Key" type="button">
+<span class="material-symbols-outlined text-[14px]" id="copy-icon">content_copy</span>
+<span class="hidden text-[10px] text-emerald-400 font-mono" id="copy-toast">COPIED</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Interactive Sandbox Live Ticker (Dialedweb Sub-strip with live pulse data) -->
+<div class="w-full bg-primary-container border-y border-white/10 text-on-primary py-3 overflow-hidden select-none rounded-2xl my-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-label-sm text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Active Pipeline
+          </span>
+<span class="font-body-sm text-body-sm text-on-primary-container">Autonomous Checkout Enclave #SGX-7719</span>
+<span class="hidden md:inline font-mono text-[11px] text-secondary-fixed-dim" id="live-clock">13:40:04 UTC</span>
+</div>
+<div class="flex items-center gap-6 font-code-sm text-code-sm text-on-primary-container">
+<span class="hidden sm:inline">Active Agents: <strong class="text-on-primary stat-counter" data-decimals="0" data-prefix="" data-suffix="" data-target="14892">14,892</strong></span>
+<span class="">Blocked Intercepts (24h): <strong class="text-rose-400 stat-counter" data-decimals="0" data-target="319">319</strong></span>
+<span class="">Allocated Capital: <strong class="text-on-primary stat-counter" data-decimals="0" data-prefix="$" data-target="4882100">$4,882,100</strong></span>
+</div>
+</div>
+</div>
+<!-- Section 1: Architecture — Intent to Settlement (3-Step Dialedweb Glass Bento) -->
+<section class="w-full py-24 sm:py-32 bg-background relative reveal-on-scroll is-revealed" id="how-it-works">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-secondary font-semibold">Execution Pipeline</span>
+<h2 class="font-headline-lg text-headline-lg sm:text-[40px] sm:leading-tight font-bold text-on-surface mt-2 tracking-tight">
+              Structured execution from intent to settlement
+            </h2>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-md">
+            Autonomous agents navigate product listings freely, while your cryptographic rules determine if, when, and how funds move.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Step 1 -->
+<div class="reveal-on-scroll reveal-delay-100 rounded-3xl bg-surface-container-lowest p-8 border border-surface-container-high shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative flex flex-col justify-between is-revealed">
+<div>
+<div class="flex items-center justify-between mb-8">
+<span class="font-display text-display text-secondary/30 font-bold">01</span>
+<div class="w-10 h-10 rounded-2xl bg-surface-container flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px]">rule_folder</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-3">Define Your Rules</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+                Specify maximum cart tolerances, merchant category code filters, delivery postal bounds, and approved model hash keys before commissioning any procurement agent.
+              </p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-low font-code-sm text-code-sm text-on-surface">
+<div class="flex justify-between items-center text-on-surface-variant mb-1">
+<span class="">Policy Rule</span>
+<span class="text-emerald-700 font-semibold">Immutable</span>
+</div>
+<p class="font-mono text-primary font-medium">max_single_tx: 50000 INR</p>
+<p class="font-mono text-on-surface-variant">require_gst_invoice: true</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="reveal-on-scroll reveal-delay-200 rounded-3xl bg-surface-container-lowest p-8 border border-surface-container-high shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative flex flex-col justify-between is-revealed">
+<div>
+<div class="flex items-center justify-between mb-8">
+<span class="font-display text-display text-secondary/30 font-bold">02</span>
+<div class="w-10 h-10 rounded-2xl bg-surface-container flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-3">Agent Explores &amp; Bids</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+                Your autonomous software agent browses stores, negotiates B2B bulk rates, and stages checkout baskets inside an isolated Mandate Gateway browser bridge.
+              </p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-low font-code-sm text-code-sm text-on-surface">
+<div class="flex justify-between items-center text-on-surface-variant mb-1">
+<span class="">Agent Session</span>
+<span class="text-secondary font-medium">Sandbox #S-902</span>
+</div>
+<p class="font-mono text-primary font-medium">Action: Basket Staged</p>
+<p class="font-mono text-on-surface-variant">Merchant: Dell India Ltd</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="reveal-on-scroll reveal-delay-300 rounded-3xl bg-surface-container-lowest p-8 border border-surface-container-high shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 relative flex flex-col justify-between is-revealed">
+<div>
+<div class="flex items-center justify-between mb-8">
+<span class="font-display text-display text-secondary/30 font-bold">03</span>
+<div class="w-10 h-10 rounded-2xl bg-surface-container flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface mb-3">Arbitrate &amp; Clear</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+                Our enclave evaluates basket contents against constraints. If verified, an ephemeral card token is instantly created for that exact cent and destroyed immediately.
+              </p>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-low font-code-sm text-code-sm text-on-surface">
+<div class="flex justify-between items-center text-on-surface-variant mb-1">
+<span class="">Settlement</span>
+<span class="text-emerald-700 font-semibold">Cleared (0.02s)</span>
+</div>
+<p class="font-mono text-primary font-medium">Token: V-CARD-EXPIRING</p>
+<p class="font-mono text-on-surface-variant">Balance After: Locked</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Interactive Mandate Specification Matrix (#M-408) -->
+<section class="w-full py-20 bg-surface-container-low relative rounded-3xl reveal-on-scroll is-revealed" id="specification">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+<div class="lg:col-span-5">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold uppercase mb-4">
+              Live Mandate Specimen
+            </div>
+<h2 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight mb-4">
+              Sample Hardware Mandate #M-408
+            </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-6 leading-relaxed">
+              Institutional controllers retain total granular oversight. Every mandate functions as a legally binding, cryptographically signed programmatic contract.
+            </p>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Multi-Factor Threshold Escalation</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Baskets crossing ₹50,000 automatically route to designated partner Telegram or Slack for 1-click biometrics.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Merchant Whitelist Locking</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Restricted strictly to validated OEM vendors, barring unknown third-party marketplace dropshippers.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<div>
+<span class="font-title-md text-title-md text-on-surface font-semibold">Tamper-Evident Audit Trails</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Exportable cryptographic proofs ready for SOC 2 Type II, ISO 27001, and banking reserve compliance.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Interactive Specimen Card -->
+<div class="lg:col-span-7">
+<div class="rounded-3xl bg-surface-container-lowest p-6 sm:p-8 border border-surface-container-high shadow-lg relative overflow-hidden transition-all duration-300 hover:shadow-xl">
+<div class="flex items-center justify-between pb-6 border-b border-surface-container mb-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary text-on-primary flex items-center justify-center font-bold font-title-md shadow">
+                    M
+                  </div>
+<div>
+<h4 class="font-title-md text-title-md font-bold text-on-surface">Mandate Specification: Engineering Hardware</h4>
+<p class="font-code-sm text-code-sm text-on-surface-variant">UUID: 89f41b2a-7c90-413e-a89f-2114d693f18e</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-sm text-label-sm font-semibold uppercase flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Active Policy
+                </span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+<div class="p-4 rounded-2xl bg-surface-container-low transition-colors hover:bg-surface-container">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Max Single Transaction</span>
+<div class="font-display text-[26px] font-bold text-primary mt-1">₹80,000</div>
+<span class="font-code-sm text-[11px] text-on-surface-variant">Hard ceiling per merchant order</span>
+</div>
+<div class="p-4 rounded-2xl bg-surface-container-low transition-colors hover:bg-surface-container">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Monthly Allocation Burn</span>
+<div class="font-display text-[26px] font-bold text-secondary mt-1">₹48,200 <span class="font-body-sm text-[13px] text-on-surface-variant font-normal">/ ₹200,000</span></div>
+<div class="w-full h-1.5 rounded-full bg-surface-container-highest mt-2 overflow-hidden">
+<div class="h-full bg-secondary rounded-full transition-all duration-1000 ease-out" style="width: 24.1%;"></div>
+</div>
+</div>
+</div>
+<div class="space-y-3 font-code-sm text-code-sm">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<span class="text-on-surface-variant">Approved Merchant Class:</span>
+<span class="text-on-surface font-semibold">IT Hardware, Electronics, Ergonomics</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<span class="text-on-surface-variant">Allowed Vendors:</span>
+<span class="text-on-surface font-semibold">Apple, Dell, Keychron, Lenovo Official</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<span class="text-on-surface-variant">HITL (Human Approval):</span>
+<span class="text-secondary font-semibold">Required for baskets &gt; ₹50,000</span>
+</div>
+</div>
+<div class="mt-6 pt-5 border-t border-surface-container flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Agent Enclave Ready</span>
+</div>
+<!-- Interactive Button triggering Raw JSON Modal -->
+<button class="inline-flex items-center gap-1.5 font-label-md text-label-md text-primary hover:text-secondary font-semibold transition-colors cursor-pointer group" id="edit-console-btn" type="button">
+<span class="group-hover:underline">Edit in Console</span>
+<span class="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Three Decisions. Zero Ambiguity. (Interactive Policy Matrix) -->
+<section class="w-full py-24 sm:py-32 bg-background relative reveal-on-scroll is-revealed" id="policy-decisions">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center max-w-2xl mx-auto mb-16">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-secondary font-semibold">Arbitration Outputs</span>
+<h2 class="font-headline-lg text-headline-lg sm:text-[40px] font-bold text-on-surface mt-2 tracking-tight">
+            Three clear decisions. Zero ambiguity.
+          </h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant mt-4">
+            Every autonomous shopping checkout attempt resolves into exactly one deterministic policy state. Select a card below to inspect simulation telemetry.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="decision-matrix-group">
+<!-- Decision 1: Instant Clearance (Default Selected) -->
+<div class="decision-card cursor-pointer rounded-3xl bg-surface-container-lowest p-8 border-2 border-emerald-500 shadow-md relative overflow-hidden transition-all duration-300 ring-2 ring-emerald-500/20" data-decision="clearance">
+<div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-700 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[24px]">verified</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Instant Clearance</h3>
+<span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-semibold uppercase">Auto</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+              Every basket item, merchant identity, warranty add-on, and tax line strictly satisfies the preset mandate rules.
+            </p>
+<div class="pt-4 border-t border-surface-container">
+<ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">check_circle</span>
+<span class="">Ephemeral card minted instantly</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">check_circle</span>
+<span class="">0.02s arbitration turnaround</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">check_circle</span>
+<span class="">Immutable audit ledger written</span>
+</li>
+</ul>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between text-emerald-700 font-label-md text-label-md font-semibold">
+<span class="">View Enclave Trace</span>
+<span class="material-symbols-outlined text-[16px]">east</span>
+</div>
+</div>
+<!-- Decision 2: Human In The Loop -->
+<div class="decision-card cursor-pointer rounded-3xl bg-surface-container-lowest p-8 border-2 border-surface-container-high hover:border-amber-500/50 shadow-sm relative overflow-hidden transition-all duration-300" data-decision="hitl">
+<div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-700 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[24px]">contact_support</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">HITL Escalation</h3>
+<span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-semibold uppercase">Approval</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+              The transaction falls inside tolerance windows but crosses high-value thresholds or flags alternate shipping destinations.
+            </p>
+<div class="pt-4 border-t border-surface-container">
+<ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-600 text-[16px]">check_circle</span>
+<span class="">Push notification to controller</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-600 text-[16px]">check_circle</span>
+<span class="">1-tap biometric confirmation</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-600 text-[16px]">check_circle</span>
+<span class="">Agent paused safely in enclave</span>
+</li>
+</ul>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between text-on-surface-variant font-label-md text-label-md font-semibold">
+<span class="">View Enclave Trace</span>
+<span class="material-symbols-outlined text-[16px]">east</span>
+</div>
+</div>
+<!-- Decision 3: Deterministic Block -->
+<div class="decision-card cursor-pointer rounded-3xl bg-surface-container-lowest p-8 border-2 border-surface-container-high hover:border-rose-500/50 shadow-sm relative overflow-hidden transition-all duration-300" data-decision="block">
+<div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-700 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-[24px]">gpp_bad</span>
+</div>
+<div class="flex items-center gap-2 mb-2">
+<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Deterministic Block</h3>
+<span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-semibold uppercase">Rejection</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6 leading-relaxed">
+              Unrecognized merchant, unexpected currency conversion, price surges, or prompt injection payloads detected in item metadata.
+            </p>
+<div class="pt-4 border-t border-surface-container">
+<ul class="space-y-2 font-body-sm text-body-sm text-on-surface-variant">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-rose-600 text-[16px]">check_circle</span>
+<span class="">Zero financial exposure</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-rose-600 text-[16px]">check_circle</span>
+<span class="">Immediate agent runtime quarantine</span>
+</li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-rose-600 text-[16px]">check_circle</span>
+<span class="">Security alert broadcast to SecOps</span>
+</li>
+</ul>
+</div>
+<div class="mt-6 pt-4 border-t border-surface-container flex items-center justify-between text-on-surface-variant font-label-md text-label-md font-semibold">
+<span class="">View Enclave Trace</span>
+<span class="material-symbols-outlined text-[16px]">east</span>
+</div>
+</div>
+</div>
+<!-- Dynamic Live Specimen Preview Panel corresponding to selected card -->
+<div class="mt-8 rounded-3xl bg-primary text-on-primary p-6 sm:p-8 border border-white/10 shadow-xl transition-all" id="decision-preview-box">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center" id="preview-badge-icon">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div>
+<h4 class="font-title-md text-title-md font-bold text-on-primary" id="preview-title">Current Simulation: Instant Clearance Policy Flow</h4>
+<p class="font-code-sm text-code-sm text-on-primary-container" id="preview-sub">Runtime ID: #ENCLAVE-SESSION-4892 • Verdict: APPROVED</p>
+</div>
+</div>
+<button class="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/15 text-on-primary font-code-sm text-xs border border-white/10 cursor-pointer transition-colors" onclick="openSpecDrawer()" type="button">
+              View JSON Rule Engine
+            </button>
+</div>
+<div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-[12px]">
+<div class="p-3.5 rounded-xl bg-primary-container/70 border border-white/5">
+<div class="text-on-primary-container mb-1">Incoming Intercept</div>
+<div class="text-on-primary font-semibold" id="preview-col1">Keychron Q1 Max (₹16,499)</div>
+<div class="text-secondary-fixed-dim text-[11px] mt-0.5">Dell Official / Keychron India</div>
+</div>
+<div class="p-3.5 rounded-xl bg-primary-container/70 border border-white/5">
+<div class="text-on-primary-container mb-1">Invariant Check</div>
+<div class="text-emerald-400 font-semibold" id="preview-col2">Under ₹80,000 threshold</div>
+<div class="text-on-primary-container text-[11px] mt-0.5">Whitelist Validated &amp; Clean DOM</div>
+</div>
+<div class="p-3.5 rounded-xl bg-primary-container/70 border border-white/5">
+<div class="text-on-primary-container mb-1">Gateway Output</div>
+<div class="text-emerald-400 font-semibold" id="preview-col3">Single-use token issued</div>
+<div class="text-on-primary-container text-[11px] mt-0.5">Dissolves in 180 seconds</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Security Architecture & Cryptographic Isolation -->
+<section class="w-full py-24 bg-primary text-on-primary relative overflow-hidden rounded-3xl reveal-on-scroll is-revealed" id="security">
+<div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
+<div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="max-w-3xl mb-16">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-secondary-fixed-dim font-semibold">Institutional Grade</span>
+<h2 class="font-headline-lg text-headline-lg sm:text-[40px] font-bold text-on-primary mt-2 tracking-tight">
+            Cryptographically isolated payment execution
+          </h2>
+<p class="font-body-lg text-body-lg text-on-primary-container mt-4">
+            Built on hardware-grade Confidential Computing and zero-knowledge policy verification.
+          </p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="tilt-card rounded-3xl bg-surface-container-lowest/[0.04] p-6 border border-white/10 backdrop-blur-md hover:border-white/25 transition-all">
+<div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-on-primary mb-5 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">memory</span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-on-primary mb-2">Intel SGX &amp; SEV Enclaves</h4>
+<p class="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
+              Code and sensitive card payloads run inside encrypted hardware enclaves unreachable even by host operating systems.
+            </p>
+</div>
+<div class="tilt-card rounded-3xl bg-surface-container-lowest/[0.04] p-6 border border-white/10 backdrop-blur-md hover:border-white/25 transition-all">
+<div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-on-primary mb-5 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">credit_card_heart</span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-on-primary mb-2">1-to-1 Ephemeral Cards</h4>
+<p class="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
+              Virtual card tokens are provisioned strictly for the authorized amount and immediately dissolved post-confirmation.
+            </p>
+</div>
+<div class="tilt-card rounded-3xl bg-surface-container-lowest/[0.04] p-6 border border-white/10 backdrop-blur-md hover:border-white/25 transition-all">
+<div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-on-primary mb-5 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">receipt_long</span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-on-primary mb-2">Immutable Attestation</h4>
+<p class="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
+              Every policy evaluation writes a cryptographic state proof into an append-only ledger for enterprise compliance.
+            </p>
+</div>
+<div class="tilt-card rounded-3xl bg-surface-container-lowest/[0.04] p-6 border border-white/10 backdrop-blur-md hover:border-white/25 transition-all">
+<div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-on-primary mb-5 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">enhanced_encryption</span>
+</div>
+<h4 class="font-title-md text-title-md font-semibold text-on-primary mb-2">Prompt-Injection Defense</h4>
+<p class="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
+              Automated scanning of all checkout DOM structures to neutralize adversarial hidden prompt injections attempting agent hijacking.
+            </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Dramatic Conversion Monument (Dialedweb Footer Gateway) -->
+<section class="w-full py-24 sm:py-32 bg-background relative overflow-hidden reveal-on-scroll is-revealed">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 text-center">
+<div class="rounded-3xl bg-primary text-on-primary p-10 sm:p-16 relative overflow-hidden shadow-2xl border border-white/10">
+<!-- Dramatic God-Ray Background Flare inside CTA box -->
+<div class="pointer-events-none absolute -top-32 -left-20 w-[450px] h-[450px] bg-gradient-to-br from-white/15 to-transparent blur-3xl transform -rotate-12"></div>
+<div class="pointer-events-none absolute bottom-0 right-0 w-[400px] h-[350px] bg-secondary-fixed/5 blur-2xl"></div>
+<div class="relative z-10 flex flex-col items-center">
+<span class="font-label-sm text-label-sm uppercase tracking-[0.2em] text-secondary-fixed-dim mb-4 font-semibold">Immediate Integration</span>
+<h2 class="font-headline-lg text-headline-lg sm:text-[44px] sm:leading-[1.1] font-bold text-on-primary tracking-tight max-w-2xl mb-6">
+              Your agent. Your rules. Protect your capital.
+            </h2>
+<p class="font-body-lg text-body-lg text-on-primary-container max-w-xl mb-10 leading-relaxed">
+              Plug Mandate Gateway directly into LangChain, AutoGPT, CrewAI, or proprietary procurement agents in under 15 minutes.
+            </p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+<button class="btn-ripple w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-4 pl-2 pr-6 py-2 rounded-full bg-surface-container-lowest text-primary hover:bg-surface-container-lowest/90 font-label-md text-label-md transition-all shadow-lg hover:scale-[1.02] cursor-pointer" onclick="openModal()" type="button">
+<span class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">key</span>
+</span>
+<span class="font-semibold tracking-tight text-sm">Provision API Keys</span>
+</button>
+<button class="btn-ripple w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 border border-white/15 text-on-primary font-label-md text-label-md transition-all cursor-pointer" onclick="openSpecDrawer()" type="button">
+<span class="">Read Documentation</span>
+<span class="material-symbols-outlined text-[16px]">north_east</span>
+</button>
+</div>
+<div class="mt-10 flex flex-wrap items-center justify-center gap-6 font-code-sm text-code-sm text-on-primary-container">
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SOC 2 Type II Certified</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> PCI-DSS Level 1 Merchant Vault</span>
+<span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Zero Raw PAN Storage</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Interactive Modal 1: Live Enclave Verification Simulator -->
+<div aria-labelledby="modal-title" aria-modal="true" class="fixed inset-0 z-50 bg-primary/75 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300" id="demo-modal" role="dialog" style="display: none;">
+<div class="bg-surface-container-lowest rounded-3xl max-w-lg w-full p-6 sm:p-8 border border-surface-container shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+<button aria-label="Close dialog" class="absolute top-6 right-6 text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors cursor-pointer" onclick="closeModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<div class="flex items-center gap-3 mb-4">
+<div class="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+</div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface" id="modal-title">Live Enclave Verification</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-4">
+      Simulating real-time incoming shopping basket from Claude Agent v3.5 against Policy #M-408:
+    </p>
+<div class="p-4 rounded-xl bg-primary text-on-primary font-mono text-[12px] space-y-2 mb-6 overflow-x-auto shadow-inner border border-white/10" id="terminal-lines">
+<div class="text-secondary-fixed-dim">// Staged Cart Intercept</div>
+<div class="transition-opacity duration-300">[0.001s] Ingesting cart payload: 1x Keychron Q1 Max (₹16,499)</div>
+<div class="transition-opacity duration-300">[0.005s] Verifying merchant domain: keychron.in -&gt; OK</div>
+<div class="transition-opacity duration-300">[0.009s] Checking cumulative monthly threshold -&gt; 24.1% burn -&gt; OK</div>
+<div class="transition-opacity duration-300">[0.012s] Inspecting DOM injection markers -&gt; Clean</div>
+<div class="text-emerald-400 font-semibold transition-opacity duration-300">[0.014s] VERDICT: INSTANT_CLEARANCE</div>
+<div class="text-on-primary-container transition-opacity duration-300">[0.015s] Minting Ephemeral Virtual Card: **** **** **** 4892</div>
+</div>
+<div class="flex items-center justify-between gap-3">
+<button class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-colors cursor-pointer" onclick="runFreshSimulation()" type="button">
+        Re-run Trace
+      </button>
+<button class="px-5 py-2.5 rounded-full bg-primary text-on-primary font-label-md text-label-md hover:bg-primary/90 transition-all cursor-pointer shadow" onclick="closeModal()" type="button">
+        Close Inspector
+      </button>
+</div>
+</div>
+</div>
+<!-- Interactive Modal 2 / Slide-over Drawer: Raw JSON Mandate Specification & Console Editor -->
+<div aria-labelledby="spec-modal-title" aria-modal="true" class="fixed inset-0 z-50 bg-primary/75 backdrop-blur-md hidden items-center justify-center p-4 transition-all duration-300" id="spec-modal" role="dialog" style="display: none;">
+<div class="bg-surface-container-lowest rounded-3xl max-w-2xl w-full p-6 sm:p-8 border border-surface-container shadow-2xl relative max-h-[90vh] flex flex-col">
+<button aria-label="Close modal" class="absolute top-6 right-6 text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-surface-container transition-colors cursor-pointer" onclick="closeSpecDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-lg bg-secondary text-on-primary flex items-center justify-center shadow">
+<span class="material-symbols-outlined text-[18px]">data_object</span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md font-bold text-on-surface" id="spec-modal-title">Mandate Policy Specification: #M-408</h3>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Cryptographically signed schema for autonomous agents</p>
+</div>
+</div>
+<div class="mt-4 flex items-center justify-between py-2 px-3 rounded-lg bg-surface-container font-code-sm text-xs">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-on-surface font-mono">Format: SGX_POLICY_V2</span>
+</div>
+<button class="flex items-center gap-1 text-primary hover:text-secondary font-medium cursor-pointer" id="copy-json-btn" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="" id="copy-json-label">Copy JSON</span>
+</button>
+</div>
+<!-- Editable JSON View -->
+<pre class="mt-3 p-4 rounded-xl bg-primary text-secondary-fixed-dim font-mono text-[12px] leading-relaxed overflow-y-auto flex-1 max-h-[360px] border border-white/10 select-all" id="json-code-display">{
+  "$schema": "https://mandate.gw/schemas/policy-v2.json",
+  "mandate_id": "89f41b2a-7c90-413e-a89f-2114d693f18e",
+  "agent_id": "claude-shopping-v3.5",
+  "target_division": "Engineering Hardware",
+  "invariants": {
+    "max_single_tx_amount": 80000,
+    "currency": "INR",
+    "monthly_allocation": 200000,
+    "current_monthly_burn": 48200,
+    "require_human_biometric_above": 50000,
+    "merchant_whitelist": [
+      "apple.com",
+      "dell.com/in",
+      "keychron.in",
+      "lenovo.com/in"
+    ],
+    "category_codes": ["5045", "5732", "5734"],
+    "prompt_injection_guard": "STRICT_AST_PARSER",
+    "ephemeral_card_ttl_sec": 180
+  },
+  "attestation": {
+    "hardware_enclave": "Intel SGX Enclave v4.2",
+    "root_signature": "0x48a1f729b7c8942a03cf81b9e"
+  }
+}</pre>
+<div class="mt-5 pt-4 border-t border-surface-container flex items-center justify-between">
+<div class="text-xs text-on-surface-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-emerald-600 text-[16px]">lock</span>
+        Zero knowledge attestation verified
+      </div>
+<div class="flex items-center gap-2">
+<button class="px-4 py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md cursor-pointer" onclick="closeSpecDrawer()" type="button">
+          Done
+        </button>
+<button class="px-4 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md hover:bg-primary-container cursor-pointer transition-colors" onclick="alert('Configuration updated and signed with Enclave Key.'); closeSpecDrawer();" type="button">
+          Apply To Agent
+        </button>
+</div>
+</div>
+</div>
+</div>
+<footer class="w-full bg-surface-container-low shadow-[0_-1px_0_rgba(0,0,0,0.02)] mt-space-2xl">
+<div class="max-w-7xl mx-auto px-6 lg:px-12 py-16">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-12">
+<div class="md:col-span-5 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded bg-primary-container text-on-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[16px]">shield</span>
+</div>
+<span class="font-title-md text-title-md font-semibold text-primary tracking-tight">Mandate Gateway</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">
+          Institutional private banking protocols synthesized for sovereign machine intelligence and high-assurance automated purchasing mandates.
+        </p>
+<div class="flex items-center gap-2 mt-2">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-code-sm text-code-sm text-on-surface-variant tracking-wide">Runtime Cluster: Alpha-09 // Isolated</span>
+</div>
+</div>
+<div class="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-8">
+<div class="flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Platform</span>
+<nav class="flex flex-col gap-2.5">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="dashboard" href="/dashboard">Mandate Dashboard</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="sign-in" href="/login">Sign In / Access</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="product" href="#product-preview">Product Preview</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="how-it-works" href="#how-it-works">How It Works</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="policy-decisions" href="#policy-decisions">Policy Engine</a>
+</nav>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Governance</span>
+<nav class="flex flex-col gap-2.5">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="security" href="#security">Security Architecture</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" onclick="openSpecDrawer()">Documentation</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="privacy-policy" href="/dashboard">Privacy Policy</a>
+</nav>
+</div>
+<div class="flex flex-col gap-3">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-semibold">Legal</span>
+<nav class="flex flex-col gap-2.5">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors" data-path="terms-of-service" href="/dashboard">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer" onclick="openModal()">Attestation Logs</a>
+</nav>
+</div>
+</div>
+</div>
+<div class="pt-8 mt-4 border-t border-surface-container flex flex-col md:flex-row items-center justify-between gap-4">
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2025 Mandate Gateway Systems AG. All rights reserved.</p>
+<div class="flex items-center gap-3 bg-surface-container px-3 py-1.5 rounded-lg">
+<span class="material-symbols-outlined text-secondary text-[16px]">info</span>
+<p class="font-code-sm text-code-sm text-on-surface-variant">Notice: Sandbox preview environment for autonomous agent verification protocols.</p>
+</div>
+</div>
+</div>
+</footer>
+<!-- Interactive Controller Scripts -->
+<script>
+  // 1. Scroll Progress Indicator Bar
+  window.addEventListener('scroll', () => {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+    const progressBar = document.getElementById('scroll-progress-bar');
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`;
+    }
+  }, { passive: true });
+
+  // 2. IntersectionObserver for Reveal Animations
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px 0px -60px 0px',
+    threshold: 0.12
+  };
+  const revealObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal-on-scroll').forEach(el => revealObserver.observe(el));
+
+  // 3. Mouse-Tracking Spotlight & 3D Tilt in Hero Stage
+  const heroStage = document.getElementById('hero-stage');
+  if (heroStage && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    heroStage.addEventListener('mousemove', (e) => {
+      const rect = heroStage.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      heroStage.style.setProperty('--mouse-x', `${x}%`);
+      heroStage.style.setProperty('--mouse-y', `${y}%`);
+    }, { passive: true });
+  }
+
+  // 3D Card Tilt for Bento Cards
+  const tiltCards = document.querySelectorAll('.tilt-card');
+  tiltCards.forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px)`;
+    }, { passive: true });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
+    });
+  });
+
+  // 4. Dynamic Number Counters
+  const counters = document.querySelectorAll('.stat-counter');
+  let countersStarted = false;
+
+  const countUp = (el) => {
+    const target = parseFloat(el.getAttribute('data-target'));
+    const decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    const prefix = el.getAttribute('data-prefix') || '';
+    const suffix = el.getAttribute('data-suffix') || '';
+    const duration = 1800;
+    const start = 0;
+    const startTime = performance.now();
+
+    const update = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const currentVal = start + (target - start) * ease;
+      
+      let formatted = currentVal.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+
+      el.textContent = `${prefix}${formatted}${suffix}`;
+
+      if (progress < 1) {
+        requestAnimationFrame(update);
+      } else {
+        el.textContent = `${prefix}${target.toLocaleString(undefined, {
+          minimumFractionDigits: decimals,
+          maximumFractionDigits: decimals
+        })}${suffix}`;
+      }
+    };
+    requestAnimationFrame(update);
+  };
+
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !countersStarted) {
+        countersStarted = true;
+        counters.forEach(counter => countUp(counter));
+      }
+    });
+  }, { threshold: 0.2 });
+
+  if (counters.length > 0) {
+    statsObserver.observe(counters[0]);
+  }
+
+  // Live real-time clock & fluctuating hash simulator
+  function updateLiveClock() {
+    const clockEl = document.getElementById('live-clock');
+    if (clockEl) {
+      const now = new Date();
+      clockEl.textContent = now.toTimeString().split(' ')[0] + ' UTC';
+    }
+  }
+  setInterval(updateLiveClock, 1000);
+  updateLiveClock();
+
+  // Subtle hash jitter for telemetry
+  const hashEl = document.getElementById('live-hash');
+  if (hashEl) {
+    setInterval(() => {
+      const randomHex = Math.random().toString(16).substring(2, 7);
+      hashEl.textContent = `HASH: 9e88b...${randomHex}`;
+    }, 4500);
+  }
+
+  // 5. Interactive Decision Cards Switcher
+  const decisionCards = document.querySelectorAll('.decision-card');
+  const previewBox = document.getElementById('decision-preview-box');
+  const previewBadge = document.getElementById('preview-badge-icon');
+  const previewTitle = document.getElementById('preview-title');
+  const previewSub = document.getElementById('preview-sub');
+  const previewCol1 = document.getElementById('preview-col1');
+  const previewCol2 = document.getElementById('preview-col2');
+  const previewCol3 = document.getElementById('preview-col3');
+
+  const decisionData = {
+    clearance: {
+      title: "Current Simulation: Instant Clearance Policy Flow",
+      sub: "Runtime ID: #ENCLAVE-SESSION-4892 • Verdict: APPROVED",
+      col1: "Keychron Q1 Max (₹16,499)",
+      col2: "Under ₹80,000 threshold",
+      col3: "Single-use token issued (0.02s)",
+      badgeClass: "bg-emerald-500/20 text-emerald-400",
+      badgeIcon: "verified",
+      cardBorder: "border-emerald-500 ring-2 ring-emerald-500/20"
+    },
+    hitl: {
+      title: "Current Simulation: HITL Escalation Approval Flow",
+      sub: "Runtime ID: #ENCLAVE-SESSION-4893 • Verdict: PENDING_BIOMETRIC",
+      col1: "MacBook Pro M3 Max (₹1,99,900)",
+      col2: "Crosses ₹50,000 HITL threshold",
+      col3: "Telegram/Slack Push -> Awaiting Tap",
+      badgeClass: "bg-amber-500/20 text-amber-400",
+      badgeIcon: "contact_support",
+      cardBorder: "border-amber-500 ring-2 ring-amber-500/20"
+    },
+    block: {
+      title: "Current Simulation: Deterministic Policy Block & Quarantine",
+      sub: "Runtime ID: #ENCLAVE-SESSION-4894 • Verdict: REJECTED",
+      col1: "Unverified Drop-shipper (₹12,400)",
+      col2: "Merchant Domain not on Whitelist",
+      col3: "Cart aborted. Agent quarantined.",
+      badgeClass: "bg-rose-500/20 text-rose-400",
+      badgeIcon: "gpp_bad",
+      cardBorder: "border-rose-500 ring-2 ring-rose-500/20"
+    }
+  };
+
+  decisionCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const type = card.getAttribute('data-decision');
+      if (!type || !decisionData[type]) return;
+
+      decisionCards.forEach(c => {
+        c.className = 'decision-card cursor-pointer rounded-3xl bg-surface-container-lowest p-8 border-2 border-surface-container-high hover:border-white/30 shadow-sm relative overflow-hidden transition-all duration-300';
+      });
+
+      const config = decisionData[type];
+      card.className = `decision-card cursor-pointer rounded-3xl bg-surface-container-lowest p-8 border-2 ${config.cardBorder} shadow-md relative overflow-hidden transition-all duration-300`;
+
+      // Update preview telemetry panel
+      if (previewTitle) previewTitle.textContent = config.title;
+      if (previewSub) previewSub.textContent = config.sub;
+      if (previewCol1) previewCol1.textContent = config.col1;
+      if (previewCol2) previewCol2.textContent = config.col2;
+      if (previewCol3) previewCol3.textContent = config.col3;
+      if (previewBadge) {
+        previewBadge.className = `w-8 h-8 rounded-lg flex items-center justify-center ${config.badgeClass}`;
+        previewBadge.innerHTML = `<span class="material-symbols-outlined text-[18px]">${config.badgeIcon}</span>`;
+      }
+    });
+  });
+
+  // 6. Modal / Drawer Controllers
+  const demoModal = document.getElementById('demo-modal');
+  const specModal = document.getElementById('spec-modal');
+
+  function openModal() {
+    if (demoModal) {
+      demoModal.classList.remove('hidden');
+      demoModal.style.display = 'flex';
+    }
+  }
+  function closeModal() {
+    if (demoModal) {
+      demoModal.classList.add('hidden');
+      demoModal.style.display = 'none';
+    }
+  }
+
+  function openSpecDrawer() {
+    if (specModal) {
+      specModal.classList.remove('hidden');
+      specModal.style.display = 'flex';
+    }
+  }
+  function closeSpecDrawer() {
+    if (specModal) {
+      specModal.classList.add('hidden');
+      specModal.style.display = 'none';
+    }
+  }
+
+  // Wires
+  const inspectBtn = document.getElementById('inspect-protocol-btn');
+  if (inspectBtn) inspectBtn.addEventListener('click', openModal);
+
+  const deployCta = document.getElementById('deploy-mandate-cta');
+  if (deployCta) deployCta.addEventListener('click', openModal);
+
+  const editConsoleBtn = document.getElementById('edit-console-btn');
+  if (editConsoleBtn) editConsoleBtn.addEventListener('click', openSpecDrawer);
+
+  // Close modals on clicking backdrop
+  [demoModal, specModal].forEach(modal => {
+    if (modal) {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          modal.style.display = 'none';
+        }
+      });
+    }
+  });
+
+  // Copy Enclave Key button
+  const copyKeyBtn = document.getElementById('copy-key-btn');
+  if (copyKeyBtn) {
+    copyKeyBtn.addEventListener('click', () => {
+      navigator.clipboard?.writeText('0x48a1f729b7c8942');
+      const icon = document.getElementById('copy-icon');
+      const toast = document.getElementById('copy-toast');
+      if (icon && toast) {
+        icon.classList.add('hidden');
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          icon.classList.remove('hidden');
+          toast.classList.add('hidden');
+        }, 1800);
+      }
+    });
+  }
+
+  // Copy JSON button inside Spec Modal
+  const copyJsonBtn = document.getElementById('copy-json-btn');
+  if (copyJsonBtn) {
+    copyJsonBtn.addEventListener('click', () => {
+      const jsonText = document.getElementById('json-code-display')?.textContent || '';
+      navigator.clipboard?.writeText(jsonText);
+      const label = document.getElementById('copy-json-label');
+      if (label) {
+        label.textContent = 'Copied!';
+        setTimeout(() => { label.textContent = 'Copy JSON'; }, 1800);
+      }
+    });
+  }
+
+  // Re-run simulation in terminal modal
+  function runFreshSimulation() {
+    const lines = document.getElementById('terminal-lines');
+    if (!lines) return;
+    lines.style.opacity = '0.3';
+    setTimeout(() => {
+      lines.style.opacity = '1';
+    }, 280);
+  }
+
+  // Light/Dark aesthetic indicator toggle
+  const themeToggle = document.getElementById('theme-toggle-btn');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      const icon = document.getElementById('theme-icon');
+      if (icon) {
+        icon.textContent = isDark ? 'dark_mode' : 'light_mode';
+      }
+    });
+  }
+</script>
+</body></html>

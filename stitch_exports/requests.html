@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_dashboard" name="shell-type"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+    }
+  </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "border-subtle": "#E7E7E3",
+            "border-line": "#E2E2DE",
+            "charcoal": "#121313",
+            "charcoal-muted": "#5A5D5E",
+            "charcoal-light": "#888B8C",
+            "primary": "#080808",
+            "on-primary": "#ffffff",
+            "background": "#FBFBF9",
+            "surface": "#ffffff",
+            "surface-dim": "#F4F4F1",
+            "surface-container": "#EEEEEC",
+            "secondary": "#695D46",
+            "secondary-container": "#F4EDE1",
+            "on-secondary-container": "#483E2D",
+            "error": "#BA1A1A",
+            "error-subtle": "#FDF2F2",
+            "error-border": "#F3CECE",
+            "success": "#1E6E38",
+            "success-subtle": "#F1F8F3"
+          },
+          fontFamily: {
+            "title-md": ["Manrope", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "headline-lg": ["Manrope", "sans-serif"],
+            "display": ["Manrope", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "headline-sm": ["Manrope", "sans-serif"],
+            "headline-md": ["Manrope", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "code-sm": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "monospace"]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background font-body-md text-charcoal antialiased">
+<!-- Left Global Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#F8F8F5] border-r border-[#EAEAE6] z-50 flex flex-col justify-between">
+<div class="flex flex-col flex-1 min-h-0">
+<div class="h-16 px-5 flex items-center justify-between border-b border-[#EAEAE6]/70">
+<a class="flex items-center gap-2.5 min-w-0 hover:opacity-90 transition-opacity" href="#dashboard">
+<img alt="Mandate Gateway Logo" class="h-7 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTIQEp-IS9gvFsW2ah5XZEMllzh2SBpkwgt9jBeZpEHlojdaOSUiOd_TTHewlw6hZYEsfj7B6qjsJmQv4fx0ZaxWmuXDklwqQ0Q9qmA7xwbflAdZI4mrQCXXFNw4bPhMcCmGkt2s2AuUexf-W4EpHNS8LknSBv-SX0t2FDBxFEqC7rA8Lq-dZQoYR_0eKT180k4v8ceH3ByU45yxc7ivPX2iPKkVSxfjsfmBcmEBvZcM2pr3j9NQd8bg"/>
+<div class="flex flex-col min-w-0">
+<span class="font-headline-sm text-[13px] tracking-tight font-semibold text-primary uppercase">Mandate Gateway</span>
+<span class="font-label-sm text-[10px] text-charcoal-muted tracking-widest uppercase">Autonomous Clearance</span>
+</div>
+</a>
+<span class="text-[10px] px-1.5 py-0.5 rounded font-mono bg-white border border-[#E4E4DE] text-charcoal-muted font-medium">v2.4</span>
+</div>
+<nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+<div class="px-2 pb-2 text-[10px] font-semibold tracking-wider uppercase text-charcoal-light">System Workspace</div>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#dashboard">
+<span>Overview Dashboard</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#mandates">
+<span>Mandates Builder</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#agent">
+<span>Autonomous Shopping Agent</span>
+</a>
+<a aria-current="page" class="flex items-center justify-between px-2.5 py-2 rounded-md bg-charcoal text-white font-medium shadow-xs text-[13px]" href="#requests">
+<span>Purchase Requests</span>
+<span class="text-[10px] bg-white/20 text-white px-1.5 py-0.2 rounded-full font-mono">2</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#payment-methods">
+<span>Payment Methods &amp; Integrations</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#passport">
+<span>Agent Passport &amp; Identity</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#activity">
+<span>Activity &amp; Audit Log</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#security">
+<span>Security Center</span>
+</a>
+<a class="flex items-center px-2.5 py-2 rounded-md text-charcoal-muted hover:bg-white hover:text-charcoal transition-colors text-[13px]" href="#settings">
+<span>Settings</span>
+</a>
+</nav>
+</div>
+<!-- User Profile Bottom Bar -->
+<div class="p-3 border-t border-[#EAEAE6]">
+<div class="p-2 rounded-lg bg-white border border-[#EAEAE6] flex items-center justify-between">
+<div class="flex items-center gap-2.5 min-w-0">
+<img alt="Elena Vance Profile" class="w-7 h-7 rounded-full object-cover ring-1 ring-black/5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2D3f8-QvkKo7Iep79rwSRjqJSxlO1LNDFKOeQWUFCr2X0OcRZKqHzk3eutzQTCES5Fg0_FRJBYKHObO5NAT5D_0RSxNR71xMq8_Y2AMHIbV6b9dXMb3LSv2sKjoM2T5CkSfz1DCVRccy77T8Smg6vzxMkKM9qxEX5GPor0vGul7__cKEKdJNrFR4Wyig0VbRRc4h1deGJ_keampTAhyAKvCpYZB75WJZlI2lP0qHIcYtSQIyAiTXdww"/>
+<div class="flex flex-col min-w-0">
+<span class="text-[12px] font-semibold text-charcoal truncate leading-tight">Elena Vance</span>
+<span class="text-[10px] text-charcoal-light truncate">Sovereign Authority</span>
+</div>
+</div>
+<a aria-label="Sign Out" class="text-charcoal-muted hover:text-charcoal p-1" href="/" title="Sign Out">
+<span class="material-symbols-outlined text-[16px]">logout</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main View Area -->
+<div class="pl-64">
+<!-- Clean Minimalist Topbar -->
+<header class="h-14 border-b border-border-subtle bg-white/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-40">
+<div class="flex items-center gap-3 text-xs text-charcoal-muted">
+<a class="hover:text-charcoal transition-colors" href="/">Public Site</a>
+<span class="text-charcoal-light">/</span>
+<span class="text-charcoal font-medium">Autonomous Clearance Protocol</span>
+<span class="text-charcoal-light">·</span>
+<span class="font-mono text-[11px] text-charcoal-light">Sub-ledger #M-902</span>
+</div>
+<div class="flex items-center gap-4 text-xs">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded bg-[#F3F3EF] font-mono text-[11px] text-charcoal-muted">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+<span>Settlement Node 0x7F...9A41 · Synced</span>
+</div>
+<div class="h-3.5 w-[1px] bg-border-subtle"></div>
+<button aria-label="Search" class="text-charcoal-muted hover:text-charcoal flex items-center gap-1 font-mono text-[11px]">
+<span class="material-symbols-outlined text-[16px]">search</span>
+<span>⌘K</span>
+</button>
+</div>
+</header>
+<main class="px-8 py-8 max-w-[1520px] mx-auto">
+<!-- Editorial Page Header -->
+<div class="pb-6 border-b border-border-subtle">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<span class="font-mono text-[11px] font-semibold uppercase tracking-widest text-charcoal-muted">TRANSACTION CLEARANCE</span>
+<h1 class="font-headline-lg text-[32px] md:text-[36px] font-semibold text-charcoal tracking-tight mt-1">Purchase Requests</h1>
+<p class="text-[14px] text-charcoal-muted mt-1 font-normal max-w-2xl">
+              Deterministic inbox for autonomous agent order clearances governed by sovereign multi-sig thresholds.
+            </p>
+</div>
+<!-- Concise Summary Indicators -->
+<div class="flex items-center gap-6 font-mono text-xs text-charcoal-muted">
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-charcoal-light font-sans">Pending Demands</span>
+<span class="font-semibold text-charcoal text-[15px]">2 orders</span>
+<span class="text-[11px] text-charcoal-light ml-1">(₹1,28,885)</span>
+</div>
+<div class="w-[1px] h-6 bg-border-subtle"></div>
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-charcoal-light font-sans">Auto-Cleared</span>
+<span class="font-semibold text-charcoal text-[15px]">3 items</span>
+<span class="text-[11px] text-charcoal-light ml-1">(₹31,500)</span>
+</div>
+<div class="w-[1px] h-6 bg-border-subtle"></div>
+<div>
+<span class="block text-[10px] uppercase tracking-wider text-charcoal-light font-sans">Policy Violations</span>
+<span class="font-semibold text-error text-[15px]">1 stopped</span>
+</div>
+</div>
+</div>
+<!-- Filter Sub-nav Strip -->
+<div class="flex items-center justify-between mt-8 pt-2">
+<div class="flex items-center gap-2">
+<button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full bg-charcoal text-white shadow-xs transition-colors" data-filter="pending" onclick="setFilter(this, 'pending')">
+              Pending Review <span class="ml-1 opacity-75 font-mono">2</span>
+</button>
+<button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full text-charcoal-muted hover:text-charcoal hover:bg-white transition-colors" data-filter="cleared" onclick="setFilter(this, 'cleared')">
+              Auto-Approved <span class="ml-1 text-charcoal-light font-mono">3</span>
+</button>
+<button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full text-charcoal-muted hover:text-charcoal hover:bg-white transition-colors" data-filter="blocked" onclick="setFilter(this, 'blocked')">
+              Blocked by Policy <span class="ml-1 text-charcoal-light font-mono">1</span>
+</button>
+<button class="filter-btn text-xs font-medium px-3 py-1.5 rounded-full text-charcoal-muted hover:text-charcoal hover:bg-white transition-colors" data-filter="all" onclick="setFilter(this, 'all')">
+              All <span class="ml-1 text-charcoal-light font-mono">6</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-xs">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded border border-border-subtle bg-white text-charcoal-muted">
+<span class="material-symbols-outlined text-[15px]">filter_list</span>
+<input class="border-none bg-transparent outline-none p-0 text-xs w-48 text-charcoal placeholder:text-charcoal-light focus:ring-0" id="inboxSearch" placeholder="Filter orders or agents..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Layout: Open Editorial 2-Column Split (Spacious Rows + Sticky Review Inspector) -->
+<div class="grid grid-cols-1 xl:grid-cols-12 gap-8 pt-4 items-start">
+<!-- Left: Open Editorial List (7 cols) -->
+<div class="xl:col-span-7 flex flex-col">
+<!-- Column Headers -->
+<div class="grid grid-cols-12 gap-4 px-4 py-2 text-[11px] font-mono uppercase tracking-wider text-charcoal-light">
+<div class="col-span-5">Item / Merchant</div>
+<div class="col-span-3">Agent</div>
+<div class="col-span-2 text-right">Amount</div>
+<div class="col-span-2 text-right">Status &amp; Action</div>
+</div>
+<!-- List Rows Container separated by #E7E7E3 1px rules -->
+<div class="divide-y divide-[#E7E7E3] border-y border-[#E7E7E3] bg-white rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.02)]" id="requestsList">
+<!-- ROW 1: Active Focus Lenovo -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4.5 items-center transition-colors cursor-pointer group hover:bg-[#FAF9F5] border-l-2 border-charcoal bg-[#FDFDFC]" data-status="pending" id="row-x1" onclick="selectRequest('lenovo')">
+<!-- Item / Merchant -->
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-[#E7E7E3] bg-[#F7F7F4] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden">
+<img alt="Lenovo ThinkPad X1" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBe2vjeSGz7iu-ozjl6LKo9UjGT1H_cIVFq6O0XfXX4Npf4UCCjC1UaL8w33MWegBPsYbinZJYmlhy83k1D7gYhEMPfkxLIJTafbFdpo6_BHR8nzDaXT6FII4xHr-J1ULH2h-LGoPK78hiRApE-NBUyhhzeD89d0_WFJm0Gm0FRilDfVMeKggZLYHnxCJxo8a_brdEqykgW_62aYm_gh55QzQYXY_jl0a4ii-FWANGvY7h1lBfOynSb-w"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13.5px] font-semibold text-charcoal truncate group-hover:text-black">
+                    Lenovo ThinkPad X1 Carbon Gen 12
+                  </span>
+<div class="flex items-center gap-1.5 text-[11px] text-charcoal-muted truncate mt-0.5">
+<span class="text-charcoal font-medium">Lenovo Official Store</span>
+<span>·</span>
+<span class="font-mono text-[10px] text-charcoal-light">ORD-8821-X</span>
+</div>
+</div>
+</div>
+<!-- Requesting Agent -->
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal font-medium truncate">Claude Shopping v3.5</span>
+<span class="font-mono text-[10px] text-charcoal-light truncate">Key: 0x981A...3C02</span>
+</div>
+<!-- Amount -->
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-semibold text-charcoal block">₹1,24,990</span>
+<span class="text-[10px] text-charcoal-light font-mono">INR (Incl. Tax)</span>
+</div>
+<!-- Status Badge / Action -->
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#EFECE6] text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Sign-off
+                </span>
+<button class="text-[11px] text-charcoal hover:underline font-semibold flex items-center gap-0.5 mt-0.5" type="button">
+<span>Review</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- ROW 2: Logitech Discretionary Pending -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4.5 items-center transition-colors cursor-pointer group hover:bg-[#FAF9F5] border-l-2 border-transparent" data-status="pending" id="row-g502" onclick="selectRequest('logitech')">
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-[#E7E7E3] bg-[#F7F7F4] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden">
+<img alt="Logitech G502 Mouse" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABIIxUD2vF3ZgYMg4JYOpY6ZSxNK0BSvTXwn-pz2prQE_8Y8QZRyFVW1jXrPsMfI62_M5d4ya3SECAJZ6gb-zPvkzEQdhizZ36PcT-1uBRqtsoSzfiwCUTsqwKN-RbCLpoRIuXnMjxUXDiamU00lfVbAPDD8WIFcyn36nD1rBFbayj8sRI8lEQQ_xGuBFwzhkpiKytIi0GVycIhndS1gPcEKX576M8dDHGQ2zzbMcYxPanu-o1vI9zZQ"/>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13.5px] font-semibold text-charcoal truncate group-hover:text-black">
+                    Logitech G502 HERO Gaming Mouse
+                  </span>
+<div class="flex items-center gap-1.5 text-[11px] text-charcoal-muted truncate mt-0.5">
+<span class="text-charcoal font-medium">Croma Electronics</span>
+<span>·</span>
+<span class="font-mono text-[10px] text-charcoal-light">ORD-8824-M</span>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal font-medium truncate">Claude Shopping v3.5</span>
+<span class="font-mono text-[10px] text-charcoal-light truncate">Office Hardware Q4</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-semibold text-charcoal block">₹3,895</span>
+<span class="text-[10px] text-charcoal-light font-mono">+₹895 Cap</span>
+</div>
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#EFECE6] text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                  Discretionary
+                </span>
+<button class="text-[11px] text-charcoal hover:underline font-semibold flex items-center gap-0.5 mt-0.5" type="button">
+<span>Review</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- ROW 3: Blocked Deterministic Stop (TechBazaar) -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4.5 items-center transition-colors cursor-pointer group hover:bg-[#FDF6F6] bg-error-subtle/20 border-l-2 border-error" data-status="blocked" id="row-mxmaster" onclick="selectRequest('blocked')">
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-error-border bg-[#FBF1F1] flex-shrink-0 flex items-center justify-center p-1 overflow-hidden opacity-75">
+<img alt="Logitech MX Master 3S" class="w-full h-full object-contain grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUxqJb1nlvEMameqzB8hqwH978Ea9Gs5RVPQe54D1kJR3wXzufcgeFAKx_eH6KlHji5p-0PW58LV-0af_5HyzjXfgt3OMczMrLrjlcVWsn_cYKD_UwDTwi5-wK6IM9Rxyd4C-yDiMZpoDd23EhxYbht-4DgKudEkk3F-rN3eUn0P7bILwliirTu_0bkA65gbAjtPqKxGwHiAR9kTMm3KpL31p0E6kqUQ6-9bqLdvWEaGy1jclyvWCiuw"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-title-md text-[13.5px] font-semibold text-charcoal truncate">
+                      Logitech MX Master 3S
+                    </span>
+</div>
+<div class="flex items-center gap-1.5 text-[11px] text-error font-medium truncate mt-0.5">
+<span>TechBazaar.in (Unverified)</span>
+<span class="text-charcoal-light">·</span>
+<span class="font-mono text-[10px]">ORD-8819-B</span>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal font-medium truncate">Perplexity Buy</span>
+<span class="font-mono text-[10px] text-error truncate font-medium">Unvetted Destination</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-semibold text-charcoal block line-through opacity-70">₹8,995</span>
+<span class="text-[10px] text-error font-mono font-medium">Cap Breach</span>
+</div>
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-error text-white font-mono uppercase tracking-wider">
+                  Blocked
+                </span>
+<span class="text-[10px] text-charcoal-muted font-mono">No Override</span>
+</div>
+</div>
+<!-- ROW 4: Auto-Approved 1 (Dell Dock) -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4 items-center transition-colors cursor-pointer group hover:bg-[#FAF9F5] border-l-2 border-transparent opacity-85" data-status="cleared" id="row-dock" onclick="selectRequest('dock')">
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-[#E7E7E3] bg-[#F7F7F4] flex-shrink-0 flex items-center justify-center p-1 text-charcoal-muted">
+<span class="material-symbols-outlined text-[18px]">hub</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13.5px] font-medium text-charcoal truncate">
+                    Dell Thunderbolt 4 Docking Hub
+                  </span>
+<div class="flex items-center gap-1.5 text-[11px] text-charcoal-muted truncate mt-0.5">
+<span class="text-charcoal">Dell Direct</span>
+<span>·</span>
+<span class="font-mono text-[10px] text-charcoal-light">ORD-8798-D</span>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal truncate">Claude Shopping v3.5</span>
+<span class="font-mono text-[10px] text-charcoal-light truncate">Cleared 14m ago</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-medium text-charcoal block">₹18,400</span>
+<span class="text-[10px] text-charcoal-light font-mono">Within Band</span>
+</div>
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  Cleared
+                </span>
+<span class="text-[10px] text-charcoal-light font-mono">Self-settled</span>
+</div>
+</div>
+<!-- ROW 5: Auto-Approved 2 (Apple Charger) -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4 items-center transition-colors cursor-pointer group hover:bg-[#FAF9F5] border-l-2 border-transparent opacity-85" data-status="cleared" id="row-apple" onclick="selectRequest('charger')">
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-[#E7E7E3] bg-[#F7F7F4] flex-shrink-0 flex items-center justify-center p-1 text-charcoal-muted">
+<span class="material-symbols-outlined text-[18px]">power</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13.5px] font-medium text-charcoal truncate">
+                    Apple 140W USB-C Power Adapter
+                  </span>
+<div class="flex items-center gap-1.5 text-[11px] text-charcoal-muted truncate mt-0.5">
+<span class="text-charcoal">Apple India Official</span>
+<span>·</span>
+<span class="font-mono text-[10px] text-charcoal-light">ORD-8790-A</span>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal truncate">Claude Shopping v3.5</span>
+<span class="font-mono text-[10px] text-charcoal-light truncate">Cleared 1h ago</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-medium text-charcoal block">₹8,900</span>
+<span class="text-[10px] text-charcoal-light font-mono">Mandate Matched</span>
+</div>
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  Cleared
+                </span>
+<span class="text-[10px] text-charcoal-light font-mono">Self-settled</span>
+</div>
+</div>
+<!-- ROW 6: Auto-Approved 3 (Cable Pack) -->
+<div class="request-row grid grid-cols-12 gap-4 px-4 py-4 items-center transition-colors cursor-pointer group hover:bg-[#FAF9F5] border-l-2 border-transparent opacity-85" data-status="cleared" id="row-cables" onclick="selectRequest('cables')">
+<div class="col-span-5 flex items-center gap-3 min-w-0">
+<div class="w-10 h-10 rounded border border-[#E7E7E3] bg-[#F7F7F4] flex-shrink-0 flex items-center justify-center p-1 text-charcoal-muted">
+<span class="material-symbols-outlined text-[18px]">cable</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-title-md text-[13.5px] font-medium text-charcoal truncate">
+                    Belkin Thunderbolt 4 Passive Cable (2m)
+                  </span>
+<div class="flex items-center gap-1.5 text-[11px] text-charcoal-muted truncate mt-0.5">
+<span class="text-charcoal">Amazon Business</span>
+<span>·</span>
+<span class="font-mono text-[10px] text-charcoal-light">ORD-8785-B</span>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col min-w-0">
+<span class="text-[12px] text-charcoal truncate">Claude Shopping v3.5</span>
+<span class="font-mono text-[10px] text-charcoal-light truncate">Cleared 3h ago</span>
+</div>
+<div class="col-span-2 text-right">
+<span class="font-title-md text-[14px] font-medium text-charcoal block">₹4,200</span>
+<span class="text-[10px] text-charcoal-light font-mono">Micro-mandate</span>
+</div>
+<div class="col-span-2 flex flex-col items-end gap-1">
+<span class="inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                  Cleared
+                </span>
+<span class="text-[10px] text-charcoal-light font-mono">Self-settled</span>
+</div>
+</div>
+</div>
+<!-- Bottom Micro-footer / Consensus State -->
+<div class="flex items-center justify-between py-3 text-[11px] text-charcoal-light font-mono">
+<span>Showing 6 transactions evaluated by Mandate Engine #M-902</span>
+<span>Cryptographic multi-sig lock active</span>
+</div>
+</div>
+<!-- Right: Side Review Panel / Detail View (5 cols sticky) -->
+<div class="xl:col-span-5 sticky top-20">
+<div class="bg-white border border-[#E7E7E3] rounded-lg p-6 shadow-xs" id="detailPanel">
+<!-- Default Display: Lenovo ThinkPad Review View -->
+<div class="detail-content flex flex-col gap-6" id="view-lenovo">
+<!-- Review Header -->
+<div class="flex items-start justify-between border-b border-[#E7E7E3] pb-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-charcoal-muted">Review Clearance Request</span>
+<span class="text-charcoal-light">/</span>
+<span class="font-mono text-[11px] font-semibold text-charcoal">ORD-8821-X</span>
+</div>
+<h2 class="font-headline-sm text-[20px] font-semibold text-charcoal mt-1 tracking-tight">
+                    Lenovo ThinkPad X1 Carbon Gen 12
+                  </h2>
+<p class="text-[12px] text-charcoal-muted mt-0.5">
+                    Intel Core Ultra 7 · 32GB LPDDR5X · 1TB Gen4 NVMe SSD
+                  </p>
+</div>
+<div class="text-right flex-shrink-0">
+<div class="font-headline-md text-[22px] font-semibold text-charcoal tracking-tight">₹1,24,990</div>
+<span class="text-[10px] font-mono text-charcoal-light">GST Inclusive (18%)</span>
+</div>
+</div>
+<!-- Context Specs 3-column strip -->
+<div class="grid grid-cols-3 gap-3 p-3 bg-[#F9F9F7] rounded border border-[#EDEDEA] text-xs">
+<div>
+<span class="text-[10px] font-mono uppercase tracking-wider text-charcoal-light block">Requesting Agent</span>
+<span class="font-medium text-charcoal truncate block mt-0.5">Claude Shopping</span>
+<span class="font-mono text-[10px] text-charcoal-light">v3.5 sovereign</span>
+</div>
+<div>
+<span class="text-[10px] font-mono uppercase tracking-wider text-charcoal-light block">Vendor Protocol</span>
+<span class="font-medium text-charcoal truncate block mt-0.5">Lenovo Official</span>
+<span class="font-mono text-[10px] text-charcoal-light">Whitelisted</span>
+</div>
+<div>
+<span class="text-[10px] font-mono uppercase tracking-wider text-charcoal-light block">Bound Mandate</span>
+<span class="font-medium text-charcoal truncate block mt-0.5">#M-902 HW</span>
+<span class="font-mono text-[10px] text-charcoal-light">₹1.5L Ceiling</span>
+</div>
+</div>
+<!-- Policy Compliance Verification Checklist -->
+<div class="flex flex-col gap-2.5">
+<div class="flex items-center justify-between text-xs">
+<span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-charcoal">Policy Compliance Matrix</span>
+<span class="text-[11px] text-charcoal-muted font-mono">3 Pass · 1 Gate Trigger</span>
+</div>
+<div class="divide-y divide-[#E7E7E3] border border-[#E7E7E3] rounded-md overflow-hidden text-xs">
+<!-- Check 1: RAM -->
+<div class="flex items-center justify-between p-3 bg-white">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">check_circle</span>
+<span class="text-charcoal font-medium">Memory Specification</span>
+</div>
+<span class="font-mono text-[11px] text-charcoal-muted">32GB (Req ≥ 16GB)</span>
+</div>
+<!-- Check 2: SSD -->
+<div class="flex items-center justify-between p-3 bg-white">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">check_circle</span>
+<span class="text-charcoal font-medium">Storage Capacity</span>
+</div>
+<span class="font-mono text-[11px] text-charcoal-muted">1TB NVMe (Req ≥ 512GB)</span>
+</div>
+<!-- Check 3: Vendor Whitelist -->
+<div class="flex items-center justify-between p-3 bg-white">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">check_circle</span>
+<span class="text-charcoal font-medium">Vendor Whitelist</span>
+</div>
+<span class="font-mono text-[11px] text-charcoal-muted">Lenovo Direct (Verified)</span>
+</div>
+<!-- Check 4: Limit Threshold Gate Trigger -->
+<div class="flex items-center justify-between p-3 bg-[#FAF8F3]">
+<div class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">gavel</span>
+<div>
+<span class="text-charcoal font-medium block">Multi-Sig Value Gate</span>
+<span class="text-[10px] text-charcoal-muted">Exceeds ₹50,000 auto-cap threshold</span>
+</div>
+</div>
+<span class="font-mono text-[11px] text-secondary font-medium">Requires Sovereign Sign</span>
+</div>
+</div>
+</div>
+<!-- Agent Reasoning Extract -->
+<div class="p-3.5 bg-[#FAF9F6] border border-[#EAEAE5] rounded-md flex flex-col gap-1.5 text-xs">
+<div class="flex items-center justify-between">
+<span class="font-mono text-[10px] font-semibold uppercase tracking-wider text-charcoal-muted">Agent Deterministic Reasoning</span>
+<span class="text-[10px] text-charcoal-light font-mono">Confidence: 99.4%</span>
+</div>
+<p class="text-[12px] text-charcoal leading-relaxed">
+                  “Configured for Elena Vance hardware refresh. Selected direct OEM store to secure enterprise 3-year Premier Support warranty with certified corporate tax invoice deducting full input credit. Evaluated against 5 distributors; direct checkout provided fastest compliant fulfillment.”
+                </p>
+<div class="text-[10px] font-mono text-charcoal-light mt-1">
+                  SHA-256: 8efc2299b80fae00318dcbfa16772990aa419f0
+                </div>
+</div>
+<!-- High Contrast Actions -->
+<div class="pt-2 flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<button class="flex-1 py-2.5 px-4 rounded-md border border-border-subtle bg-white text-charcoal hover:bg-[#F7F7F4] text-xs font-medium transition-colors" onclick="processAction('row-x1', 'rejected', 'Lenovo ThinkPad X1')" type="button">
+                    Reject Request
+                  </button>
+<button class="flex-2 flex-grow py-2.5 px-5 rounded-md bg-charcoal text-white hover:bg-black text-xs font-semibold tracking-wide flex items-center justify-center gap-2 shadow-xs transition-colors" onclick="processAction('row-x1', 'approved', 'Lenovo ThinkPad X1')" type="button">
+<span class="material-symbols-outlined text-[16px]">key</span>
+<span>Approve &amp; Release Funds</span>
+</button>
+</div>
+<span class="text-center font-mono text-[10px] text-charcoal-light">
+                  Executing release issues a cryptographic ERC-4337 signature to Lenovo's merchant settlement contract.
+                </span>
+</div>
+</div>
+<!-- View: Blocked Details (Displayed when clicking TechBazaar) -->
+<div class="detail-content hidden flex-col gap-6" id="view-blocked">
+<div class="flex items-start justify-between border-b border-[#E7E7E3] pb-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-error font-semibold">DETERMINISTIC HARD STOP</span>
+<span class="text-charcoal-light">/</span>
+<span class="font-mono text-[11px] text-charcoal-muted">ORD-8819-B</span>
+</div>
+<h2 class="font-headline-sm text-[20px] font-semibold text-charcoal mt-1 tracking-tight">
+                    Logitech MX Master 3S
+                  </h2>
+<p class="text-[12px] text-error font-medium mt-0.5">
+                    Attempted Agent Dispatch via Unvetted Portal
+                  </p>
+</div>
+<div class="text-right flex-shrink-0">
+<div class="font-headline-md text-[22px] font-semibold text-error tracking-tight">₹8,995</div>
+<span class="text-[10px] font-mono text-charcoal-light">Disallowed</span>
+</div>
+</div>
+<!-- Severe Protocol Stop Box -->
+<div class="p-4 rounded-md bg-error-subtle border border-error-border flex flex-col gap-2.5">
+<div class="flex items-center gap-2 text-error font-semibold text-xs">
+<span class="material-symbols-outlined text-[18px]">gpp_bad</span>
+<span>Consensus Boundary Violation — Override Strictly Blocked</span>
+</div>
+<div class="text-xs text-charcoal space-y-2 leading-relaxed">
+<p>
+<strong>1. Destination Domain:</strong> <code>techbazaar.in</code> is absent from the cryptographic corporate vendor whitelist. Zero merchant trust score recorded.
+                  </p>
+<p>
+<strong>2. Category Cap:</strong> Order price (₹8,995) exceeds standard peripheral ceiling (₹5,000) defined in Mandate #M-902.
+                  </p>
+</div>
+<div class="p-2.5 rounded bg-white text-[11px] font-mono text-error font-medium border border-error-border/60 mt-1">
+                  Policy Rule 7.2: Manual administrative override is strictly blocked by immutable smart mandate invariants. No sovereign signature can clear this dispatch.
+                </div>
+</div>
+<!-- Checklist State -->
+<div class="divide-y divide-[#E7E7E3] border border-[#E7E7E3] rounded-md text-xs">
+<div class="flex items-center justify-between p-3 bg-white">
+<div class="flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span class="font-medium text-charcoal">Merchant Whitelist Check</span>
+</div>
+<span class="font-mono text-[11px] text-error">FAILED (Unvetted)</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-white">
+<div class="flex items-center gap-2 text-error">
+<span class="material-symbols-outlined text-[16px]">cancel</span>
+<span class="font-medium text-charcoal">Unit Price Cap (&lt;₹5k)</span>
+</div>
+<span class="font-mono text-[11px] text-error">FAILED (₹8,995)</span>
+</div>
+</div>
+<div class="pt-2 flex flex-col gap-2">
+<button class="w-full py-2.5 px-4 rounded-md bg-[#F4F4F1] hover:bg-[#EAEAE6] text-charcoal text-xs font-medium transition-colors" onclick="processAction('row-mxmaster', 'dismissed', 'TechBazaar Blocked Log')" type="button">
+                  Acknowledge &amp; Dismiss from Active Inbox
+                </button>
+<span class="text-center font-mono text-[10px] text-charcoal-light">
+                  Transaction permanently flagged in immutable ledger #M-902.
+                </span>
+</div>
+</div>
+<!-- View: Logitech Discretionary Pending View -->
+<div class="detail-content hidden flex-col gap-6" id="view-logitech">
+<div class="flex items-start justify-between border-b border-[#E7E7E3] pb-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-charcoal-muted">Discretionary Review</span>
+<span class="text-charcoal-light">/</span>
+<span class="font-mono text-[11px] font-semibold text-charcoal">ORD-8824-M</span>
+</div>
+<h2 class="font-headline-sm text-[20px] font-semibold text-charcoal mt-1 tracking-tight">
+                    Logitech G502 HERO Mouse
+                  </h2>
+<p class="text-[12px] text-charcoal-muted mt-0.5">
+                    25K HERO Sensor · 11 Programmable Buttons · Direct USB
+                  </p>
+</div>
+<div class="text-right flex-shrink-0">
+<div class="font-headline-md text-[22px] font-semibold text-charcoal tracking-tight">₹3,895</div>
+<span class="text-[10px] font-mono text-secondary">+₹895 over unattended</span>
+</div>
+</div>
+<div class="p-3 bg-[#FAF8F3] border border-[#ECE5D8] rounded text-xs text-charcoal">
+<span class="font-semibold block text-secondary text-[11px] uppercase tracking-wider">Discretionary Auto-Cap Trigger</span>
+<p class="mt-1 leading-relaxed">
+                  Price exceeds unattended threshold (₹3,000) by ₹895, but remains well within the ₹5,000 standard hardware limit. Whitelisted merchant: Croma Electronics.
+                </p>
+</div>
+<div class="divide-y divide-[#E7E7E3] border border-[#E7E7E3] rounded-md text-xs">
+<div class="flex items-center justify-between p-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">check_circle</span>
+<span class="text-charcoal font-medium">Merchant Protocol</span>
+</div>
+<span class="font-mono text-[11px] text-charcoal-muted">Croma (Verified)</span>
+</div>
+<div class="flex items-center justify-between p-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-700 text-[18px]">check_circle</span>
+<span class="text-charcoal font-medium">Monthly Allocation Cap</span>
+</div>
+<span class="font-mono text-[11px] text-charcoal-muted">Within ₹3L Pool</span>
+</div>
+</div>
+<div class="pt-2 flex items-center gap-3">
+<button class="flex-1 py-2.5 px-4 rounded-md border border-border-subtle bg-white text-charcoal hover:bg-[#F7F7F4] text-xs font-medium transition-colors" onclick="processAction('row-g502', 'rejected', 'Logitech G502')" type="button">
+                  Decline
+                </button>
+<button class="flex-1 py-2.5 px-4 rounded-md bg-charcoal text-white hover:bg-black text-xs font-semibold tracking-wide transition-colors" onclick="processAction('row-g502', 'approved', 'Logitech G502')" type="button">
+                  Approve (1-Tap)
+                </button>
+</div>
+</div>
+<!-- View: Cleared Generic View -->
+<div class="detail-content hidden flex-col gap-6" id="view-cleared-generic">
+<div class="flex items-start justify-between border-b border-[#E7E7E3] pb-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] uppercase tracking-wider text-emerald-700 font-semibold">AUTOMATICALLY CLEARED</span>
+</div>
+<h2 class="font-headline-sm text-[20px] font-semibold text-charcoal mt-1 tracking-tight" id="clearedTitle">
+                    Dell Thunderbolt 4 Docking Hub
+                  </h2>
+<p class="text-[12px] text-charcoal-muted mt-0.5" id="clearedSub">
+                    Settled autonomously via micro-mandate zero touch clearance
+                  </p>
+</div>
+<div class="text-right flex-shrink-0">
+<div class="font-headline-md text-[22px] font-semibold text-charcoal tracking-tight" id="clearedAmount">₹18,400</div>
+<span class="text-[10px] font-mono text-emerald-700">Settled</span>
+</div>
+</div>
+<div class="p-3 bg-emerald-50/50 border border-emerald-100 rounded text-xs text-emerald-900">
+                This transaction matched all invariant validation policies and was signed deterministically without requiring sovereign manual clearance.
+              </div>
+<div class="divide-y divide-[#E7E7E3] border border-[#E7E7E3] rounded-md text-xs">
+<div class="flex items-center justify-between p-3">
+<span class="text-charcoal-muted">Settlement Hash</span>
+<span class="font-mono text-[11px] text-charcoal">0x4a19...9b1c</span>
+</div>
+<div class="flex items-center justify-between p-3">
+<span class="text-charcoal-muted">Audit Trace</span>
+<span class="font-mono text-[11px] text-charcoal">Verified on Sub-ledger #M-902</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Subtle Toast Feedback -->
+<div class="fixed bottom-6 right-6 z-50 transform translate-y-16 opacity-0 transition-all duration-200 pointer-events-none" id="toastFeedback">
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg bg-charcoal text-white shadow-xl text-xs font-medium">
+<span class="material-symbols-outlined text-[18px] text-emerald-400" id="toastIcon">check_circle</span>
+<div class="flex flex-col">
+<span class="font-semibold text-white" id="toastTitle">Action Processed</span>
+<span class="text-[11px] text-white/70 font-mono" id="toastMsg">Updated inbox state</span>
+</div>
+</div>
+</div>
+<script>
+    function selectRequest(type) {
+      // Manage active row visual borders
+      document.querySelectorAll('.request-row').forEach(row => {
+        row.classList.remove('border-charcoal', 'bg-[#FAF9F5]');
+        row.classList.add('border-transparent');
+      });
+
+      const contents = document.querySelectorAll('.detail-content');
+      contents.forEach(c => {
+        c.classList.add('hidden');
+        c.classList.remove('flex');
+      });
+
+      if (type === 'lenovo') {
+        const row = document.getElementById('row-x1');
+        if (row) {
+          row.classList.add('border-charcoal', 'bg-[#FAF9F5]');
+          row.classList.remove('border-transparent');
+        }
+        const view = document.getElementById('view-lenovo');
+        view.classList.remove('hidden');
+        view.classList.add('flex');
+      } else if (type === 'blocked') {
+        const row = document.getElementById('row-mxmaster');
+        if (row) {
+          row.classList.add('border-charcoal');
+          row.classList.remove('border-transparent');
+        }
+        const view = document.getElementById('view-blocked');
+        view.classList.remove('hidden');
+        view.classList.add('flex');
+      } else if (type === 'logitech') {
+        const row = document.getElementById('row-g502');
+        if (row) {
+          row.classList.add('border-charcoal', 'bg-[#FAF9F5]');
+          row.classList.remove('border-transparent');
+        }
+        const view = document.getElementById('view-logitech');
+        view.classList.remove('hidden');
+        view.classList.add('flex');
+      } else {
+        const view = document.getElementById('view-cleared-generic');
+        view.classList.remove('hidden');
+        view.classList.add('flex');
+        
+        const title = document.getElementById('clearedTitle');
+        const amount = document.getElementById('clearedAmount');
+        if (type === 'dock') {
+          title.textContent = 'Dell Thunderbolt 4 Docking Hub';
+          amount.textContent = '₹18,400';
+        } else if (type === 'charger') {
+          title.textContent = 'Apple 140W USB-C Power Adapter';
+          amount.textContent = '₹8,900';
+        } else {
+          title.textContent = 'Belkin Thunderbolt 4 Passive Cable';
+          amount.textContent = '₹4,200';
+        }
+      }
+    }
+
+    function processAction(rowId, action, title) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.style.opacity = '0.35';
+        row.style.pointerEvents = 'none';
+        row.style.backgroundColor = '#F4F4F1';
+      }
+
+      const toast = document.getElementById('toastFeedback');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      if (action === 'approved') {
+        toastTitle.textContent = 'Funds Released';
+        toastMsg.textContent = 'Cryptographic signature issued for ' + title;
+        toastIcon.textContent = 'verified';
+        toastIcon.className = 'material-symbols-outlined text-[18px] text-emerald-400';
+      } else if (action === 'rejected') {
+        toastTitle.textContent = 'Order Rejected';
+        toastMsg.textContent = 'Clearance rejected: ' + title;
+        toastIcon.textContent = 'cancel';
+        toastIcon.className = 'material-symbols-outlined text-[18px] text-rose-400';
+      } else {
+        toastTitle.textContent = 'Record Dismissed';
+        toastMsg.textContent = 'Archived violation notification from active view';
+        toastIcon.textContent = 'archive';
+        toastIcon.className = 'material-symbols-outlined text-[18px] text-charcoal-light';
+      }
+
+      if (toast) {
+        toast.classList.remove('translate-y-16', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+          toast.classList.add('translate-y-16', 'opacity-0');
+          toast.classList.remove('translate-y-0', 'opacity-100');
+        }, 3200);
+      }
+    }
+
+    function setFilter(button, filter) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-charcoal', 'text-white', 'shadow-xs');
+        btn.classList.add('text-charcoal-muted');
+      });
+      button.classList.add('bg-charcoal', 'text-white', 'shadow-xs');
+      button.classList.remove('text-charcoal-muted');
+
+      const rows = document.querySelectorAll('.request-row');
+      rows.forEach(row => {
+        const status = row.getAttribute('data-status');
+        if (filter === 'all' || status === filter) {
+          row.style.display = 'grid';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const search = document.getElementById('inboxSearch');
+      if (search) {
+        search.addEventListener('input', (e) => {
+          const val = e.target.value.toLowerCase();
+          document.querySelectorAll('.request-row').forEach(row => {
+            if (row.textContent.toLowerCase().includes(val)) {
+              row.style.display = 'grid';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      }
+    });
+  </script>
+</body></html>

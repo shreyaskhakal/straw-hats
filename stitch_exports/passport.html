@@ -1,0 +1,434 @@
+<!DOCTYPE html><html lang="en" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Manrope:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 300,'GRAD' 0,'opsz' 20;font-size:20px;line-height:1;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "error": "#ba1a1a",
+          "tertiary-fixed": "#f0e1c5",
+          "surface-container-low": "#f4f4f2",
+          "background": "#f9f9f7",
+          "tertiary-fixed-dim": "#d3c5aa",
+          "tertiary-container": "#271f0e",
+          "on-tertiary-fixed": "#221b09",
+          "on-primary-container": "#898787",
+          "on-secondary": "#ffffff",
+          "secondary-fixed-dim": "#d5c4a9",
+          "on-primary-fixed-variant": "#474746",
+          "secondary-container": "#f2e0c3",
+          "primary": "#080808",
+          "on-background": "#1a1c1b",
+          "outline": "#747878",
+          "on-secondary-fixed-variant": "#514530",
+          "surface-tint": "#5f5e5e",
+          "primary-container": "#202020",
+          "surface-dim": "#dadad8",
+          "surface-container": "#eeeeec",
+          "primary-fixed-dim": "#c8c6c5",
+          "on-surface-variant": "#444748",
+          "surface": "#f9f9f7",
+          "surface-container-highest": "#e2e3e1",
+          "on-secondary-fixed": "#231a08",
+          "on-secondary-container": "#6f634c",
+          "surface-bright": "#f9f9f7",
+          "inverse-surface": "#2f3130",
+          "surface-variant": "#e2e3e1",
+          "on-tertiary-fixed-variant": "#4f4631",
+          "secondary": "#695d46",
+          "outline-variant": "#c4c7c7",
+          "inverse-on-surface": "#f1f1ef",
+          "primary-fixed": "#e5e2e1",
+          "on-error": "#ffffff",
+          "tertiary": "#0d0700",
+          "on-primary": "#ffffff",
+          "surface-container-high": "#e8e8e6",
+          "on-error-container": "#93000a",
+          "on-tertiary": "#ffffff",
+          "secondary-fixed": "#f2e0c3",
+          "on-surface": "#1a1c1b",
+          "on-primary-fixed": "#1b1c1c",
+          "on-tertiary-container": "#93866e",
+          "surface-container-lowest": "#ffffff",
+          "error-container": "#ffdad6",
+          "inverse-primary": "#c8c6c5"
+        },
+        "borderRadius": {
+          "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px"
+        },
+        "spacing": {
+          "space-xs": "0.25rem",
+          "space-2xl": "3rem",
+          "gutter-mobile": "1rem",
+          "margin-mobile": "1.25rem",
+          "margin": "2.5rem",
+          "space-xl": "2rem",
+          "space-lg": "1.5rem",
+          "space-md": "1rem",
+          "space-sm": "0.5rem",
+          "gutter": "1.5rem"
+        },
+        "fontFamily": {
+          "title-md": ["Manrope"],
+          "label-sm": ["Inter"],
+          "headline-lg": ["Manrope"],
+          "display": ["Manrope"],
+          "body-md": ["Inter"],
+          "headline-sm": ["Manrope"],
+          "headline-md": ["Manrope"],
+          "display-mobile": ["Manrope"],
+          "headline-lg-mobile": ["Manrope"],
+          "body-lg": ["Inter"],
+          "label-md": ["Inter"],
+          "body-sm": ["Inter"],
+          "code-sm": ["Inter"]
+        },
+        "fontSize": {
+          "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+          "label-sm": ["11px", {"lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+          "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "display": ["44px", {"lineHeight": "52px", "letterSpacing": "-0.025em", "fontWeight": "600"}],
+          "body-md": ["14px", {"lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "400"}],
+          "headline-sm": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+          "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+          "display-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+          "headline-lg-mobile": ["26px", {"lineHeight": "34px", "letterSpacing": "-0.015em", "fontWeight": "600"}],
+          "body-lg": ["16px", {"lineHeight": "26px", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+          "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+          "body-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0.005em", "fontWeight": "400"}],
+          "code-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "-0.01em", "fontWeight": "400"}]
+        }
+      }
+    }
+  }</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-low shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-50 flex flex-col justify-between"><div class="flex flex-col flex-1 min-h-0"><div class="h-16 px-space-md flex items-center justify-between gap-space-sm"><a class="flex items-center gap-space-sm min-w-0 hover:opacity-90 transition-opacity" href="#dashboard"><img alt="Mandate Gateway Logo" class="h-8 w-auto object-contain flex-shrink-0" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTIQEp-IS9gvFsW2ah5XZEMllzh2SBpkwgt9jBeZpEHlojdaOSUiOd_TTHewlw6hZYEsfj7B6qjsJmQv4fx0ZaxWmuXDklwqQ0Q9qmA7xwbflAdZI4mrQCXXFNw4bPhMcCmGkt2s2AuUexf-W4EpHNS8LknSBv-SX0t2FDBxFEqC7rA8Lq-dZQoYR_0eKT180k4v8ceH3ByU45yxc7ivPX2iPKkVSxfjsfmBcmEBvZcM2pr3j9NQd8bg"><div class="flex flex-col min-w-0"><span class="font-title-md text-title-md text-primary tracking-tight truncate leading-none">MANDATE GATEWAY</span><span class="font-label-sm text-label-sm text-secondary tracking-widest uppercase mt-0.5 truncate">AI Payment Security</span></div></a><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-surface-container-high text-on-surface-variant font-code-sm text-code-sm">v2.4</div></div><div class="px-space-md py-space-xs"><div class="flex items-center justify-between px-space-sm py-1.5 rounded-lg bg-surface-container-high/70 text-on-surface-variant"><div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-code-sm text-code-sm uppercase tracking-wider">Autonomous Clearance</span></div><span class="font-label-sm text-label-sm bg-surface-container-lowest px-1.5 py-0.5 rounded text-on-surface shadow-[0_1px_2px_rgba(0,0,0,0.04)]">Active</span></div></div><nav class="flex-1 px-space-sm py-space-xs space-y-1 overflow-y-auto" data-active-classes="bg-primary text-on-primary font-semibold shadow-sm"><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="dashboard" href="#dashboard"><span class="">Overview Dashboard</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="mandates" href="#mandates"><span class="">Mandates Builder</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="agent" href="#agent"><span class="">Autonomous Shopping Agent</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="requests" href="#requests"><span class="">Purchase Requests Review Center</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="payment-methods" href="#payment-methods"><span class="">Payment Methods &amp; Integrations</span></a><a aria-current="page" class="flex items-center px-3 py-2 rounded-lg transition-all bg-primary text-on-primary font-semibold shadow-sm" data-path="passport" href="#passport"><span class="">Agent Passport &amp; Identity</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="activity" href="#activity"><span class="">Activity &amp; Audit Log</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="security" href="#security"><span class="">Security Center &amp; Resilience</span></a><a class="flex items-center px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all font-body-sm text-body-sm" data-path="settings" href="#settings"><span class="">System &amp; Profile Settings</span></a></nav></div><div class="p-space-sm space-y-space-xs"><div class="p-2.5 rounded-xl bg-surface-container-lowest shadow-[0_1px_4px_rgba(0,0,0,0.03)] space-y-2.5"><div class="flex items-center justify-between"><div class="flex items-center gap-2.5 min-w-0"><img alt="Elena Vance Profile" class="w-8 h-8 rounded-full object-cover flex-shrink-0 ring-1 ring-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2D3f8-QvkKo7Iep79rwSRjqJSxlO1LNDFKOeQWUFCr2X0OcRZKqHzk3eutzQTCES5Fg0_FRJBYKHObO5NAT5D_0RSxNR71xMq8_Y2AMHIbV6b9dXMb3LSv2sKjoM2T5CkSfz1DCVRccy77T8Smg6vzxMkKM9qxEX5GPor0vGul7__cKEKdJNrFR4Wyig0VbRRc4h1deGJ_keampTAhyAKvCpYZB75WJZlI2lP0qHIcYtSQIyAiTXdww"><div class="flex flex-col min-w-0"><span class="font-title-md text-title-md text-on-surface leading-tight truncate">Elena Vance</span><span class="font-label-sm text-label-sm text-secondary truncate">Sovereign Account</span></div></div><a aria-label="Sign Out" class="w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-surface-container transition-colors" href="/" title="Sign Out"><span class="material-symbols-outlined text-[18px]">logout</span></a></div><a class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-surface-container-high/70 hover:bg-surface-container-highest text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" href="/"><span class="material-symbols-outlined text-[16px]">logout</span><span class="">Sign Out</span></a></div></div></aside><div class="pl-72"><header class="fixed top-0 left-72 right-0 h-16 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40 flex items-center justify-between px-space-lg border-b border-outline-variant/30"><div class="flex items-center gap-space-md flex-shrink-0"><div class="flex items-center gap-2 font-label-md text-label-md"><a class="text-on-surface-variant hover:text-on-surface transition-colors font-medium" href="#dashboard">Mandate Gateway</a><span class="text-outline-variant font-normal">/</span><span class="text-primary font-semibold text-title-md tracking-tight">Agent Passport</span></div><div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/30 text-on-surface-variant"><span class="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span><span class="font-code-sm text-[11px] tracking-wide uppercase font-medium">PayPal Sandbox Active</span></div></div><div class="flex-1 max-w-xl mx-space-md hidden sm:flex items-center justify-center"><div class="relative flex items-center w-full group"><span class="material-symbols-outlined text-[18px] text-on-surface-variant absolute left-3 transition-colors group-focus-within:text-primary pointer-events-none">search</span><input class="bg-surface-container-lowest/80 hover:bg-surface-container-lowest focus:bg-surface-container-lowest border border-outline-variant/30 focus:border-primary pl-9 pr-12 py-1.5 rounded-lg w-full font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant outline-none shadow-sm transition-all" placeholder="Search transactions, agents, mandates..." readonly="" type="text"><span class="font-code-sm text-[11px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant/30 absolute right-2.5 pointer-events-none">⌘K</span></div></div><div class="flex items-center gap-2 flex-shrink-0"><button aria-label="Notifications" class="relative w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-2 right-2 w-2 h-2 rounded-full bg-error ring-2 ring-surface"></span></button><button aria-label="Toggle theme" class="w-9 h-9 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">dark_mode</span></button><div class="h-4 w-px bg-outline-variant/30 mx-1"></div><button aria-label="User menu" class="flex items-center gap-2 p-1 rounded-full hover:bg-surface-container transition-colors ring-1 ring-outline-variant/30" type="button"><img alt="Elena Vance Profile" class="w-7 h-7 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2D3f8-QvkKo7Iep79rwSRjqJSxlO1LNDFKOeQWUFCr2X0OcRZKqHzk3eutzQTCES5Fg0_FRJBYKHObO5NAT5D_0RSxNR71xMq8_Y2AMHIbV6b9dXMb3LSv2sKjoM2T5CkSfz1DCVRccy77T8Smg6vzxMkKM9qxEX5GPor0vGul7__cKEKdJNrFR4Wyig0VbRRc4h1deGJ_keampTAhyAKvCpYZB75WJZlI2lP0qHIcYtSQIyAiTXdww"></button></div></header><main class="relative pt-16 bg-background min-h-screen w-full px-space-lg py-space-lg"><div class="flex flex-col w-full space-y-space-xl"><!-- Page Header: Editorial & Minimalist -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md border-b border-outline-variant/30 pb-space-lg">
+<div class="space-y-space-xs max-w-2xl">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm tracking-widest uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span class="">Mandate Gateway • Autonomous Identities</span>
+</div>
+<h1 class="font-display text-display text-primary tracking-tight">Agent Passport</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">
+      Review the identity and permissions of your authorized agents.
+    </p>
+</div>
+<div class="flex items-center gap-space-sm flex-shrink-0">
+<button class="group flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container transition-all shadow-sm" onclick="openModal('provisionModal')" type="button">
+<span class="material-symbols-outlined text-[18px] transition-transform group-hover:rotate-90">add</span>
+<span class="font-title-md text-title-md">Provision New Agent Passport</span>
+</button>
+</div>
+</div>
+<!-- Metric / Summary Strip (Inline typography row, NO separate boxed cards) -->
+<div class="py-space-sm px-space-md rounded-xl bg-surface-container-low flex flex-wrap items-center justify-between gap-space-md text-body-sm font-body-sm text-on-surface-variant">
+<div class="flex items-center gap-2">
+<span class="font-title-md text-primary font-semibold">3</span>
+<span class="">Active Passports</span>
+</div>
+<span class="hidden sm:inline text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-title-md text-primary font-semibold">₹2,05,000</span>
+<span class="">Aggregate Daily Ceiling</span>
+</div>
+<span class="hidden sm:inline text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-title-md text-primary font-semibold">7</span>
+<span class="">Allowed Merchant Endpoints</span>
+</div>
+<span class="hidden sm:inline text-outline-variant">•</span>
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-primary font-semibold">Ed25519</span>
+<span class="">ZK-Proof Protocol</span>
+</div>
+</div>
+<!-- Cryptographic Passports Ledger: Open Minimalist Rows -->
+<div class="space-y-space-md">
+<div class="flex items-center justify-between pb-space-xs border-b border-outline-variant/30">
+<div class="flex items-center gap-space-sm">
+<h2 class="font-headline-sm text-headline-sm text-primary font-medium">Cryptographic Passports Ledger</h2>
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-code-sm text-code-sm">3 Active</span>
+</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">
+      Standard: <span class="font-mono text-primary">W3C DID v1.0 / ZK-Attestation</span>
+</div>
+</div>
+<!-- Ledger Table / Open Rows -->
+<div class="divide-y divide-outline-variant/30">
+<!-- Row 1: Claude Shopping v3.5 -->
+<div class="py-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md transition-colors hover:bg-surface-container-lowest/50 rounded-xl px-space-xs">
+<div class="space-y-space-xs max-w-xl">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-title-md text-title-md text-primary font-bold">Claude Shopping v3.5</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">Flagship Procurement</span>
+<span class="inline-flex items-center gap-1.5 text-label-sm font-medium text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Active &amp; Verified
+          </span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Autonomous high-assurance IT hardware &amp; research procurement proxy</p>
+<div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-label-sm font-label-sm text-on-surface-variant pt-1">
+<div class="">Key: <span class="font-mono text-primary">0x7f9a88c2...3b81ef10</span></div>
+<span class="">•</span>
+<div class="">Mandate: <span class="text-primary font-medium">Office Hardware Q4</span></div>
+<span class="">•</span>
+<div class="">Ceiling: <span class="text-primary font-medium">₹50,000</span> auto / <span class="text-primary font-medium">₹1,50,000</span> disc.</div>
+<span class="">•</span>
+<div class="">Expires: <span class="text-primary">30 Dec 2024</span></div>
+</div>
+<div class="text-label-sm text-on-surface-variant flex items-center gap-1.5 pt-1">
+<span class="">Merchants:</span>
+<span class="text-primary font-medium">Amazon IN, Croma Retail, Lenovo Store</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm flex-shrink-0">
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5" onclick="previewCredential('claude')" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span class="">Inspect Proof</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-lg text-error hover:bg-error-container/20 font-label-md text-label-md transition-colors flex items-center gap-1" onclick="confirmRevoke('PASS-CLAUDE-981A', 'Claude Shopping v3.5')" type="button">
+<span class="material-symbols-outlined text-[16px]">block</span>
+<span class="">Revoke Access</span>
+</button>
+</div>
+</div>
+<!-- Row 2: Perplexity Buy v1.2 -->
+<div class="py-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md transition-colors hover:bg-surface-container-lowest/50 rounded-xl px-space-xs">
+<div class="space-y-space-xs max-w-xl">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-title-md text-title-md text-primary font-bold">Perplexity Buy v1.2</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">Specialized Sourcing</span>
+<span class="inline-flex items-center gap-1.5 text-label-sm font-medium text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            Active (₹5,000 Cap)
+          </span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Micro-purchase and niche textbook bibliographic research fulfillment</p>
+<div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-label-sm font-label-sm text-on-surface-variant pt-1">
+<div class="">Key: <span class="font-mono text-primary">0x4c220f8b...1d29fa8e</span></div>
+<span class="">•</span>
+<div class="">Mandate: <span class="text-primary font-medium">Engineering Hardware</span></div>
+<span class="">•</span>
+<div class="">Expiry: <span class="text-primary">14 days remaining</span></div>
+</div>
+<div class="text-label-sm text-on-surface-variant flex items-center gap-1.5 pt-1">
+<span class="">Merchants:</span>
+<span class="text-primary font-medium">Amazon India, Bookswagon</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm flex-shrink-0">
+<button class="px-3.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5" onclick="previewCredential('perplexity')" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+<span class="">Inspect Proof</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-lg text-error hover:bg-error-container/20 font-label-md text-label-md transition-colors flex items-center gap-1" onclick="confirmRevoke('PASS-PERPLEX-410C', 'Perplexity Buy v1.2')" type="button">
+<span class="material-symbols-outlined text-[16px]">block</span>
+<span class="">Revoke Access</span>
+</button>
+</div>
+</div>
+<!-- Row 3: AutoProcure Background Daemon -->
+<div class="py-space-lg flex flex-col xl:flex-row xl:items-center justify-between gap-space-md transition-colors hover:bg-surface-container-lowest/50 rounded-xl px-space-xs">
+<div class="space-y-space-xs max-w-xl">
+<div class="flex items-center gap-2.5 flex-wrap">
+<span class="font-title-md text-title-md text-primary font-bold">AutoProcure Background Daemon</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">System Service</span>
+<span class="inline-flex items-center gap-1.5 text-label-sm font-semibold text-error">
+<span class="w-1.5 h-1.5 rounded-full bg-error"></span>
+            Revaluation Pending (Expires in 5h)
+          </span>
+</div>
+<p class="text-body-sm text-on-surface-variant">Autonomous scheduled renewal daemon for compute clusters &amp; version control</p>
+<div class="flex flex-wrap items-center gap-y-1 gap-x-space-md text-label-sm font-label-sm text-on-surface-variant pt-1">
+<div class="">Key: <span class="font-mono text-primary">0x7e2911b...88f0</span></div>
+<span class="">•</span>
+<div class="">Mandate: <span class="text-primary font-medium">Cloud DevOps SaaS</span></div>
+<span class="">•</span>
+<div class="">Cap: <span class="text-primary font-medium">₹85,000/mo</span></div>
+</div>
+<div class="text-label-sm text-on-surface-variant flex items-center gap-1.5 pt-1">
+<span class="">Merchants:</span>
+<span class="text-primary font-medium">GitHub Enterprise, AWS Cloud, DigitalOcean</span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm flex-shrink-0">
+<button class="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-colors flex items-center gap-1.5 shadow-sm" onclick="renewToken('PASS-AUTOPROC-88F0')" type="button">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+<span class="">Renew Token</span>
+</button>
+<button class="px-3.5 py-1.5 rounded-lg text-error hover:bg-error-container/20 font-label-md text-label-md transition-colors flex items-center gap-1" onclick="confirmRevoke('PASS-AUTOPROC-88F0', 'AutoProcure Daemon')" type="button">
+<span class="material-symbols-outlined text-[16px]">delete_forever</span>
+<span class="">Revoke Immediately</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Verifiable Proof & Zero-Knowledge Summary (Zero Card Nesting, Pure Editorial Typography) -->
+<div class="pt-space-lg border-t border-outline-variant/30 space-y-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-xs">
+<div class="space-y-0.5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">verified</span>
+<h3 class="font-title-md text-title-md text-primary font-bold">Public Verifiable Proof &amp; Identity Guard</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">W3C Compliant Verifiable Credential issued through Sovereign Trust Node #09</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md transition-colors flex items-center gap-1.5" id="copyUrlBtn" onclick="copyVerificationUrl()" type="button">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span id="copyUrlLabel" class="">Copy Verification URL</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-space-md py-space-sm text-body-sm text-on-surface-variant border-y border-outline-variant/30">
+<div class="space-y-1">
+<div class="font-label-sm uppercase tracking-wider text-primary font-semibold">Zero Raw Financials</div>
+<p class="text-body-sm">No banking credentials, PAN, CVV, or card numbers are exposed to merchant terminals during checkout.</p>
+</div>
+<div class="space-y-1">
+<div class="font-label-sm uppercase tracking-wider text-primary font-semibold">Cryptographic Attestation</div>
+<p class="text-body-sm">Signed using Ed25519 node enclave keys. Merchants mathematically verify valid mandate envelopes client-side.</p>
+</div>
+<div class="space-y-1">
+<div class="font-label-sm uppercase tracking-wider text-primary font-semibold">Ephemeral Zero-PII</div>
+<p class="text-body-sm">User personally identifiable details remain unshared. Passports expire automatically upon envelope completion.</p>
+</div>
+</div>
+</div>
+<!-- Emergency Kill-Switch: Restrained Single Danger Row -->
+<div class="pt-space-md pb-space-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md border-b border-outline-variant/30">
+<div class="space-y-0.5 max-w-2xl">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-error text-[18px]">crisis_alert</span>
+<span class="font-title-md text-title-md text-error font-semibold">Emergency Kill-Switch: Revoke All Agent Passports</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+      Immediately repudiates all Ed25519 cryptographic credentials across Amazon, Croma, GitHub, and integrated merchant trust anchors. Ongoing sessions will terminate synchronously.
+    </p>
+</div>
+<button class="px-4 py-2 rounded-lg border border-error text-error hover:bg-error hover:text-on-error font-label-md text-label-md transition-all flex items-center gap-1.5 flex-shrink-0 shadow-sm" onclick="openModal('killSwitchModal')" type="button">
+<span class="material-symbols-outlined text-[16px]">power_settings_new</span>
+<span class="">Revoke All Passports</span>
+</button>
+</div>
+<!-- Demo Prototype State Notice -->
+<div class="text-center font-label-sm text-label-sm text-on-surface-variant pt-space-xs">
+<span class="">PROTOTYPE DEMO STATE • Sovereign Key Pair: </span>
+<span class="font-code-sm text-code-sm font-semibold text-primary">0xELENA_VANCE_NODE_ENCLAVE</span>
+<span class="mx-2">•</span>
+<span class="">Zero cloud secrets leaked • All cryptographic proofs generated client-side</span>
+</div></div>
+<script>
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+    if (!toast || !toastMsg) return;
+    
+    toastMsg.textContent = message;
+    toastIcon.textContent = isError ? 'warning' : 'check_circle';
+    toastIcon.className = `material-symbols-outlined text-[20px] ${isError ? 'text-error' : 'text-secondary'}`;
+    
+    toast.classList.remove('hidden');
+    toast.classList.add('flex');
+
+    setTimeout(() => {
+      toast.classList.remove('flex');
+      toast.classList.add('hidden');
+    }, 3200);
+  }
+
+  function triggerCopy(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+      showToast('Key / Link copied to sovereign clipboard');
+    } else {
+      showToast('Copied: ' + text.substring(0, 20) + '...');
+    }
+  }
+
+  function copyVerificationUrl() {
+    const btn = document.getElementById('copyUrlBtn');
+    const label = document.getElementById('copyUrlLabel');
+    const url = 'https://verify.mandategateway.internal/proof/did:mg:pass-claude-981a-signed';
+    
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url);
+    }
+    
+    if (label) label.textContent = 'Link Copied to Clipboard!';
+    showToast('External verification link generated and copied!');
+    
+    setTimeout(() => {
+      if (label) label.textContent = 'Copy External Verification URL';
+    }, 2500);
+  }
+
+  function openModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.remove('hidden');
+  }
+
+  function closeModal(id) {
+    const modal = document.getElementById(id);
+    if (modal) modal.classList.add('hidden');
+  }
+
+  function previewCredential(agent) {
+    const nameEl = document.getElementById('previewAgentName');
+    const didEl = document.getElementById('previewDid');
+    if (!nameEl || !didEl) return;
+
+    if (agent === 'claude') {
+      nameEl.textContent = 'Claude Shopping v3.5';
+      didEl.textContent = 'did:mandate:gateway:ed25519:7f9a88c2...3b81ef10';
+      showToast('Switched preview to Claude Shopping v3.5');
+    } else if (agent === 'perplexity') {
+      nameEl.textContent = 'Perplexity Buy v1.2';
+      didEl.textContent = 'did:mandate:gateway:ed25519:4c220f8b...1d29fa8e';
+      showToast('Switched preview to Perplexity Buy v1.2');
+    }
+  }
+
+  function confirmRevoke(id, name) {
+    if (confirm(`Repudiate passport ${id} for ${name}? The agent will lose autonomous checkout authority.`)) {
+      showToast(`Revoked passport ${id}. Merkle branch severed.`, true);
+    }
+  }
+
+  function renewToken(id) {
+    showToast(`Token for ${id} re-signed for 30 additional days via secure enclave.`);
+  }
+
+  function validateKillSwitch() {
+    const input = document.getElementById('killSwitchInput');
+    const btn = document.getElementById('killSwitchExecuteBtn');
+    if (!input || !btn) return;
+
+    if (input.value.trim() === 'REVOKE-ALL-CONFIRM') {
+      btn.disabled = false;
+      btn.classList.remove('opacity-40', 'cursor-not-allowed');
+      btn.classList.add('hover:bg-error/80');
+    } else {
+      btn.disabled = true;
+      btn.classList.add('opacity-40', 'cursor-not-allowed');
+      btn.classList.remove('hover:bg-error/80');
+    }
+  }
+
+  function executeKillSwitch() {
+    closeModal('killSwitchModal');
+    showToast('ALL PASS-TOKENS TERMINATED. Agent network disconnected.', true);
+  }
+
+  function handleProvisionSubmit(e) {
+    e.preventDefault();
+    closeModal('provisionModal');
+    showToast('New Agent Passport cryptographically minted & active.');
+  }
+</script></main></div>
+
+</body></html>
