@@ -103,7 +103,7 @@ export default function PurchaseRequestsPage() {
     setActionLoading(true);
     try {
       const res = await api.approveRequest(item.id);
-      showToast('Order Approved', `Settled via single-use PayPal sandbox order ${res.request?.paypalOrder?.orderId || ''}`);
+      showToast('Order Approved (Simulated)', `Simulated authorization on PayPal sandbox order ${res.request?.paypalOrder?.orderId || ''}`);
       await loadLiveRequests();
     } catch (err) {
       showToast('Action Failed', err.message);
@@ -536,7 +536,7 @@ export default function PurchaseRequestsPage() {
                           </button>
                         </div>
                         <span className="text-center font-mono text-[10px] text-[#888B8C]">
-                          Executing release issues a cryptographic single-use token authorization to PayPal Sandbox.
+                          Simulated Sandbox Rail: Release issues a single-use demo authorization token to PayPal Sandbox.
                         </span>
                       </div>
                     )}
@@ -549,10 +549,10 @@ export default function PurchaseRequestsPage() {
                           className="w-full py-2.5 px-4 rounded-md border border-[#E7E7E3] bg-[#FAF9F6] hover:bg-[#F4F4F0] text-charcoal text-xs font-medium flex items-center justify-center gap-2 shadow-sm transition-colors cursor-pointer"
                         >
                           <span className="material-symbols-outlined text-[16px] text-secondary">verified</span>
-                          <span>View Proof of Intent Dispute Pack</span>
+                          <span>View Proof of Intent Dispute Pack (Demo)</span>
                         </button>
                         <div className="p-3 bg-emerald-50/60 border border-emerald-200/60 rounded text-xs font-mono text-emerald-900 flex justify-between items-center">
-                          <span>Settlement Nonce:</span>
+                          <span>Simulated Settlement Nonce:</span>
                           <span className="font-semibold">{selectedItem.hash}</span>
                         </div>
                       </div>

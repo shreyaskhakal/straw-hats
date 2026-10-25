@@ -269,7 +269,7 @@ export default function DashboardPage() {
                             {actionFeedback[req.id] === 'approved' ? (
                               <span className="text-emerald-700 font-label-md flex items-center gap-1">
                                 <span className="material-symbols-outlined text-[16px]">done</span>
-                                <span>Single-Use PayPal Order Issued</span>
+                                <span>Single-Use PayPal Sandbox Order Issued</span>
                               </span>
                             ) : actionFeedback[req.id] === 'rejected' ? (
                               <span className="text-error font-label-md flex items-center gap-1">

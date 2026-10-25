@@ -5,7 +5,7 @@ export default function DisputePackModal({ disputePack, onClose }) {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(JSON.stringify(disputePack, null, 2));
-    alert('Cryptographic Dispute Evidence JSON copied to clipboard');
+    alert('Dispute Evidence JSON (Simulated Sandbox Artifact) copied to clipboard');
   };
 
   return (
@@ -18,11 +18,16 @@ export default function DisputePackModal({ disputePack, onClose }) {
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-secondary text-[20px]">verified</span>
             <div>
-              <h3 className="font-title-md text-[16px] font-semibold text-primary">
-                Proof of Intent Dispute Package
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-title-md text-[16px] font-semibold text-primary">
+                  Proof of Intent Dispute Package
+                </h3>
+                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-800 border border-amber-500/20">
+                  Simulated Demo
+                </span>
+              </div>
               <span className="font-code-sm text-[11px] text-secondary">
-                {disputePack.packId} • PayPal Claims Ready
+                {disputePack.packId} • PayPal Claims Ready (Sandbox Spec)
               </span>
             </div>
           </div>

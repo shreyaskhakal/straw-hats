@@ -63,9 +63,9 @@ export default function MerchantVerifyPage() {
         </Link>
 
         <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-full bg-secondary-container/40 text-on-secondary-fixed font-code-sm text-code-sm flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-            Zero-Knowledge Attestation
+          <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-800 border border-amber-500/20 font-code-sm text-[11px] flex items-center gap-1.5" title="Demo sandbox mode for frontend preview">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            Simulated Verification Demo
           </span>
           <Link
             to="/dashboard"
@@ -133,16 +133,16 @@ export default function MerchantVerifyPage() {
                 </div>
                 <div>
                   <h2 className="font-title-md text-[18px] font-semibold text-primary">
-                    Trusted Autonomous Agent
+                    Trusted Autonomous Agent (Simulated)
                   </h2>
                   <span className="font-code-sm text-code-sm text-secondary font-semibold font-mono">
-                    {data.status} • Token Signature Valid
+                    {data.status} • Simulated Signature Verified (Sandbox Demo)
                   </span>
                 </div>
               </div>
 
               <span className="px-3 py-1 rounded-full bg-secondary text-on-secondary text-label-sm font-semibold tracking-wider uppercase">
-                SAFE TO CLEAR
+                SAFE TO CLEAR (DEMO)
               </span>
             </div>
 
@@ -180,7 +180,7 @@ export default function MerchantVerifyPage() {
             </div>
 
             <div className="pt-2 text-label-sm text-secondary text-center font-code-sm border-t border-outline-variant/30">
-              Attested via Mandate Gateway Sovereign Enclave • Token Hash #{activeToken?.substring(0, 16)}...
+              Simulated verification preview via Mandate Gateway Demo Enclave • Token Hash #{activeToken?.substring(0, 16)}...
             </div>
           </div>
         ) : null}
@@ -188,7 +188,7 @@ export default function MerchantVerifyPage() {
 
       {/* Footer */}
       <footer className="text-center font-code-sm text-code-sm text-secondary py-4 border-t border-outline-variant/30 max-w-4xl mx-auto w-full">
-        Mandate Gateway • Autonomous Commerce Trust Layer & SGX Enclave Verifier
+        Mandate Gateway • Autonomous Commerce Trust Layer & Enclave Verifier (Frontend Preview Demo)
       </footer>
     </div>
   );

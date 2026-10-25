@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "start": "node server/index.js",
-    "test": "node scripts/test_integration.mjs && node scripts/test_routes.mjs"
+    "test": "node scripts/test_frontend.mjs",
+    "test:frontend": "node scripts/test_frontend.mjs",
+    "test:integration": "node scripts/test_integration.mjs && node scripts/test_routes.mjs"
   },
   "dependencies": {
     "express-rate-limit": "^8.7.1",

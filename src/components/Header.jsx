@@ -34,8 +34,12 @@ export default function Header({ pageTitle = 'Overview Ledger', onOpenGuide }) {
         <span className="text-primary font-medium tracking-tight truncate">
           {pageTitle}
         </span>
-        <span className="ml-2 sm:ml-4 px-2 py-0.5 rounded-full text-[10px] font-code-sm bg-secondary-container/60 text-secondary uppercase tracking-wider hidden lg:inline-block shrink-0">
-          PayPal Sandbox
+        <span className="ml-2 sm:ml-4 px-2.5 py-0.5 rounded-full text-[10px] font-code-sm bg-amber-500/10 text-amber-800 border border-amber-500/20 uppercase tracking-wider hidden sm:inline-flex items-center gap-1.5 shrink-0" title="Frontend preview operating with simulated sandbox payment rails & demo data">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          Simulated Sandbox Rails
+        </span>
+        <span className="sm:hidden ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/10 text-amber-800 border border-amber-500/20 shrink-0" title="Frontend preview operating with simulated sandbox rails">
+          Demo
         </span>
       </div>
 
