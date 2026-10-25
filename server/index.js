@@ -1,13 +1,51 @@
 import express from 'express';
-import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+import {
+  createCorsMiddleware,
+  createHelmetMiddleware,
+  standardLimiter,
+  authLimiter,
+  aiProcurementLimiter,
+  createAuthMiddleware,
+  validateBody,
+  exportToSafeCsv,
+  errorHandler
+} from './securityMiddleware.js';
+
+import { evaluatePurchasePolicy } from './policyEngine.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, '..');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
-app.use(express.json());
+// Validate Environment Variables on Startup
+function validateEnvironment() {
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  console.log(`[STARTUP] Initializing Mandate Gateway Server in mode: ${nodeEnv.toUpperCase()}`);
+  if (nodeEnv === 'production') {
+    if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
+      console.warn('[SECURITY WARNING] SESSION_SECRET is missing or less than 32 characters in production. Using ephemeral fallback.');
+    }
+  }
+}
+validateEnvironment();
 
-// In-Memory Database initialized with realistic data matching Stitch designs
+// Security Headers & Body Parser
+app.use(createHelmetMiddleware());
+app.use(createCorsMiddleware());
+app.use(express.json({ limit: '64kb' })); // Restrict request body size to prevent DoS
+
+// Global Standard Rate Limiter on /api
+app.use('/api', standardLimiter);
+
+// ---------------------- IN-MEMORY DATABASE & STATE ----------------------
+
 let sessionUser = {
   id: 'usr_elena_vance',
   name: 'Elena Vance',
@@ -19,14 +57,22 @@ let sessionUser = {
   compliance: 'PCI-DSS 4.0 Attested',
 };
 
+// Emergency Kill Switch State
+let emergencyKillSwitch = {
+  active: false,
+  activatedAt: null,
+  activatedBy: null,
+  reason: null,
+};
+
 let mandates = [
   {
     id: 'M-902',
     name: 'Office Hardware Q4',
     category: 'Hardware & Peripherals',
-    agents: ['Claude Shopping'],
-    allowedMerchants: ['Amazon India', 'Croma Retail', 'Logitech Official'],
-    budgetCeiling: 25000,
+    agents: ['Claude Shopping', 'Claude Shopping v3.5'],
+    allowedMerchants: ['Amazon India', 'Croma Retail', 'Logitech Official', 'Lenovo Direct', 'Apple India Official', 'Dell Direct'],
+    budgetCeiling: 50000,
     utilized: 18200,
     currency: 'INR',
     singlePurchaseLimit: 5000,
@@ -41,7 +87,7 @@ let mandates = [
     id: 'M-844',
     name: 'DevOps & Infrastructure SaaS',
     category: 'Cloud & Infrastructure',
-    agents: ['AutoProcure'],
+    agents: ['AutoProcure', 'AutoProcure Daemon'],
     allowedMerchants: ['GitHub', 'AWS', 'DigitalOcean', 'Cloudflare'],
     budgetCeiling: 12000,
     utilized: 9450,
@@ -58,7 +104,7 @@ let mandates = [
     id: 'M-719',
     name: 'Research & Reference Materials',
     category: 'Books & Subscriptions',
-    agents: ['Perplexity Buy'],
+    agents: ['Perplexity Buy', 'Perplexity Buy v1.2'],
     allowedMerchants: ['Amazon India', 'Bookswagon', 'ACM Digital Library'],
     budgetCeiling: 5500,
     utilized: 1850,
@@ -97,7 +143,7 @@ let agentPassports = [
     agentIdentifier: 'agent.anthropic.claude-3-5.shop-v1',
     tokenPrefix: '0x9A...3B81',
     fullToken: '0x9A48F9E03B812C44D87102E9B310FCA1',
-    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIH1...',
+    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIH188a109bf004123b81ef1088c42109e2fa90a1bc334188',
     authorizedBy: 'Elena Vance (WebAuthn Signed)',
     spendingCeiling: 25000,
     expiresInDays: 28,
@@ -113,7 +159,7 @@ let agentPassports = [
     agentIdentifier: 'agent.perplexity.sonar.procure-v2',
     tokenPrefix: '0x4C...1D29',
     fullToken: '0x4C189A021D2988F023AB45CC9031E512',
-    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIN9...',
+    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIN941b20f8b77a012911d29fa8e990b7145e12089ca2001',
     authorizedBy: 'Elena Vance (WebAuthn Signed)',
     spendingCeiling: 5500,
     expiresInDays: 14,
@@ -129,7 +175,7 @@ let agentPassports = [
     agentIdentifier: 'agent.langchain.autoprocure.saas-v4',
     tokenPrefix: '0x7E...88F0',
     fullToken: '0x7E301CB288F099AD4356E088190B3891',
-    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIZ7...',
+    publicKey: 'ed25519:MC4CAQAwBQYDK2VwBCIEIZ7921acb6188f001294821cc0911094ba76192a001889',
     authorizedBy: 'Elena Vance (WebAuthn Signed)',
     spendingCeiling: 12000,
     expiresInDays: 1,
@@ -315,7 +361,8 @@ let paymentMethods = [
     balance: '$4,850.00 USD (Sandbox)',
     autoApproveCap: '₹3,000 INR',
     mode: 'SANDBOX',
-    webhookStatus: 'ACTIVE (Listener verified)'
+    webhookStatus: 'ACTIVE (Listener verified)',
+    frozen: false
   },
   {
     id: 'pm_vcard_primary',
@@ -499,6 +546,7 @@ let redTeamAttacks = [
 let appSettings = {
   defaultAutoApproveLimit: 3000,
   requireCoSignerThreshold: 8000,
+  hardMandateCap: 150000,
   autoRevokeOnAnomaly: true,
   strictQuoteVerification: true,
   paypalSandboxMode: true,
@@ -507,19 +555,49 @@ let appSettings = {
   webhookEndpoint: 'https://gateway.internal.sovereign/v1/webhook',
   notificationsEmail: 'elena.vance@sovereign-vault.internal',
   coSignerEmail: 'family-co-signer@vault.internal',
-  networkNodeId: 'node-us-east-sgx-01'
+  networkNodeId: 'node-us-east-sgx-01',
+  currency: 'INR',
+  nodeMode: 'sandbox'
 };
+
+const requireAuth = createAuthMiddleware(sessionUser);
 
 // ---------------------- API ROUTES ----------------------
 
-// Session
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'UP',
+    service: 'Mandate Gateway API',
+    version: '2.4.0',
+    mode: 'SANDBOX',
+    killSwitchActive: emergencyKillSwitch.active,
+    activeMandatesCount: mandates.filter(m => m.status === 'ACTIVE').length,
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
+
+// Session & Auth
 app.get('/api/session', (req, res) => {
   res.json({ success: true, user: sessionUser });
 });
 
-app.post('/api/login', (req, res) => {
-  const { passphrase, rememberTerminal } = req.body;
+app.post('/api/login', authLimiter, (req, res) => {
+  const { passphrase } = req.body || {};
   sessionUser.isAuthenticated = true;
+
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: 'USER_LOGIN',
+    agent: 'Elena Vance',
+    summary: 'Sovereign Account authenticated via hardware terminal.',
+    amount: 'Session Verified',
+    meta: 'FIDO2 / WebAuthn Assertion Validated',
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`
+  });
+
   res.json({
     success: true,
     user: sessionUser,
@@ -547,12 +625,13 @@ app.get('/api/dashboard', (req, res) => {
       totalMandates: mandates.length,
       totalCeiling,
       totalUtilized,
-      utilizationPercentage: Math.round((totalUtilized / totalCeiling) * 100),
+      utilizationPercentage: totalCeiling > 0 ? Math.round((totalUtilized / totalCeiling) * 100) : 0,
       authorizedAgentsCount: agentPassports.filter(a => a.status === 'ACTIVE').length,
       pendingApprovalsCount: pendingApprovals.length,
       haltedAmount: haltedSum,
       policyInvariance: '100%',
-      blockedCallsCount: 14
+      blockedCallsCount: purchaseRequests.filter(r => r.status === 'BLOCKED').length + 14,
+      killSwitchActive: emergencyKillSwitch.active
     },
     pendingApprovals,
     activeMandates: mandates,
@@ -566,25 +645,26 @@ app.get('/api/mandates', (req, res) => {
   res.json({ success: true, mandates });
 });
 
-app.post('/api/mandates', (req, res) => {
+app.post('/api/mandates', requireAuth, validateBody(['name', 'budgetCeiling']), (req, res) => {
   const { name, category, plainTextRule, budgetCeiling, singlePurchaseLimit, allowedMerchants, agents } = req.body;
   
-  if (!name || !budgetCeiling) {
-    return res.status(400).json({ success: false, error: 'Name and budget ceiling are required' });
+  const parsedBudget = Number(budgetCeiling);
+  if (isNaN(parsedBudget) || parsedBudget <= 0) {
+    return res.status(400).json({ success: false, error: 'Budget ceiling must be a positive number' });
   }
 
   const newId = `M-${Math.floor(100 + Math.random() * 900)}`;
   const newMandate = {
     id: newId,
-    name,
+    name: name.trim(),
     category: category || 'General Procurement',
     plainTextRule: plainTextRule || `Custom mandate rule for ${name}`,
-    budgetCeiling: Number(budgetCeiling),
+    budgetCeiling: parsedBudget,
     utilized: 0,
     currency: 'INR',
-    singlePurchaseLimit: Number(singlePurchaseLimit || Math.round(budgetCeiling / 4)),
-    allowedMerchants: allowedMerchants && allowedMerchants.length ? allowedMerchants : ['Amazon India', 'Croma Retail'],
-    agents: agents && agents.length ? agents : ['Claude Shopping'],
+    singlePurchaseLimit: Number(singlePurchaseLimit || Math.round(parsedBudget / 4)),
+    allowedMerchants: Array.isArray(allowedMerchants) && allowedMerchants.length ? allowedMerchants : ['Amazon India', 'Croma Retail'],
+    agents: Array.isArray(agents) && agents.length ? agents : ['Claude Shopping'],
     status: 'ACTIVE',
     expiry: '2026-12-31',
     createdAt: new Date().toISOString(),
@@ -593,13 +673,12 @@ app.post('/api/mandates', (req, res) => {
 
   mandates.unshift(newMandate);
 
-  // Add audit entry
   auditFeed.unshift({
     id: `evt_${Date.now()}`,
     type: 'MANDATE_CREATED',
     agent: 'Elena Vance',
-    summary: `New mandate ${newMandate.name} (#${newMandate.id}) created with ceiling ₹${newMandate.budgetCeiling}.`,
-    amount: `Ceiling: ₹${newMandate.budgetCeiling}`,
+    summary: `New mandate ${newMandate.name} (#${newMandate.id}) created with ceiling ₹${newMandate.budgetCeiling.toLocaleString()}.`,
+    amount: `Ceiling: ₹${newMandate.budgetCeiling.toLocaleString()}`,
     meta: 'FIDO2 / WebAuthn cryptographically sealed',
     timestamp: 'Just now',
     hash: `sha256:${Math.random().toString(16).substring(2, 10)}`,
@@ -613,7 +692,7 @@ app.post('/api/mandates', (req, res) => {
   res.status(201).json({ success: true, mandate: newMandate });
 });
 
-app.post('/api/mandates/:id/revoke', (req, res) => {
+app.post('/api/mandates/:id/revoke', requireAuth, (req, res) => {
   const mandate = mandates.find(m => m.id === req.params.id);
   if (!mandate) return res.status(404).json({ success: false, error: 'Mandate not found' });
 
@@ -636,9 +715,11 @@ app.post('/api/mandates/:id/revoke', (req, res) => {
 });
 
 // Shopping Agent: Natural Language Brief Parser
-app.post('/api/agent/parse-brief', (req, res) => {
-  const { prompt } = req.body;
-  if (!prompt) return res.status(400).json({ success: false, error: 'Prompt is required' });
+app.post('/api/agent/parse-brief', aiProcurementLimiter, (req, res) => {
+  const { prompt } = req.body || {};
+  if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
+    return res.status(400).json({ success: false, error: 'Prompt is required' });
+  }
 
   const lower = prompt.toLowerCase();
   
@@ -651,7 +732,7 @@ app.post('/api/agent/parse-brief', (req, res) => {
   const hasTopButton = lower.includes('top button') || lower.includes('dpi');
   
   let priceMatch = lower.match(/(?:under|below|less than|max|₹|\$)\s*(\d+)/);
-  let maxPrice = priceMatch ? parseInt(priceMatch[1]) : (lower.includes('$40') ? 3300 : 5000);
+  let maxPrice = priceMatch ? parseInt(priceMatch[1], 10) : (lower.includes('$40') ? 3300 : 5000);
 
   const structuredBrief = {
     productType: isMouse ? 'Gaming Mouse' : isKeyboard ? 'Mechanical Keyboard' : 'Computer Peripheral',
@@ -684,7 +765,7 @@ app.post('/api/agent/parse-brief', (req, res) => {
 });
 
 // Shopping Agent: Candidate Evaluation with Quote Verification
-app.post('/api/agent/evaluate-candidates', (req, res) => {
+app.post('/api/agent/evaluate-candidates', aiProcurementLimiter, (req, res) => {
   const candidates = [
     {
       id: 'prod_match_01',
@@ -696,6 +777,13 @@ app.post('/api/agent/evaluate-candidates', (req, res) => {
       image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGqwIsKwfPmOuWi7w8Z-ROPHNTVH4U6UHCMLsJc_BDJso3CMDUp6_VQBcGZ-PmVSTj5_xHpQBAqo5lIC386p8psBsLfD_nhXgbB7SE02dotT-AoVkjNojMzNiink_ga2lITFcOlQ00_nZiLZWha3cxjM27UG6G23bcdg5bZyewTFfWXcxCRJZcCwgKgVJU7iXEfoXU1nZm6ZGWehqpIcUs5yuNBQbDyGmfSDdhauM4zfnthtliCFqyvQ',
       complianceScore: 100,
       verdict: 'FULL_MATCH_ELIGIBLE',
+      specs: [
+        { label: 'Wired Connection', pass: true },
+        { label: 'Crimson Red Lighting', pass: true },
+        { label: 'Side Buttons', pass: true },
+        { label: 'Top DPI Clutch', pass: true },
+        { label: 'Price Limit', pass: true }
+      ],
       quoteChecks: [
         { spec: 'Wired Connection', status: 'MATCH', quote: '"Speedflex Cable ensures fluid, drag-free wired responsiveness with zero battery drag."' },
         { spec: 'Color Accent', status: 'MATCH', quote: '"Programmable 11-Zone Chroma lighting with vibrant Crimson Red and customizable accents."' },
@@ -715,6 +803,11 @@ app.post('/api/agent/evaluate-candidates', (req, res) => {
       complianceScore: 40,
       verdict: 'DEALBREAKER_REJECTED',
       rejectionReason: 'Dealbreaker Triggered: Wireless-only device. User brief specifically mandated Wired.',
+      specs: [
+        { label: 'Wired Connection', pass: false },
+        { label: 'Color Accent', pass: false },
+        { label: 'Side Buttons', pass: true }
+      ],
       quoteChecks: [
         { spec: 'Wired Connection', status: 'MISMATCH', quote: '"Next-generation LIGHTSPEED wireless technology with 250-hour AA battery life."' },
         { spec: 'Color Accent', status: 'MISMATCH', quote: '"Matte White finish with black grip buttons."' },
@@ -732,6 +825,10 @@ app.post('/api/agent/evaluate-candidates', (req, res) => {
       complianceScore: 50,
       verdict: 'DEALBREAKER_REJECTED',
       rejectionReason: 'Dealbreaker Triggered: Item is certified refurbished. Must-have requires brand new stock.',
+      specs: [
+        { label: 'Item Condition', pass: false },
+        { label: 'Wired Connection', pass: true }
+      ],
       quoteChecks: [
         { spec: 'Item Condition', status: 'MISMATCH', quote: '"Professionally restored refurbished unit with 90-day replacement warranty."' },
         { spec: 'Wired Connection', status: 'MATCH', quote: '"Super mesh soft micro-fiber cable."' }
@@ -748,6 +845,10 @@ app.post('/api/agent/evaluate-candidates', (req, res) => {
       complianceScore: 65,
       verdict: 'UNKNOWN_SPEC_REQUIRES_REVIEW',
       rejectionReason: 'Spec Unknown: Listing text fails to document DPI button position or button count.',
+      specs: [
+        { label: 'Top DPI Button', pass: false },
+        { label: 'Wired Connection', pass: true }
+      ],
       quoteChecks: [
         { spec: 'Top DPI Button', status: 'UNKNOWN', quote: 'No mention of top button in listing specifications.' },
         { spec: 'Wired Connection', status: 'MATCH', quote: '"Braided USB gold-plated connector cord."' }
@@ -764,14 +865,151 @@ app.post('/api/agent/evaluate-candidates', (req, res) => {
   });
 });
 
+// Deterministic Policy Engine Evaluation Endpoint
+app.post('/api/policy/evaluate', (req, res) => {
+  const { request: purchaseReq, mandateId } = req.body || {};
+  if (!purchaseReq) {
+    return res.status(400).json({ success: false, error: 'request payload is required' });
+  }
+
+  const targetMandate = mandateId ? mandates.find(m => m.id === mandateId) : mandates.find(m => m.id === purchaseReq.mandateId) || mandates[0];
+
+  const evalResult = evaluatePurchasePolicy({
+    request: purchaseReq,
+    mandate: targetMandate,
+    systemState: {
+      emergencyKillSwitchActive: emergencyKillSwitch.active,
+      agentPassports,
+      requireCoSignerThreshold: appSettings.requireCoSignerThreshold
+    }
+  });
+
+  res.json({ success: true, evaluation: evalResult });
+});
+
 // Purchase Requests
 app.get('/api/requests', (req, res) => {
   res.json({ success: true, requests: purchaseRequests });
 });
 
-app.post('/api/requests/:id/approve', (req, res) => {
+// Create Purchase Request from Shopping Agent or external dispatch
+app.post('/api/requests', requireAuth, validateBody(['itemTitle', 'amount', 'merchant']), (req, res) => {
+  const {
+    itemTitle,
+    amount,
+    currency = 'INR',
+    merchant,
+    mandateId = 'M-902',
+    agentName = 'Claude Shopping',
+    agentId = 'pass_claude_shop',
+    listingUrl,
+    specs = [],
+    quoteEvidence = []
+  } = req.body;
+
+  const targetMandate = mandates.find(m => m.id === mandateId) || mandates[0];
+
+  // Evaluate against policy engine
+  const evalResult = evaluatePurchasePolicy({
+    request: { itemTitle, amount: Number(amount), currency, merchant, agentId, agentName, specs },
+    mandate: targetMandate,
+    systemState: {
+      emergencyKillSwitchActive: emergencyKillSwitch.active,
+      agentPassports,
+      requireCoSignerThreshold: appSettings.requireCoSignerThreshold
+    }
+  });
+
+  const newId = `PR-${Math.floor(1000 + Math.random() * 9000)}`;
+  let status = 'PENDING_HITL';
+  let triggerReason = evalResult.reasons.join(' • ');
+
+  if (evalResult.verdict === 'ALLOW') {
+    status = 'AUTO_CLEARED';
+    targetMandate.utilized += Number(amount);
+  } else if (evalResult.verdict === 'BLOCK' || evalResult.verdict === 'ERROR') {
+    status = 'BLOCKED';
+  } else {
+    status = 'PENDING_HITL';
+  }
+
+  const newRequest = {
+    id: newId,
+    itemTitle: itemTitle.trim(),
+    merchant: merchant.trim(),
+    agentName,
+    agentId,
+    amount: Number(amount),
+    currency,
+    mandateId: targetMandate.id,
+    mandateName: targetMandate.name,
+    status,
+    triggerReason,
+    decisionType: evalResult.decisionType,
+    createdAt: new Date().toISOString(),
+    listingUrl: listingUrl || `https://${merchant.toLowerCase().replace(/\s+/g, '')}.com/items/${newId}`,
+    quoteEvidence: quoteEvidence.length > 0 ? quoteEvidence : [
+      { field: 'Product Name', value: itemTitle, exactQuote: `"${itemTitle}"`, match: true },
+      { field: 'Price', value: `₹${amount}`, exactQuote: `"Listed price ₹${amount}"`, match: true }
+    ],
+    paypalOrder: {
+      orderId: `MOCK-PP-ORD-${Date.now().toString().slice(-6)}`,
+      status: status === 'AUTO_CLEARED' ? 'COMPLETED' : 'AWAITING_PAYER_APPROVAL',
+      captureId: status === 'AUTO_CLEARED' ? `CAP-${Date.now().toString().slice(-8)}` : null,
+      payee: `${merchant} Official (PayPal Sandbox)`,
+      singleUseToken: `tok_sandbox_${Math.random().toString(16).substring(2, 10)}`
+    }
+  };
+
+  purchaseRequests.unshift(newRequest);
+
+  // Audit entry
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: status === 'AUTO_CLEARED' ? 'AUTO_CLEARED' : status === 'BLOCKED' ? 'MERCHANT_BLOCKED' : 'HITL_ESCALATION',
+    agent: agentName,
+    summary: `${itemTitle} (${merchant}) evaluated: ${status} (${evalResult.decisionType}).`,
+    amount: `₹${Number(amount).toLocaleString()}`,
+    meta: `Policy check: ${evalResult.reasons[0] || 'Processed'}`,
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`,
+    details: {
+      requestId: newId,
+      verdict: evalResult.verdict,
+      mandate: targetMandate.name
+    }
+  });
+
+  res.status(201).json({ success: true, request: newRequest, evaluation: evalResult });
+});
+
+app.post('/api/requests/:id/approve', requireAuth, (req, res) => {
   const reqItem = purchaseRequests.find(r => r.id === req.params.id);
   if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
+
+  // Prevent duplicate approval
+  if (reqItem.status === 'AUTO_CLEARED') {
+    return res.status(409).json({
+      success: false,
+      error: `Request #${reqItem.id} has already been approved and settled (Capture ID: ${reqItem.paypalOrder?.captureId || 'settled'}). Duplicate approval blocked.`
+    });
+  }
+
+  // Prevent approving blocked requests
+  if (reqItem.status === 'BLOCKED') {
+    return res.status(409).json({
+      success: false,
+      error: `Request #${reqItem.id} was BLOCKED due to policy invariance violations. Overriding deterministic blocks is forbidden.`
+    });
+  }
+
+  // Check kill switch
+  if (emergencyKillSwitch.active) {
+    return res.status(403).json({
+      success: false,
+      error: 'Emergency Kill Switch is ENGAGED. Approvals are blocked until the kill switch is deactivated.'
+    });
+  }
 
   reqItem.status = 'AUTO_CLEARED';
   reqItem.triggerReason = 'Human Authorized: Single-use PayPal order authorized and cleared by Elena Vance.';
@@ -779,7 +1017,7 @@ app.post('/api/requests/:id/approve', (req, res) => {
   reqItem.paypalOrder.captureId = `CAP-${Date.now().toString().slice(-8)}`;
   reqItem.settledAt = new Date().toISOString();
 
-  // Update mandate utilization
+  // Atomically update mandate utilization
   const mandate = mandates.find(m => m.id === reqItem.mandateId);
   if (mandate) {
     mandate.utilized += reqItem.amount;
@@ -804,9 +1042,16 @@ app.post('/api/requests/:id/approve', (req, res) => {
   res.json({ success: true, request: reqItem });
 });
 
-app.post('/api/requests/:id/reject', (req, res) => {
+app.post('/api/requests/:id/reject', requireAuth, (req, res) => {
   const reqItem = purchaseRequests.find(r => r.id === req.params.id);
   if (!reqItem) return res.status(404).json({ success: false, error: 'Request not found' });
+
+  if (reqItem.status === 'AUTO_CLEARED') {
+    return res.status(409).json({
+      success: false,
+      error: `Request #${reqItem.id} has already been settled and cannot be cancelled retroactively.`
+    });
+  }
 
   reqItem.status = 'REJECTED';
   reqItem.triggerReason = 'Human Authorization Declined: Order cancelled by sovereign account holder.';
@@ -865,7 +1110,7 @@ app.get('/api/payment-methods', (req, res) => {
   res.json({ success: true, paymentMethods });
 });
 
-app.post('/api/payment-methods/:id/toggle-freeze', (req, res) => {
+app.post('/api/payment-methods/:id/toggle-freeze', requireAuth, (req, res) => {
   const pm = paymentMethods.find(p => p.id === req.params.id);
   if (!pm) return res.status(404).json({ success: false, error: 'Payment method not found' });
 
@@ -886,13 +1131,114 @@ app.post('/api/payment-methods/:id/toggle-freeze', (req, res) => {
   res.json({ success: true, paymentMethod: pm });
 });
 
+// Connect Sandbox Payment Rail
+app.post('/api/payment-methods/connect', requireAuth, validateBody(['name', 'type']), (req, res) => {
+  const { name, type, identifier, autoApproveCap } = req.body;
+  const newId = `pm_rail_${Date.now()}`;
+  const newMethod = {
+    id: newId,
+    type: type || 'SANDBOX_RAIL',
+    name: name.trim(),
+    identifier: identifier || `sb-${Date.now().toString().slice(-4)}@business.example.com`,
+    clientId: `BAAv${Math.random().toString(16).substring(2, 8)}`,
+    status: 'CONNECTED',
+    balance: '$5,000.00 USD (Sandbox)',
+    autoApproveCap: autoApproveCap || '₹5,000 INR',
+    mode: 'SANDBOX',
+    webhookStatus: 'ACTIVE (Listener verified)',
+    frozen: false
+  };
+
+  paymentMethods.push(newMethod);
+
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: 'PAYMENT_RAIL_CONNECTED',
+    agent: 'Elena Vance',
+    summary: `Sandbox rail "${newMethod.name}" connected with ${newMethod.autoApproveCap} cap.`,
+    amount: newMethod.autoApproveCap,
+    meta: 'Sandbox isolation guard verified',
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`
+  });
+
+  res.status(201).json({ success: true, paymentMethod: newMethod });
+});
+
+// Update Payment Limits
+app.post('/api/payment-methods/:id/limits', requireAuth, (req, res) => {
+  const pm = paymentMethods.find(p => p.id === req.params.id);
+  if (!pm) return res.status(404).json({ success: false, error: 'Payment method not found' });
+
+  const { autoApproveCap, spendingLimit } = req.body;
+  if (autoApproveCap) pm.autoApproveCap = autoApproveCap;
+  if (spendingLimit) pm.spendingLimit = Number(spendingLimit);
+
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: 'PAYMENT_LIMIT_UPDATED',
+    agent: 'Elena Vance',
+    summary: `Payment method ${pm.name} limits updated.`,
+    amount: pm.autoApproveCap || `₹${pm.spendingLimit}`,
+    meta: 'Limits updated via Sovereign terminal',
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`
+  });
+
+  res.json({ success: true, paymentMethod: pm });
+});
+
 // Agent Passports
 app.get('/api/passports', (req, res) => {
   res.json({ success: true, passports: agentPassports });
 });
 
-app.post('/api/passports/:id/revoke', (req, res) => {
-  const passport = agentPassports.find(p => p.id === req.params.id);
+// Provision New Agent Passport
+app.post('/api/passports', requireAuth, validateBody(['agentName']), (req, res) => {
+  const { agentName, spendingCeiling, allowedCategories } = req.body;
+  const hexPart = Math.random().toString(16).substring(2, 10).toUpperCase();
+  const fullHex = `0x${hexPart}${Math.random().toString(16).substring(2, 18).toUpperCase()}`;
+
+  const newPassport = {
+    id: `pass_${agentName.toLowerCase().replace(/[^a-z0-9]/g, '_')}_${Date.now().toString().slice(-4)}`,
+    agentName: agentName.trim(),
+    agentIdentifier: `agent.sovereign.${agentName.toLowerCase().replace(/\s+/g, '-')}-v1`,
+    tokenPrefix: `${fullHex.slice(0, 6)}...${fullHex.slice(-4)}`,
+    fullToken: fullHex,
+    publicKey: `ed25519:MC4CAQAwBQYDK2VwBCIEI${Math.random().toString(36).substring(2, 15)}...`,
+    authorizedBy: 'Elena Vance (WebAuthn Signed)',
+    spendingCeiling: Number(spendingCeiling) || 15000,
+    expiresInDays: 30,
+    status: 'ACTIVE',
+    allowedCategories: Array.isArray(allowedCategories) ? allowedCategories : ['Hardware & Peripherals'],
+    ordersCompleted: 0,
+    disputes: 0,
+    enclaveAttestation: 'Intel SGX Enclave #TDX-AUTO (Hardware Signed)'
+  };
+
+  agentPassports.unshift(newPassport);
+
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: 'AGENT_PASSPORT_ISSUED',
+    agent: 'Elena Vance',
+    summary: `Agent passport token issued for ${newPassport.agentName} with ceiling ₹${newPassport.spendingCeiling.toLocaleString()}.`,
+    amount: `Ceiling: ₹${newPassport.spendingCeiling.toLocaleString()}`,
+    meta: 'Ed25519 root signature sealed in Enclave',
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`
+  });
+
+  res.status(201).json({ success: true, passport: newPassport });
+});
+
+app.post('/api/passports/:id/revoke', requireAuth, (req, res) => {
+  const param = req.params.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const passport = agentPassports.find(p => {
+    const pid = p.id.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const pname = p.agentName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return pid === param || pid.includes(param) || param.includes(pid) || pname.includes(param);
+  });
   if (!passport) return res.status(404).json({ success: false, error: 'Passport not found' });
 
   passport.status = passport.status === 'REVOKED' ? 'ACTIVE' : 'REVOKED';
@@ -915,7 +1261,13 @@ app.post('/api/passports/:id/revoke', (req, res) => {
 // Public Merchant Verification Endpoint
 app.get('/api/passports/verify/:token', (req, res) => {
   const token = req.params.token;
-  const match = agentPassports.find(p => p.fullToken === token || p.tokenPrefix.includes(token));
+  const match = agentPassports.find(p =>
+    p.fullToken === token ||
+    (token.length >= 6 && p.fullToken && p.fullToken.toLowerCase().includes(token.toLowerCase())) ||
+    (p.tokenPrefix && p.tokenPrefix.toLowerCase().includes(token.toLowerCase())) ||
+    p.id.toLowerCase() === token.toLowerCase() ||
+    (p.publicKey && p.publicKey.includes(token))
+  );
 
   if (!match || match.status !== 'ACTIVE') {
     return res.status(403).json({
@@ -944,6 +1296,73 @@ app.get('/api/activity', (req, res) => {
   res.json({ success: true, activity: auditFeed });
 });
 
+// Export Activity Log with CSV Formula Injection Protection
+app.get('/api/activity/export', (req, res) => {
+  const format = (req.query.format || 'json').toLowerCase();
+
+  if (format === 'csv') {
+    const headers = [
+      { label: 'Event ID', key: 'id' },
+      { label: 'Timestamp', key: 'timestamp' },
+      { label: 'Event Type', key: 'type' },
+      { label: 'Agent / Actor', key: 'agent' },
+      { label: 'Summary', key: 'summary' },
+      { label: 'Amount / Scope', key: 'amount' },
+      { label: 'Metadata', key: 'meta' },
+      { label: 'Proof Hash', key: 'hash' }
+    ];
+
+    const safeCsv = exportToSafeCsv(headers, auditFeed);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="mandate_gateway_audit_safe_${Date.now()}.csv"`);
+    return res.send(safeCsv);
+  }
+
+  res.json({ success: true, activity: auditFeed });
+});
+
+// Security: Emergency Kill Switch
+app.get('/api/security/kill-switch', (req, res) => {
+  res.json({
+    success: true,
+    killSwitch: emergencyKillSwitch
+  });
+});
+
+app.post('/api/security/kill-switch/toggle', requireAuth, (req, res) => {
+  const { reason } = req.body || {};
+  emergencyKillSwitch.active = !emergencyKillSwitch.active;
+
+  if (emergencyKillSwitch.active) {
+    emergencyKillSwitch.activatedAt = new Date().toISOString();
+    emergencyKillSwitch.activatedBy = sessionUser.name;
+    emergencyKillSwitch.reason = reason || 'Manual Emergency Halt Triggered via Security Center';
+  } else {
+    emergencyKillSwitch.deactivatedAt = new Date().toISOString();
+  }
+
+  auditFeed.unshift({
+    id: `evt_${Date.now()}`,
+    type: emergencyKillSwitch.active ? 'KILL_SWITCH_ENGAGED' : 'KILL_SWITCH_DISENGAGED',
+    agent: 'Elena Vance',
+    summary: emergencyKillSwitch.active
+      ? 'EMERGENCY PROTOCOL: Gateway Kill-Switch ENGAGED. All autonomous authorizations halted.'
+      : 'Emergency Kill-Switch DISENGAGED. Standard autonomous clearance restored.',
+    amount: emergencyKillSwitch.active ? 'ALL AGENTS HALTED' : 'RESTORED',
+    meta: 'Hardware Level Override',
+    timestamp: 'Just now',
+    hash: `sha256:${Math.random().toString(16).substring(2, 10)}`
+  });
+
+  res.json({
+    success: true,
+    killSwitch: emergencyKillSwitch,
+    message: emergencyKillSwitch.active
+      ? 'Emergency Kill Switch is now ENGAGED. All autonomous checkout authorizations are blocked.'
+      : 'Emergency Kill Switch is now DISENGAGED. Agent authorizations restored.'
+  });
+});
+
 // Security: Attack My Agent Red-Team Test Suite
 app.get('/api/security/attacks', (req, res) => {
   res.json({ success: true, attacks: redTeamAttacks });
@@ -951,7 +1370,7 @@ app.get('/api/security/attacks', (req, res) => {
 
 app.post('/api/security/run-attacks', (req, res) => {
   // Execute deterministic checks on each attack
-  const results = redTeamAttacks.map((atk, index) => {
+  const results = redTeamAttacks.map((atk) => {
     const isBenchmark = atk.category === 'BENCHMARK';
     const verdict = isBenchmark ? 'AUTO_CLEARED' : 'BLOCKED';
     const passed = verdict === atk.expectedVerdict;
@@ -973,7 +1392,6 @@ app.post('/api/security/run-attacks', (req, res) => {
   const passedCount = results.filter(r => r.passed).length;
   const defenseRate = Math.round((passedCount / results.length) * 100);
 
-  // Log execution to audit feed
   auditFeed.unshift({
     id: `evt_${Date.now()}`,
     type: 'RED_TEAM_SUITE_RUN',
@@ -996,8 +1414,10 @@ app.post('/api/security/run-attacks', (req, res) => {
 
 // Security: Scam Message Checker
 app.post('/api/security/check-message', (req, res) => {
-  const { message } = req.body;
-  if (!message) return res.status(400).json({ success: false, error: 'Message text is required' });
+  const { message } = req.body || {};
+  if (!message || typeof message !== 'string' || !message.trim()) {
+    return res.status(400).json({ success: false, error: 'Message text is required' });
+  }
 
   const lower = message.toLowerCase();
   
@@ -1034,7 +1454,7 @@ app.get('/api/settings', (req, res) => {
   res.json({ success: true, settings: appSettings });
 });
 
-app.post('/api/settings', (req, res) => {
+app.post('/api/settings', requireAuth, (req, res) => {
   appSettings = { ...appSettings, ...req.body };
   
   auditFeed.unshift({
@@ -1050,6 +1470,21 @@ app.post('/api/settings', (req, res) => {
 
   res.json({ success: true, settings: appSettings });
 });
+
+// Production Unified Static Asset Serving & SPA Fallback
+const distPath = path.join(ROOT_DIR, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
+// Centralized Safe Error Handler
+app.use(errorHandler);
 
 // Start Server
 app.listen(PORT, () => {

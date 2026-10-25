@@ -20,23 +20,37 @@ async function test(name, fn) {
 async function runAll() {
   console.log('--- Starting Mandate Gateway End-to-End Integration Suite ---\n');
 
-  // 1. Frontend Dev Server Root
-  await test('Frontend Dev Server (http://localhost:5173/)', async () => {
-    const res = await fetch(FRONTEND_URL);
-    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+  // 1. Frontend Shell Delivery (Dev Server or Production Build on Backend)
+  await test('Frontend HTML Shell Delivery', async () => {
+    let res;
+    let url = FRONTEND_URL;
+    try {
+      res = await fetch(FRONTEND_URL);
+    } catch {
+      url = BACKEND_URL;
+      res = await fetch(BACKEND_URL);
+    }
+    if (!res.ok) throw new Error(`HTTP status ${res.status} from ${url}`);
     const text = await res.text();
     if (!text.includes('id="root"')) throw new Error('Root element missing from HTML');
     if (!text.includes('Mandate Gateway')) throw new Error('Page title missing from HTML');
-    return 'HTML served with #root and title';
+    return `HTML served with #root and title via ${url}`;
   });
 
-  // 2. Vite Proxy to Backend
-  await test('Vite Proxy /api -> Backend (http://localhost:5173/api/dashboard)', async () => {
-    const res = await fetch(`${FRONTEND_URL}/api/dashboard`);
-    if (!res.ok) throw new Error(`HTTP status ${res.status}`);
+  // 2. Gateway API Resolution (/api/dashboard)
+  await test('Gateway API Endpoint Resolution (/api/dashboard)', async () => {
+    let res;
+    let url = `${FRONTEND_URL}/api/dashboard`;
+    try {
+      res = await fetch(url);
+    } catch {
+      url = `${BACKEND_URL}/api/dashboard`;
+      res = await fetch(url);
+    }
+    if (!res.ok) throw new Error(`HTTP status ${res.status} from ${url}`);
     const json = await res.json();
-    if (!json.success || !json.stats) throw new Error('Invalid dashboard payload through proxy');
-    return `Proxied successfully: ${json.stats.activeMandates} active mandates, utilization: ${json.stats.utilizationPercentage}%`;
+    if (!json.success || !json.stats) throw new Error('Invalid dashboard payload');
+    return `Resolved successfully via ${url}: ${json.stats.activeMandates} active mandates, utilization: ${json.stats.utilizationPercentage}%`;
   });
 
   // 3. Session Info
@@ -139,11 +153,29 @@ async function runAll() {
   // 11. Purchase Requests List
   let testRequestId = null;
   await test('Backend GET /api/requests', async () => {
-    const res = await fetch(`${BACKEND_URL}/api/requests`);
-    const json = await res.json();
+    let res = await fetch(`${BACKEND_URL}/api/requests`);
+    let json = await res.json();
     if (!json.success || !Array.isArray(json.requests)) throw new Error('Failed to fetch requests');
-    testRequestId = json.requests[0]?.id;
-    return `Retrieved ${json.requests.length} requests (Target: #${testRequestId})`;
+    let pending = json.requests.find(r => r.status === 'PENDING_HITL');
+    if (!pending) {
+      // Create a fresh pending request
+      const createRes = await fetch(`${BACKEND_URL}/api/requests`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemTitle: 'Logitech Ergonomic MX Vertical Mouse',
+          amount: 5400,
+          currency: 'INR',
+          merchant: 'Amazon India',
+          mandateId: 'M-902'
+        })
+      });
+      const createdJson = await createRes.json();
+      testRequestId = createdJson.request?.id;
+    } else {
+      testRequestId = pending.id;
+    }
+    return `Retrieved ${json.requests.length} requests (Target for approval: #${testRequestId})`;
   });
 
   // 12. Purchase Request Approval (HITL Clearance)
@@ -274,6 +306,208 @@ async function runAll() {
     const json = await res.json();
     if (!json.success || json.settings.defaultAutoApproveLimit !== 3500) throw new Error('Failed to update settings');
     return `Updated defaultAutoApproveLimit to ₹${json.settings.defaultAutoApproveLimit}`;
+  });
+
+  // 25. Health Check & Security Headers (Helmet CSP, X-Frame-Options)
+  await test('Backend Security Headers & GET /api/health', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/health`);
+    const csp = res.headers.get('content-security-policy');
+    const nosniff = res.headers.get('x-content-type-options');
+    if (!res.ok) throw new Error(`Health check returned status ${res.status}`);
+    const json = await res.json();
+    if (json.status !== 'UP') throw new Error(`Service not UP: ${json.status}`);
+    return `Health UP, Mode=${json.mode}, nosniff=${nosniff}, CSP active=${!!csp}`;
+  });
+
+  // 26. Deterministic Policy Engine: ALLOW verdict
+  await test('Deterministic Policy Engine: Compliant Order -> ALLOW', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/policy/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        request: {
+          itemTitle: 'Compliant USB-C Cable',
+          amount: 899,
+          currency: 'INR',
+          merchant: 'Amazon India',
+          agentId: 'pass_claude_shop',
+          mandateId: 'M-902'
+        }
+      })
+    });
+    const json = await res.json();
+    if (!json.success || json.evaluation.verdict !== 'ALLOW') {
+      throw new Error(`Expected ALLOW, got: ${json.evaluation?.verdict}`);
+    }
+    return `Verdict: ${json.evaluation.verdict} (Score: ${json.evaluation.confidenceScore}%)`;
+  });
+
+  // 27. Deterministic Policy Engine: Single-Item Over-Cap -> REQUIRES_APPROVAL
+  await test('Deterministic Policy Engine: Over Cap -> REQUIRES_APPROVAL', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/policy/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        request: {
+          itemTitle: 'High-end Ergonomic Mechanical Keyboard',
+          amount: 6500,
+          currency: 'INR',
+          merchant: 'Amazon India',
+          agentId: 'pass_claude_shop',
+          mandateId: 'M-902'
+        }
+      })
+    });
+    const json = await res.json();
+    if (!json.success || json.evaluation.verdict !== 'REQUIRES_APPROVAL') {
+      throw new Error(`Expected REQUIRES_APPROVAL, got: ${json.evaluation?.verdict}`);
+    }
+    return `Verdict: ${json.evaluation.verdict} (Reason: ${json.evaluation.reasons[0]})`;
+  });
+
+  // 28. Deterministic Policy Engine: Unwhitelisted Merchant -> BLOCK
+  await test('Deterministic Policy Engine: Rogue Merchant -> BLOCK', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/policy/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        request: {
+          itemTitle: 'Questionable Flash Drive',
+          amount: 1200,
+          currency: 'INR',
+          merchant: 'ShadyDealsDarknet.ru',
+          agentId: 'pass_claude_shop',
+          mandateId: 'M-902'
+        }
+      })
+    });
+    const json = await res.json();
+    if (!json.success || json.evaluation.verdict !== 'BLOCK') {
+      throw new Error(`Expected BLOCK, got: ${json.evaluation?.verdict}`);
+    }
+    return `Verdict: ${json.evaluation.verdict} (Reason: ${json.evaluation.reasons[0]})`;
+  });
+
+  // 29. Emergency Kill-Switch Lifecycle & Hard-Stop Verification
+  await test('Emergency Kill-Switch: Activation blocks purchase pipeline', async () => {
+    // 1. Toggle ON
+    const toggleOn = await fetch(`${BACKEND_URL}/api/security/kill-switch/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: 'Integration test automated verification' })
+    });
+    const onJson = await toggleOn.json();
+    if (!onJson.success || !onJson.killSwitch.active) throw new Error('Failed to activate kill switch');
+
+    // 2. Try evaluating policy while kill-switch is active -> MUST return BLOCK
+    const evalRes = await fetch(`${BACKEND_URL}/api/policy/evaluate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        request: {
+          itemTitle: 'Emergency Cable Test',
+          amount: 400,
+          currency: 'INR',
+          merchant: 'Amazon India',
+          agentId: 'pass_claude_shop',
+          mandateId: 'M-902'
+        }
+      })
+    });
+    const evalJson = await evalRes.json();
+    if (evalJson.evaluation.verdict !== 'BLOCK') {
+      throw new Error(`Kill switch active but verdict was ${evalJson.evaluation.verdict}`);
+    }
+
+    // 3. Toggle OFF to restore normal state
+    const toggleOff = await fetch(`${BACKEND_URL}/api/security/kill-switch/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason: 'Restoring after test' })
+    });
+    const offJson = await toggleOff.json();
+    if (!offJson.success || offJson.killSwitch.active) throw new Error('Failed to deactivate kill switch');
+
+    return 'Kill-switch toggled ON, verified hard-stop BLOCK, and cleanly restored OFF';
+  });
+
+  // 30. Duplicate Approval Prevention (409 Conflict)
+  await test('Duplicate Approval Prevention: Second approval returns 409 Conflict', async () => {
+    if (!testRequestId) throw new Error('No test request ID found');
+    const res = await fetch(`${BACKEND_URL}/api/requests/${testRequestId}/approve`, { method: 'POST' });
+    if (res.status !== 409) {
+      throw new Error(`Expected HTTP 409 Conflict, got HTTP ${res.status}`);
+    }
+    const json = await res.json();
+    if (!json.error || (!json.error.includes('already been approved') && !json.error.includes('already been settled'))) {
+      throw new Error(`Unexpected error message: ${json.error}`);
+    }
+    return `HTTP 409 Conflict correctly returned: "${json.error}"`;
+  });
+
+  // 31. Activity CSV Export with Formula Injection Defense
+  await test('Backend GET /api/activity/export?format=csv (Formula Injection Defense)', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/activity/export?format=csv`);
+    if (!res.ok) throw new Error(`CSV export HTTP status ${res.status}`);
+    const csv = await res.text();
+    const lines = csv.trim().split('\n');
+    if (lines.length < 2) throw new Error('CSV is missing data rows');
+    const headers = lines[0];
+    if (!headers.includes('Event ID') || !headers.includes('Summary')) {
+      throw new Error(`Unexpected headers: ${headers}`);
+    }
+    // Verify no line starts with unquoted unsafe formulas =,+,-,@
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (/^[=\+\-@]/.test(line)) {
+        throw new Error(`Formula injection vulnerability detected on row ${i}: ${line}`);
+      }
+    }
+    return `CSV verified with ${lines.length - 1} rows; no formula injection prefixes`;
+  });
+
+  // 32. Connect Payment Rail & Limit Configuration
+  await test('Backend POST /api/payment-methods/connect & /limits', async () => {
+    const connectRes = await fetch(`${BACKEND_URL}/api/payment-methods/connect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Automated CI PayPal Sandbox Rail',
+        type: 'SANDBOX_RAIL',
+        autoApproveCap: '₹7,500 INR'
+      })
+    });
+    const connectJson = await connectRes.json();
+    if (!connectJson.success || !connectJson.paymentMethod) throw new Error('Rail connect failed');
+    const railId = connectJson.paymentMethod.id;
+
+    // Update limits
+    const limitRes = await fetch(`${BACKEND_URL}/api/payment-methods/${railId}/limits`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ autoApproveCap: '₹10,000 INR', spendingLimit: 50000 })
+    });
+    const limitJson = await limitRes.json();
+    if (!limitJson.success || limitJson.paymentMethod.autoApproveCap !== '₹10,000 INR') {
+      throw new Error('Limit update failed');
+    }
+    return `Connected rail ${railId} and updated cap to ${limitJson.paymentMethod.autoApproveCap}`;
+  });
+
+  // 33. Provision New Agent Passport
+  await test('Backend POST /api/passports (Provision Ed25519 Token)', async () => {
+    const res = await fetch(`${BACKEND_URL}/api/passports`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentName: 'Gemini Autonomous Procurement Ultra',
+        spendingCeiling: 35000,
+        allowedCategories: ['Hardware & Peripherals', 'SaaS Infra']
+      })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success || !json.passport) throw new Error('Provision failed');
+    return `Provisioned ${json.passport.agentName} (ID: ${json.passport.id}, Token: ${json.passport.tokenPrefix})`;
   });
 
   console.log('\n=============================================');

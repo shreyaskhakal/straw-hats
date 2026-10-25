@@ -14,6 +14,9 @@ export default function AgentPassportPage() {
   const [copiedKeyId, setCopiedKeyId] = useState(null);
   const [toast, setToast] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [newAgentName, setNewAgentName] = useState('');
+  const [newCeiling, setNewCeiling] = useState(25000);
+  const [newMandateEnvelope, setNewMandateEnvelope] = useState('Office Hardware Q4');
 
   const initialPassports = [
     {
@@ -112,13 +115,15 @@ export default function AgentPassportPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  const copyVerificationUrl = () => {
-    const url = 'https://verify.mandategateway.internal/proof/did:mg:pass-claude-981a-signed';
+  const copyVerificationUrl = (targetPass) => {
+    const selectedPass = targetPass || passports.find(p => p.status === 'active') || passports[0];
+    const tokenVal = selectedPass?.fullKey || selectedPass?.key || '0x7f9a88c29bf004123b81ef1088c42109e2fa90a1bc334188';
+    const url = `${window.location.origin}/verify/${encodeURIComponent(tokenVal)}`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(url);
     }
     setCopiedLabel('Link Copied to Clipboard!');
-    showToast('External verification link generated and copied!');
+    showToast(`Verification URL for ${selectedPass?.name || 'Agent'} copied!`);
     setTimeout(() => setCopiedLabel('Copy Verification URL'), 2500);
   };
 
@@ -139,7 +144,7 @@ export default function AgentPassportPage() {
     if (window.confirm(`Repudiate passport ${pass.id} for ${pass.name}? The agent will immediately lose autonomous checkout authority.`)) {
       setLoading(true);
       try {
-        await api.revokePassport(pass.id.toLowerCase());
+        await api.revokePassport(pass.rawId || pass.id.toLowerCase());
       } catch (e) {
         console.warn('API revoke fallback to client state');
       }
@@ -154,11 +159,63 @@ export default function AgentPassportPage() {
     showToast(`Token for ${pass.id} re-signed for 30 additional days via secure enclave.`);
   };
 
-  const handleExecuteKillSwitch = () => {
+  const handleExecuteKillSwitch = async () => {
+    try {
+      await api.toggleKillSwitch('Emergency Kill-Switch executed from Agent Passport ledger');
+    } catch (e) {
+      console.warn('API kill switch error:', e);
+    }
     setPassports(passports.map((p) => ({ ...p, status: 'revoked', statusText: 'REVOKED' })));
     setKillSwitchModalOpen(false);
     setKillSwitchConfirmInput('');
-    showToast('ALL PASS-TOKENS TERMINATED. Agent network disconnected.', true);
+    showToast('ALL PASS-TOKENS TERMINATED. Emergency Kill-Switch Engaged.', true);
+  };
+
+  const handleProvisionSubmit = async (e) => {
+    e.preventDefault();
+    if (!newAgentName.trim()) {
+      showToast('Agent Name & Version is required', true);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await api.createPassport({
+        agentName: newAgentName.trim(),
+        spendingCeiling: Number(newCeiling),
+        allowedCategories: [newMandateEnvelope]
+      });
+
+      if (res && res.passport) {
+        const bp = res.passport;
+        const formatted = {
+          id: bp.id.toUpperCase(),
+          rawId: bp.id,
+          name: bp.agentName,
+          version: 'v1.0',
+          badge: 'Autonomous Procurement',
+          status: 'active',
+          statusText: 'Active & Verified',
+          description: `Autonomous procurement agent authorized by ${bp.authorizedBy}.`,
+          key: bp.tokenPrefix,
+          fullKey: bp.fullToken,
+          mandate: newMandateEnvelope,
+          ceiling: `₹${Number(bp.spendingCeiling).toLocaleString()} ceiling`,
+          expires: `${bp.expiresInDays} days remaining`,
+          merchants: (bp.allowedCategories || []).join(', ') || 'Amazon India, Croma Retail',
+          did: `did:mandate:gateway:ed25519:${(bp.fullToken || 'token').slice(0, 24)}`,
+          attestation: bp.enclaveAttestation
+        };
+        setPassports([formatted, ...passports]);
+        showToast(`Agent Passport minted and verified for ${bp.agentName}!`);
+      }
+    } catch (err) {
+      console.warn('API provision error:', err);
+      showToast('Failed to mint passport: ' + err.message, true);
+    } finally {
+      setLoading(false);
+      setProvisionModalOpen(false);
+      setNewAgentName('');
+    }
   };
 
   const activeCount = passports.filter((p) => p.status !== 'revoked').length;
@@ -422,6 +479,17 @@ export default function AgentPassportPage() {
                             <span>Inspect Proof</span>
                           </button>
 
+                          <a
+                            href={`/verify/${encodeURIComponent(pass.fullKey || pass.key)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn-secondary text-xs h-9 px-3.5 inline-flex items-center gap-1.5"
+                            title="Verify via Public Merchant Portal"
+                          >
+                            <span className="material-symbols-outlined text-[15px]">verified</span>
+                            <span>Merchant Verify</span>
+                          </a>
+
                           {!isRevoked && (
                             <button
                               type="button"
@@ -660,11 +728,7 @@ export default function AgentPassportPage() {
             </div>
 
             <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setProvisionModalOpen(false);
-                showToast('New Agent Passport cryptographically minted & active.');
-              }}
+              onSubmit={handleProvisionSubmit}
               className="space-y-3.5 text-xs"
             >
               <div className="space-y-1">
@@ -672,6 +736,8 @@ export default function AgentPassportPage() {
                 <input
                   type="text"
                   placeholder="e.g. Gemini Shopping Ultra v1.0"
+                  value={newAgentName}
+                  onChange={(e) => setNewAgentName(e.target.value)}
                   required
                   className="input-standard text-xs"
                 />
@@ -679,11 +745,28 @@ export default function AgentPassportPage() {
 
               <div className="space-y-1">
                 <label className="block text-secondary font-medium">Bound Mandate Envelope</label>
-                <select className="select-standard text-xs">
-                  <option>Office Hardware Q4 (₹50,000 auto / ₹1,50,000 disc.)</option>
-                  <option>Developer Tools &amp; Infra (₹25,000/mo)</option>
-                  <option>Research &amp; Books (₹5,500/mo)</option>
+                <select
+                  value={newMandateEnvelope}
+                  onChange={(e) => setNewMandateEnvelope(e.target.value)}
+                  className="select-standard text-xs"
+                >
+                  <option value="Office Hardware Q4">Office Hardware Q4 (₹50,000 auto / ₹1,50,000 disc.)</option>
+                  <option value="Developer Tools & Infra">Developer Tools &amp; Infra (₹25,000/mo)</option>
+                  <option value="Research & Books">Research &amp; Books (₹5,500/mo)</option>
                 </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-secondary font-medium">Autonomous Spending Limit (INR)</label>
+                <input
+                  type="number"
+                  min="1000"
+                  max="150000"
+                  step="1000"
+                  value={newCeiling}
+                  onChange={(e) => setNewCeiling(e.target.value)}
+                  className="input-standard text-xs font-mono"
+                />
               </div>
 
               <div className="space-y-1">
@@ -706,9 +789,10 @@ export default function AgentPassportPage() {
                 </button>
                 <button
                   type="submit"
+                  disabled={loading}
                   className="btn-primary text-xs"
                 >
-                  Mint &amp; Sign Passport
+                  {loading ? 'Minting...' : 'Mint & Sign Passport'}
                 </button>
               </div>
             </form>

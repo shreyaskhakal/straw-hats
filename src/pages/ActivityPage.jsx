@@ -284,6 +284,56 @@ export default function ActivityPage() {
     showToast(`Exported ${filteredEvents.length} verifiable audit records as JSON`);
   };
 
+  const handleExportCsv = async () => {
+    try {
+      const res = await fetch('/api/activity/export?format=csv');
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mandate_gateway_audit_${Date.now()}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast('Exported CSV with Formula Injection Defense');
+        return;
+      }
+    } catch (e) {
+      console.warn('Backend CSV export error, falling back to client CSV', e);
+    }
+
+    // Client-side fallback with formula injection sanitization
+    const sanitize = (val) => {
+      let str = String(val ?? '');
+      if (/^[=\+\-@\t\r]/.test(str)) {
+        str = "'" + str;
+      }
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const headers = ['ID', 'Timestamp', 'Type', 'Summary', 'Amount', 'Agent', 'Status', 'Hash'];
+    const rows = filteredEvents.map(e => [
+      sanitize(e.id),
+      sanitize(e.timestamp),
+      sanitize(e.title),
+      sanitize(e.itemTitle),
+      sanitize(e.amount),
+      sanitize(e.agent),
+      sanitize(e.status),
+      sanitize(e.fullHash || e.hash)
+    ].join(','));
+
+    const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent([headers.join(','), ...rows].join('\n'));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', csvContent);
+    downloadAnchor.setAttribute('download', `mandate_gateway_audit_${Date.now()}.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast(`Exported ${filteredEvents.length} records as CSV (Formula Injection Safe)`);
+  };
+
   const handleResetFilters = () => {
     setSearch('');
     setEventTypeFilter('all');
@@ -327,6 +377,15 @@ export default function ActivityPage() {
                     Attested
                   </span>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleExportCsv}
+                  className="btn-secondary text-xs h-9 px-3 flex items-center gap-1.5 shadow-sm"
+                  title="Download CSV sanitized against spreadsheet formula injection attacks"
+                >
+                  <span className="material-symbols-outlined text-[16px]">table_view</span>
+                  <span>Export CSV</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleExport}

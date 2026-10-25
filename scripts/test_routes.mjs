@@ -19,11 +19,19 @@ const routes = [
 ];
 
 async function checkRoutes() {
-  console.log('Testing frontend direct URL resolution & client routing fallbacks...\n');
+  let port = process.env.TEST_PORT ? Number(process.env.TEST_PORT) : 5173;
+  try {
+    const probe = await fetch(`http://localhost:${port}/`);
+    if (!probe.ok) port = 3001;
+  } catch {
+    port = 3001;
+  }
+
+  console.log(`Testing frontend direct URL resolution & client routing fallbacks on port ${port}...\n`);
   let passCount = 0;
 
   for (const route of routes) {
-    const url = `http://localhost:5173${route}`;
+    const url = `http://localhost:${port}${route}`;
     try {
       const res = await fetch(url);
       const text = await res.text();

@@ -81,14 +81,23 @@ export default function MandatesPage() {
   };
 
   const handleDeployMandate = async () => {
+    if (!intentText.trim()) {
+      showToast('Please enter a spending intent text first.');
+      return;
+    }
+    if (merchants.length === 0) {
+      showToast('Please whitelist at least one merchant domain.');
+      return;
+    }
     setSigning(true);
     try {
       await api.createMandate({
         name: 'Synthesized Mandate Node',
         category: 'Hardware & Peripherals',
-        plainTextRule: intentText,
+        plainTextRule: intentText.trim(),
         budgetCeiling: 25000,
         singlePurchaseLimit: 5000,
+        autoApproveLimit: sliderVal,
         allowedMerchants: merchants,
         agents: ['Claude Shopping'],
       });
@@ -97,7 +106,7 @@ export default function MandatesPage() {
       document.getElementById('policies-section')?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.error(err);
-      showToast('Deployment failed: ' + err.message);
+      showToast('Deployment failed: ' + (err.message || 'Unknown error'));
     } finally {
       setSigning(false);
     }

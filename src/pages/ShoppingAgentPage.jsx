@@ -39,9 +39,29 @@ export default function ShoppingAgentPage() {
 
   const handleIssueRequest = async (candId) => {
     setSubmittedRequest(candId);
+    const cand = displayCandidates.find((c) => c.id === candId) || displayCandidates[0];
+    try {
+      await api.createRequest({
+        itemTitle: cand.title,
+        amount: cand.price,
+        merchant: cand.merchant,
+        agentName: 'Claude Shopping',
+        agentId: 'pass_claude_shop',
+        mandateId: 'M-902',
+        specs: cand.specs || [],
+        quoteEvidence: cand.quoteChecks?.map(qc => ({
+          field: qc.spec,
+          value: qc.status,
+          exactQuote: qc.quote,
+          match: qc.status === 'MATCH'
+        })) || []
+      });
+    } catch (err) {
+      console.warn('Request creation error:', err);
+    }
     setTimeout(() => {
       navigate('/requests');
-    }, 900);
+    }, 600);
   };
 
   const removeParam = (listType, item) => {
