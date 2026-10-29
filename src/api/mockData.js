@@ -99,6 +99,23 @@ const initialDemoState = {
       plainTextRule: 'Inter-city travel booking and airport taxi rides during active team trips only.',
       createdAt: '2026-10-15T16:00:00Z',
       isDemoData: true,
+    },
+    {
+      id: 'M-512',
+      name: 'Legacy Cloud Micro-Tier (Revoked)',
+      category: 'Cloud & Infrastructure',
+      agents: ['Claude Shopping', 'AutoProcure'],
+      allowedMerchants: ['DigitalOcean', 'Vercel', 'Hetzner'],
+      budgetCeiling: 8000,
+      utilized: 7900,
+      currency: 'INR',
+      singlePurchaseLimit: 1500,
+      requiresCoSignerOver: 1500,
+      status: 'REVOKED',
+      expiry: '2026-09-30',
+      plainTextRule: 'Deprecated mandate node. Immediate authorization failure on all agent calls.',
+      createdAt: '2026-08-01T10:00:00Z',
+      isDemoData: true,
     }
   ],
   requests: [

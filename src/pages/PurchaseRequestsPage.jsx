@@ -210,11 +210,12 @@ export default function PurchaseRequestsPage() {
     else if (filter === 'expired') matchesFilter = item.status === 'expired';
     else if (filter === 'draft') matchesFilter = item.status === 'draft';
 
+    const query = (search || '').toLowerCase();
     const matchesSearch =
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.merchant.toLowerCase().includes(search.toLowerCase()) ||
-      item.agent.toLowerCase().includes(search.toLowerCase()) ||
-      item.code.toLowerCase().includes(search.toLowerCase());
+      (item.title || '').toLowerCase().includes(query) ||
+      (item.merchant || '').toLowerCase().includes(query) ||
+      (item.agent || '').toLowerCase().includes(query) ||
+      (item.code || '').toLowerCase().includes(query);
     return matchesFilter && matchesSearch;
   });
 
@@ -494,7 +495,7 @@ export default function PurchaseRequestsPage() {
               </span>
             </div>
             <span className="font-mono text-[10px] text-[#888B8C] flex-shrink-0">
-              Contract: {REQUEST_LIFECYCLE_STATUS.join(' • ')}
+              Contract: {Object.values(REQUEST_LIFECYCLE_STATUS).join(' • ')}
             </span>
           </div>
 
@@ -718,11 +719,11 @@ export default function PurchaseRequestsPage() {
                           Policy Compliance Matrix
                         </span>
                         <span className="text-[11px] text-[#5A5D5E] dark:text-[#B8B8B8] font-mono">
-                          {selectedItem.checks.filter(c => c.pass).length} / {selectedItem.checks.length} Checks Validated
+                          {(selectedItem.checks || []).filter(c => c.pass).length} / {(selectedItem.checks || []).length} Checks Validated
                         </span>
                       </div>
                       <div className="divide-y divide-[#E7E7E3] dark:divide-[#353535] border border-[#E7E7E3] dark:border-[#353535] rounded-md overflow-hidden text-xs">
-                        {selectedItem.checks.map((chk, idx) => (
+                        {(selectedItem.checks || []).map((chk, idx) => (
                           <div
                             key={idx}
                             className={`flex items-center justify-between p-3 ${

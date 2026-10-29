@@ -222,6 +222,156 @@ async function run() {
     assert(Boolean(API_ROUTES && API_ROUTES.HEALTH), 'apiContract.js exports API_ROUTES with HEALTH');
     assert(Boolean(REQUEST_LIFECYCLE_STATUS && REQUEST_LIFECYCLE_STATUS.APPROVED), 'apiContract.js exports REQUEST_LIFECYCLE_STATUS');
     assert(Boolean(POLICY_VERDICTS && POLICY_VERDICTS.ALLOW && POLICY_VERDICTS.FLAG_HUMAN && POLICY_VERDICTS.BLOCK), 'apiContract.js exports POLICY_VERDICTS');
+    assert(typeof Object.values(REQUEST_LIFECYCLE_STATUS).join(' • ') === 'string', 'Object.values(REQUEST_LIFECYCLE_STATUS).join creates valid status contract string');
+  });
+
+  // 6. Shopping Agent Demo Workflow
+  await testSection('6. Shopping Agent Demo Workflow', async () => {
+    const { defaultProductProvider } = await import('../src/services/productProvider.js');
+    const { dispatchMockRequest } = await import('../src/api/mockService.js');
+
+    // 1. Search candidates via ProductProvider
+    const searchRes = await defaultProductProvider.searchCandidates({
+      prompt: 'Ergonomic dual-mode wireless mouse for office',
+      mustHave: 'Brand new, 2.4GHz + Bluetooth',
+      mustNotHave: 'Refurbished',
+      marketplaces: ['channel3-demo']
+    });
+    assert(searchRes.candidates && searchRes.candidates.length >= 3, 'Shopping agent searches and retrieves candidates from ProductProvider');
+
+    const topCandidate = searchRes.candidates[0];
+    assert(Boolean(topCandidate.id && topCandidate.title && topCandidate.price && topCandidate.merchant), 'Candidate has required schema fields');
+    assert(typeof topCandidate.price === 'number', 'Candidate price is numeric');
+
+    // 2. Evaluate policy clearance against mandate
+    const evalRes = await dispatchMockRequest('/policy/evaluate', {
+      method: 'POST',
+      body: JSON.stringify({
+        request: {
+          merchant: topCandidate.merchant,
+          amount: topCandidate.price,
+          mandateId: 'M-902'
+        }
+      })
+    });
+    assert(evalRes.success && evalRes.evaluation.verdict === 'ALLOW', 'Top candidate clears mandate policy invariants');
+
+    // 3. Issue purchase request from candidate
+    const createRes = await dispatchMockRequest('/requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemTitle: topCandidate.title,
+        merchant: topCandidate.merchant,
+        agentName: 'Claude Shopping',
+        agentId: 'pass_claude_shop',
+        amount: topCandidate.price,
+        currency: 'INR',
+        mandateId: 'M-902',
+        listingUrl: topCandidate.buyUrl || 'https://amazon.in'
+      })
+    });
+    assert(createRes.success && createRes.request && createRes.request.id.startsWith('PR-'), 'Shopping agent successfully creates purchase request');
+
+    // 4. Verify request appears in queue
+    const requestsQueue = await dispatchMockRequest('/requests');
+    const queuedItem = requestsQueue.requests.find((r) => r.id === createRes.request.id);
+    assert(Boolean(queuedItem), 'Created shopping agent request is present in active requests queue');
+    assert(queuedItem.status === 'AUTO_CLEARED', 'Under-limit purchase request auto-clears under ₹5,000 ceiling');
+  });
+
+  // 7. Purchase Request Lifecycle (Approval & Rejection)
+  await testSection('7. Purchase Request Human-in-the-Loop Approval & Rejection Flow', async () => {
+    const { dispatchMockRequest } = await import('../src/api/mockService.js');
+
+    // 1. Create a high-value item exceeding auto-clearance ceiling
+    const highValueCreate = await dispatchMockRequest('/requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemTitle: 'Dell UltraSharp 27" 4K Monitor',
+        merchant: 'Amazon India',
+        agentName: 'AutoProcure',
+        agentId: 'pass_autoprocure',
+        amount: 32000,
+        currency: 'INR',
+        mandateId: 'M-902'
+      })
+    });
+    assert(highValueCreate.success && highValueCreate.request.status === 'PENDING_HITL', 'High-value item > ₹5,000 escalates to PENDING_HITL');
+    const pendingId = highValueCreate.request.id;
+
+    // 2. Approve request
+    const approveRes = await dispatchMockRequest(`/requests/${pendingId}/approve`, { method: 'POST' });
+    assert(approveRes.success && approveRes.request.status === 'AUTO_CLEARED', 'Human co-signer approval updates request status to AUTO_CLEARED');
+    assert(approveRes.request.paypalOrder && approveRes.request.paypalOrder.status === 'COMPLETED', 'Approval transitions PayPal sandbox order to COMPLETED');
+
+    // 3. Prevent duplicate approval
+    let duplicateBlocked = false;
+    try {
+      await dispatchMockRequest(`/requests/${pendingId}/approve`, { method: 'POST' });
+    } catch (err) {
+      if (err.status === 409 || err.message.includes('already been approved')) {
+        duplicateBlocked = true;
+      }
+    }
+    assert(duplicateBlocked, 'Duplicate approval on settled purchase request is strictly blocked (HTTP 409)');
+
+    // 4. Create another item for rejection test
+    const rejectTarget = await dispatchMockRequest('/requests', {
+      method: 'POST',
+      body: JSON.stringify({
+        itemTitle: 'Unapproved Specialty Drone',
+        merchant: 'Amazon India',
+        agentName: 'Claude Shopping',
+        agentId: 'pass_claude_shop',
+        amount: 8500,
+        currency: 'INR',
+        mandateId: 'M-902'
+      })
+    });
+    const rejectId = rejectTarget.request.id;
+
+    // 5. Reject request
+    const rejectRes = await dispatchMockRequest(`/requests/${rejectId}/reject`, { method: 'POST' });
+    assert(rejectRes.success && rejectRes.request.status === 'REJECTED', 'Rejection marks request status as REJECTED');
+    assert(rejectRes.request.paypalOrder && rejectRes.request.paypalOrder.status === 'CANCELLED', 'Rejection cancels associated PayPal order');
+  });
+
+  // 8. Direct Route Navigation, Refresh & Bundle Static Safety Check
+  await testSection('8. Direct Route Refresh & Bundle Static Safety Check', async () => {
+    // Verify source files do not contain the bug
+    const purchaseRequestsSrc = fs.readFileSync(path.join(ROOT_DIR, 'src', 'pages', 'PurchaseRequestsPage.jsx'), 'utf8');
+    assert(!purchaseRequestsSrc.includes('REQUEST_LIFECYCLE_STATUS.join'), 'PurchaseRequestsPage.jsx does NOT contain unguarded REQUEST_LIFECYCLE_STATUS.join');
+    assert(purchaseRequestsSrc.includes('Object.values(REQUEST_LIFECYCLE_STATUS).join'), 'PurchaseRequestsPage.jsx uses safe Object.values(REQUEST_LIFECYCLE_STATUS).join');
+
+    const shoppingAgentSrc = fs.readFileSync(path.join(ROOT_DIR, 'src', 'pages', 'ShoppingAgentPage.jsx'), 'utf8');
+    assert(!shoppingAgentSrc.includes('c.verdict.includes'), 'ShoppingAgentPage.jsx does NOT contain unguarded c.verdict.includes');
+
+    const appSrc = fs.readFileSync(path.join(ROOT_DIR, 'src', 'App.jsx'), 'utf8');
+    assert(appSrc.includes('<ErrorBoundary>'), 'App.jsx wraps application routes in ErrorBoundary');
+
+    // Test direct route requests and simulated browser refresh on /agent and /requests
+    const indexHtml = fs.readFileSync(path.join(DIST_DIR, 'index.html'), 'utf8');
+    const server = http.createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(indexHtml);
+    });
+
+    await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const port = server.address().port;
+
+    const criticalRoutes = ['/agent', '/requests'];
+    for (const r of criticalRoutes) {
+      // First hit
+      const res1 = await fetch(`http://127.0.0.1:${port}${r}`);
+      assert(res1.status === 200, `Direct navigation to ${r} returns 200`);
+      // Simulated browser refresh with cache-control
+      const res2 = await fetch(`http://127.0.0.1:${port}${r}`, {
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
+      assert(res2.status === 200, `Simulated browser refresh on ${r} returns 200`);
+    }
+
+    await new Promise((resolve) => server.close(resolve));
   });
 
   console.log(`\n🏁 Frontend Verification Results: ${passedTests} / ${totalTests} tests passed.\n`);

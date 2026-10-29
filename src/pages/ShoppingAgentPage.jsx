@@ -83,6 +83,12 @@ export default function ShoppingAgentPage() {
     setSubmittedRequest(candId);
     const cand = candidates.find((c) => c.id === candId) || candidates[0];
     
+    if (!cand) {
+      showToast('Select a product candidate before issuing a purchase request.');
+      setSubmittedRequest(null);
+      return;
+    }
+
     // Evaluate against selected mandate before submitting
     if (currentMandate.status === 'REVOKED') {
       showToast(`Cannot issue purchase: Mandate #${currentMandate.id} is Revoked.`);
@@ -156,10 +162,8 @@ export default function ShoppingAgentPage() {
       showToast('Scenario 4 Loaded: Requires explicit approval (Exceeds ₹3,000 auto-cap -> Pending).');
     } else if (scenarioNum === 5) {
       // 5. Revoked or expired mandate
-      const revoked = mandates.find(m => m.status === 'REVOKED');
-      if (revoked) {
-        setSelectedMandateId(revoked.id);
-      }
+      const revoked = mandates.find(m => m.status === 'REVOKED') || { id: 'M-512' };
+      setSelectedMandateId(revoked.id);
       showToast('Scenario 5 Loaded: Revoked Mandate selected (Immediate authorization failure).');
     } else if (scenarioNum === 6) {
       // 6. Payment failure or cancellation
@@ -207,6 +211,9 @@ export default function ShoppingAgentPage() {
                     onChange={(e) => setSelectedMandateId(e.target.value)}
                     className="select-standard h-8 text-xs font-semibold bg-surface-container-lowest mt-1"
                   >
+                    {mandates.length === 0 && (
+                      <option value="">No Active Mandates</option>
+                    )}
                     {mandates.map((m) => (
                       <option key={m.id} value={m.id}>
                         {m.name} (#{m.id}) {m.status === 'REVOKED' ? '[REVOKED]' : `[Cap: ₹${(m.singlePurchaseLimit || 5000).toLocaleString()}]`}
@@ -509,7 +516,7 @@ export default function ShoppingAgentPage() {
                             </h3>
 
                             <p className={`font-code-sm text-code-sm font-semibold ${isBlocked ? 'text-error' : 'text-primary'}`}>
-                              ₹{cand.price.toLocaleString()}.00{' '}
+                              ₹{Number(cand.price || 0).toLocaleString()}.00{' '}
                               <span className="font-normal text-on-surface-variant text-[11px]">
                                 {cand.source}
                               </span>
@@ -654,39 +661,44 @@ export default function ShoppingAgentPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E7E7E3]">
-                  {candidates.map((c) => (
-                    <tr key={c.id} className="hover:bg-surface-container-low/40">
-                      <td className="p-3 font-semibold text-primary max-w-xs">{c.title}</td>
-                      <td className="p-3 font-mono">{c.merchant}</td>
-                      <td className="p-3 font-mono font-bold">₹{c.price.toLocaleString()}</td>
-                      <td className="p-3 text-secondary font-mono">{c.source}</td>
-                      <td className="p-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
-                          c.verdict.includes('BLOCKED') || c.verdict.includes('REJECTED')
-                            ? 'bg-red-50 text-error border border-red-200'
-                            : c.verdict.includes('REVIEW')
-                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
-                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                        }`}>
-                          {c.verdict}
-                        </span>
-                      </td>
-                      <td className="p-3 text-right">
-                        {!c.verdict.includes('BLOCKED') && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setComparisonModalOpen(false);
-                              handleIssueRequest(c.id);
-                            }}
-                            className="btn-outline text-xs px-2 py-1"
-                          >
-                            Select
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                  {candidates.map((c) => {
+                    const verdictStr = c.verdict || '';
+                    const isBlocked = verdictStr.includes('BLOCKED') || verdictStr.includes('REJECTED');
+                    const isReview = verdictStr.includes('REVIEW');
+                    return (
+                      <tr key={c.id} className="hover:bg-surface-container-low/40">
+                        <td className="p-3 font-semibold text-primary max-w-xs">{c.title}</td>
+                        <td className="p-3 font-mono">{c.merchant}</td>
+                        <td className="p-3 font-mono font-bold">₹{Number(c.price || 0).toLocaleString()}</td>
+                        <td className="p-3 text-secondary font-mono">{c.source}</td>
+                        <td className="p-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                            isBlocked
+                              ? 'bg-red-50 text-error border border-red-200'
+                              : isReview
+                              ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                              : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                          }`}>
+                            {verdictStr || 'PENDING'}
+                          </span>
+                        </td>
+                        <td className="p-3 text-right">
+                          {!isBlocked && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setComparisonModalOpen(false);
+                                handleIssueRequest(c.id);
+                              }}
+                              className="btn-outline text-xs px-2 py-1"
+                            >
+                              Select
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
