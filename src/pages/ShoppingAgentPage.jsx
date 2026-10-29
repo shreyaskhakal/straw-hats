@@ -4,32 +4,74 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ArbitrationModal from '../components/ArbitrationModal';
 import { api } from '../api/client';
+import { defaultProductProvider } from '../services/productProvider';
 
 export default function ShoppingAgentPage() {
   const navigate = useNavigate();
   const [guideOpen, setGuideOpen] = useState(false);
+  const [mandates, setMandates] = useState([]);
+  const [selectedMandateId, setSelectedMandateId] = useState('M-902');
+  const [selectedSource, setSelectedSource] = useState('channel3-demo');
   const [prompt, setPrompt] = useState('Find a wired ergonomic gaming mouse with side buttons, silent clicks, and an optical sensor under ₹3,000.');
   const [candidates, setCandidates] = useState([]);
   const [searching, setSearching] = useState(false);
   const [submittedRequest, setSubmittedRequest] = useState(null);
-  const [selectedCandidateQuote, setSelectedCandidateQuote] = useState(null);
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
+  const [selectedCandidateForModal, setSelectedCandidateForModal] = useState(null);
+  const [activeScenario, setActiveScenario] = useState(null);
+  const [toastMessage, setToastMessage] = useState(null);
 
-  // Filter parameter pills state matching Stitch
+  // Filter parameter pills state
   const [mustHave, setMustHave] = useState(['Wired USB', 'Side Buttons', 'Optical Sensor']);
   const [niceToHave, setNiceToHave] = useState(['Silent Clicks', 'Braided Cable']);
   const [mustNotHave, setMustNotHave] = useState(['Wireless / Battery', 'Price > ₹3,000']);
 
   useEffect(() => {
+    loadMandates();
     handleSearch();
   }, []);
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  const loadMandates = async () => {
+    try {
+      const res = await api.getMandates();
+      if (res?.mandates?.length) {
+        setMandates(res.mandates);
+        if (!selectedMandateId || !res.mandates.some(m => m.id === selectedMandateId)) {
+          setSelectedMandateId(res.mandates[0].id);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to load mandates', err);
+    }
+  };
+
+  const currentMandate = mandates.find((m) => m.id === selectedMandateId) || {
+    id: 'M-902',
+    name: 'Office Hardware Q4',
+    budgetCeiling: 50000,
+    singlePurchaseLimit: 5000,
+    requiresCoSignerOver: 3000,
+    allowedMerchants: ['Amazon India', 'Croma Retail', 'Lenovo Direct'],
+    status: 'ACTIVE'
+  };
 
   const handleSearch = async () => {
     setSearching(true);
     setSubmittedRequest(null);
     try {
-      const briefRes = await api.parseBrief(prompt);
-      const candRes = await api.evaluateCandidates(briefRes.structuredBrief);
-      setCandidates(candRes.candidates || []);
+      // Use replaceable ProductProvider interface
+      const searchResult = await defaultProductProvider.searchCandidates({
+        prompt,
+        mustHave,
+        mustNotHave,
+        marketplaces: [selectedSource],
+      });
+      setCandidates(searchResult.candidates || []);
     } catch (err) {
       console.error('Agent search error:', err);
     } finally {
@@ -39,15 +81,23 @@ export default function ShoppingAgentPage() {
 
   const handleIssueRequest = async (candId) => {
     setSubmittedRequest(candId);
-    const cand = displayCandidates.find((c) => c.id === candId) || displayCandidates[0];
+    const cand = candidates.find((c) => c.id === candId) || candidates[0];
+    
+    // Evaluate against selected mandate before submitting
+    if (currentMandate.status === 'REVOKED') {
+      showToast(`Cannot issue purchase: Mandate #${currentMandate.id} is Revoked.`);
+      setSubmittedRequest(null);
+      return;
+    }
+
     try {
       await api.createRequest({
         itemTitle: cand.title,
         amount: cand.price,
         merchant: cand.merchant,
-        agentName: 'Claude Shopping',
+        agentName: 'Claude Shopping v3.5',
         agentId: 'pass_claude_shop',
-        mandateId: 'M-902',
+        mandateId: currentMandate.id,
         specs: cand.specs || [],
         quoteEvidence: cand.quoteChecks?.map(qc => ({
           field: qc.spec,
@@ -56,12 +106,15 @@ export default function ShoppingAgentPage() {
           match: qc.status === 'MATCH'
         })) || []
       });
+      showToast(`Purchase request issued for ${cand.title}! Navigating to Approval Center...`);
+      setTimeout(() => {
+        navigate('/requests');
+      }, 700);
     } catch (err) {
       console.warn('Request creation error:', err);
+      showToast('Error issuing request: ' + err.message);
+      setSubmittedRequest(null);
     }
-    setTimeout(() => {
-      navigate('/requests');
-    }, 600);
   };
 
   const removeParam = (listType, item) => {
@@ -70,65 +123,55 @@ export default function ShoppingAgentPage() {
     if (listType === 'not') setMustNotHave(mustNotHave.filter((x) => x !== item));
   };
 
-  // Canonical Stitch products data for initial / fallback display
-  const displayCandidates = candidates.length > 0 ? candidates : [
-    {
-      id: 'cand-1',
-      title: 'Razer DeathAdder Essential Wired',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA9Tatw59VFN2ASbvLR92_AcdfiqlekwVZD8rRR6dispVT0e239t3F8hQ-jAVT1JqhQ2f-bnNlz8hhzMnc_p5j9-rguRyC1_yrjyXfMnLqCsmQ9IpqKWV6GqKyZp4oC0roB2MDEH7BgcDWJVzDWXbR3GclOEpiEmn6E9Kp0mlYD4q4UPL_b4esctDlgReQ0KSP0ot1UdiZ5wfSrM5Sfe3DIkds8y2rgEUGeyWjKfxbUq4bVAhzXqzsbgw',
-      merchant: 'Amazon India',
-      price: 1499,
-      model: 'RZ01-03850100-R3M1',
-      stockNote: 'Prime Verified Stock',
-      verdict: 'FULL_MATCH_ELIGIBLE',
-      specs: [
-        { label: 'Wired USB', pass: true },
-        { label: '6,400 DPI Optical', pass: true },
-        { label: '5 Prog. Buttons', pass: true }
-      ],
-      clearanceNote: 'Satisfies all 3 mandatory hardware constraints and lands well within the ₹3,000 autonomous ceiling.',
-      proofToken: 'HMAC-SHA256:7f9a...c801 generated'
-    },
-    {
-      id: 'cand-2',
-      title: 'Logitech G502 HERO High Performance',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA_2Z9hj5yEiye0NYjH394ThJZiAJBCOPM9n-QRYXzQi4l0TU_ScGjknzZXTBvOXO5aBPQuiuLPyOkqp_ap18ppmNjAiYmIOfuysb3yqg6v6XW4mWGYgmz2pNTteGo-cFu3bwsUMh1lpGGge8jtgbamw85rw6O5r0njCnGv-2moXImdXdDGILOJMZpAAhllDVBpJ1sMUdToeiKDWRU1FYBWDBiwRNpf5E-7epanMdvG9SbJs435dMz48g',
-      merchant: 'Croma Verified',
-      price: 3895,
-      model: '910-005469',
-      stockNote: 'Tier 1 Merchant',
-      verdict: 'NEEDS_HUMAN_REVIEW',
-      specs: [
-        { label: 'Wired USB', pass: true },
-        { label: 'HERO 25K Sensor', pass: true },
-        { label: '11 Prog. Buttons', pass: true }
-      ],
-      clearanceNote: 'Clause §4.2 escalation: All hardware specifications match perfectly, but price (₹3,895) surpasses autonomous checkout cap of ₹3,000.',
-      proofToken: 'Pending Sovereign Signer approval • Elena Vance queue'
-    },
-    {
-      id: 'cand-3',
-      title: 'Logitech MX Master 3S Wireless',
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGqwIsKwfPmOuWi7w8Z-ROPHNTVH4U6UHCMLsJc_BDJso3CMDUp6_VQBcGZ-PmVSTj5_xHpQBAqo5lIC386p8psBsLfD_nhXgbB7SE02dotT-AoVkjNojMzNiink_ga2lITFcOlQ00_nZiLZWha3cxjM27UG6G23bcdg5bZyewTFfWXcxCRJZcCwgKgVJU7iXEfoXU1nZm6ZGWehqpIcUs5yuNBQbDyGmfSDdhauM4zfnthtliCFqyvQ',
-      merchant: 'TechBazaar (Unlisted)',
-      price: 8995,
-      model: '910-006561',
-      stockNote: 'Unauthorized Seller',
-      verdict: 'BLOCKED_BY_POLICY',
-      specs: [
-        { label: 'Wireless Only', pass: false },
-        { label: '8K Optical', pass: true },
-        { label: 'Seller Unverified', pass: false }
-      ],
-      clearanceNote: 'Strict mandate rejection: Violates wired requirement, unapproved marketplace seller, and exceeds absolute ₹5,000 ceiling.',
-      proofToken: 'Zero override bypass permitted under mandate rule SEC-0914'
+  // Hackathon Scenario Loader for Judges
+  const loadScenario = (scenarioNum) => {
+    setActiveScenario(scenarioNum);
+    if (scenarioNum === 1) {
+      // 1. Purchase within limits
+      setPrompt('Buy ergonomic wired mouse for office desk under ₹3,000 with silent optical sensor');
+      setMustHave(['Wired USB', 'Optical Sensor', 'Silent Clicks']);
+      setMustNotHave(['Wireless', 'Price > ₹3,000']);
+      handleSearch();
+      showToast('Scenario 1 Loaded: Purchase within limits (Auto-Approved).');
+    } else if (scenarioNum === 2) {
+      // 2. Purchase above spending limit
+      setPrompt('Procure top-tier 27-inch 4K IPS development monitor with USB-C hub');
+      setMustHave(['4K UHD', 'IPS Panel', 'USB-C']);
+      setMustNotHave(['1080p', 'Refurbished']);
+      handleSearch();
+      showToast('Scenario 2 Loaded: Purchase above limit (Exceeds ₹5k ceiling -> Blocked).');
+    } else if (scenarioNum === 3) {
+      // 3. Blocked merchant
+      setPrompt('Find Logitech MX Master 3S from any available seller with cheapest pricing');
+      setMustHave(['Ergonomic Contour', 'Side Wheel']);
+      setMustNotHave(['Refurbished']);
+      handleSearch();
+      showToast('Scenario 3 Loaded: Blocked merchant (TechBazaar.in unauthorized seller -> Blocked).');
+    } else if (scenarioNum === 4) {
+      // 4. Requires explicit approval
+      setPrompt('Order Logitech G502 HERO wired mouse with high precision sensor');
+      setMustHave(['Wired USB', 'HERO 25K Sensor', '11 Buttons']);
+      setMustNotHave(['Wireless']);
+      handleSearch();
+      showToast('Scenario 4 Loaded: Requires explicit approval (Exceeds ₹3,000 auto-cap -> Pending).');
+    } else if (scenarioNum === 5) {
+      // 5. Revoked or expired mandate
+      const revoked = mandates.find(m => m.status === 'REVOKED');
+      if (revoked) {
+        setSelectedMandateId(revoked.id);
+      }
+      showToast('Scenario 5 Loaded: Revoked Mandate selected (Immediate authorization failure).');
+    } else if (scenarioNum === 6) {
+      // 6. Payment failure or cancellation
+      showToast('Scenario 6: Payment Rail Failure/Cancellation demo ready in Approval Center.');
+      navigate('/requests');
     }
-  ];
+  };
 
   return (
     <div className="bg-background min-h-screen text-on-surface antialiased">
       <Sidebar />
-      <Header pageTitle="Shopping Agent" onOpenGuide={() => setGuideOpen(true)} />
+      <Header pageTitle="Autonomous Shopping Agent" onOpenGuide={() => setGuideOpen(true)} />
       <ArbitrationModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
 
       {/* Main Workspace */}
@@ -138,59 +181,138 @@ export default function ShoppingAgentPage() {
             
             {/* Header */}
             <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#E7E7E3]">
-              <div className="space-y-2 max-w-2xl">
+              <div className="space-y-1.5 max-w-2xl">
                 <div className="page-eyebrow flex items-center gap-2">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
                   <span>Autonomous Shopping Agent</span>
                   <span className="text-outline-variant">/</span>
-                  <span>Procurement Orchestration Engine</span>
+                  <span>Procurement &amp; Policy Clearance</span>
                 </div>
                 <h1 className="page-title">
                   Autonomous Shopping Agent
                 </h1>
                 <p className="page-subtitle">
-                  Issue purchase tasks to AI agents and review candidate products against active spending mandates with deterministic gateway clearance.
+                  Issue natural-language shopping tasks to AI agents. Candidates are searched via the Channel3 ProductProvider interface and evaluated against active spending mandates.
                 </p>
               </div>
 
-              <div className="flex items-center gap-6 self-start md:self-end">
+              {/* Active Mandate Selector & Assigned Agent */}
+              <div className="flex flex-wrap items-center gap-4 self-start md:self-end bg-surface-container-low p-3 rounded-xl border border-[#E7E7E3]">
                 <div className="flex flex-col">
-                  <span className="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">
-                    Active Mandate
+                  <span className="font-label-sm text-[10px] text-secondary uppercase tracking-wider font-semibold">
+                    Bound Spending Mandate
                   </span>
-                  <button className="flex items-center gap-2 pt-1 text-on-surface font-title-md hover:text-secondary transition-colors text-left" type="button">
-                    <span className="w-2 h-2 rounded-full bg-secondary"></span>
-                    <span className="font-semibold text-body-sm">Office Hardware Q4</span>
-                    <span className="font-code-sm text-code-sm text-secondary font-normal">(Cap: ₹5,000)</span>
-                    <span className="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
-                  </button>
+                  <select
+                    value={selectedMandateId}
+                    onChange={(e) => setSelectedMandateId(e.target.value)}
+                    className="select-standard h-8 text-xs font-semibold bg-surface-container-lowest mt-1"
+                  >
+                    {mandates.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} (#{m.id}) {m.status === 'REVOKED' ? '[REVOKED]' : `[Cap: ₹${(m.singlePurchaseLimit || 5000).toLocaleString()}]`}
+                      </option>
+                    ))}
+                  </select>
                 </div>
+
                 <div className="h-8 w-px bg-[#E7E7E3] hidden sm:block"></div>
-                <div className="hidden sm:flex flex-col">
-                  <span className="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">
-                    Assigned Agent
+
+                <div className="flex flex-col">
+                  <span className="font-label-sm text-[10px] text-secondary uppercase tracking-wider font-semibold">
+                    Product Provider
                   </span>
-                  <div className="flex items-center gap-1.5 pt-1 font-body-sm text-body-sm text-on-surface font-medium">
-                    <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-                    <span>Claude Shopping</span>
-                    <span className="font-code-sm text-[11px] text-secondary">v3.5-Sonnet</span>
-                  </div>
+                  <select
+                    value={selectedSource}
+                    onChange={(e) => setSelectedSource(e.target.value)}
+                    className="select-standard h-8 text-xs font-medium bg-surface-container-lowest mt-1"
+                  >
+                    <option value="channel3-demo">Channel3 Adapter (Simulated)</option>
+                    <option value="amazon-in">Amazon India (Direct)</option>
+                    <option value="croma-in">Croma Verified Catalog</option>
+                    <option value="multi-merchant">Aggregated Multi-Merchant</option>
+                  </select>
                 </div>
               </div>
             </header>
 
-            {/* Zero-Implicit-Assent Protocol Banner */}
-            <section className="py-3 px-4 rounded-lg bg-surface-container-low/60 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-body-sm text-on-surface-variant border-l-2 border-secondary">
-              <div className="flex items-center gap-2.5">
-                <span className="material-symbols-outlined text-secondary text-[18px]">verified_user</span>
-                <span>
-                  <strong className="font-medium text-on-surface">Zero-Implicit-Assent Protocol:</strong> Unknown specifications are never verified matches. Blocked products have no override bypass.
+            {/* Hackathon Deterministic Scenarios Bar */}
+            <section className="p-4 rounded-2xl bg-surface-container-lowest border border-[#E7E7E3] shadow-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-label-sm text-xs uppercase tracking-wider text-primary font-bold flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-secondary text-[16px]">science</span>
+                  <span>Deterministic Test Scenarios for Hackathon Evaluation:</span>
+                </span>
+                <span className="font-mono text-[10px] text-secondary bg-surface-container px-2 py-0.5 rounded">
+                  Reproducible Test Fixtures
                 </span>
               </div>
-              <div className="flex items-center gap-3 font-code-sm text-[12px] text-secondary flex-shrink-0">
-                <span>RULE-SEC-0914</span>
-                <span>•</span>
-                <span>Deterministic Policy Enforced</span>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => loadScenario(1)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 1
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  1. Within Limits (Auto-Approved)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadScenario(2)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 2
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  2. Above Spending Limit (Blocked)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadScenario(3)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 3
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  3. Blocked Merchant (Blocked)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadScenario(4)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 4
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  4. Explicit Approval Required
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadScenario(5)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 5
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  5. Revoked Mandate Test
+                </button>
+                <button
+                  type="button"
+                  onClick={() => loadScenario(6)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
+                    activeScenario === 6
+                      ? 'bg-primary text-white border-primary shadow-sm'
+                      : 'bg-surface-container-low text-primary border-[#E7E7E3] hover:border-primary'
+                  }`}
+                >
+                  6. Payment Cancellation
+                </button>
               </div>
             </section>
 
@@ -201,11 +323,11 @@ export default function ShoppingAgentPage() {
                   <div className="flex items-center gap-2">
                     <span className="material-symbols-outlined text-secondary text-[20px]">edit_note</span>
                     <span className="font-label-sm uppercase tracking-wider text-on-surface font-semibold">
-                      Shopping Task Brief
+                      Natural-Language Shopping Task
                     </span>
                   </div>
-                  <span className="font-code-sm text-code-sm text-on-surface-variant">
-                    AST Semantic Parser Active
+                  <span className="font-code-sm text-code-sm text-secondary">
+                    Channel3 ProductProvider Interface Active
                   </span>
                 </div>
 
@@ -218,7 +340,7 @@ export default function ShoppingAgentPage() {
                     className="w-full bg-transparent font-headline-sm text-headline-sm text-primary placeholder:text-on-surface-variant/40 outline-none resize-none leading-relaxed border-0 p-0 focus:ring-0"
                   />
                   <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Targeting 3 authorized e-commerce marketplaces: Amazon India, Croma, Flipkart Business.
+                    Bound to Mandate #{currentMandate.id}: {currentMandate.name} (Single Cap: ₹{(currentMandate.singlePurchaseLimit || 5000).toLocaleString()}, Auto ≤ ₹{(currentMandate.requiresCoSignerOver || 3000).toLocaleString()})
                   </p>
                 </div>
 
@@ -226,10 +348,10 @@ export default function ShoppingAgentPage() {
                 <div className="pt-4 border-t border-[#E7E7E3] space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-label-sm text-[11px] text-on-surface-variant uppercase tracking-wider">
-                      Deterministic Filter Parameters
+                      Required &amp; Excluded Product Attributes
                     </span>
                     <span className="font-code-sm text-code-sm text-on-surface-variant">
-                      Click to reassign parameter status
+                      Deterministic constraints applied to product attributes
                     </span>
                   </div>
 
@@ -238,7 +360,7 @@ export default function ShoppingAgentPage() {
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="font-label-sm uppercase tracking-wider text-on-surface font-semibold flex items-center gap-1.5 mr-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-on-background"></span>
-                        Must Have
+                        Required
                       </span>
                       {mustHave.map((item) => (
                         <span key={item} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-code-sm text-[12px]">
@@ -257,34 +379,11 @@ export default function ShoppingAgentPage() {
 
                     <span className="text-outline-variant/60 hidden lg:inline">|</span>
 
-                    {/* Nice to Have */}
-                    <div className="flex items-center flex-wrap gap-2">
-                      <span className="font-label-sm uppercase tracking-wider text-secondary font-semibold flex items-center gap-1.5 mr-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                        Nice to Have
-                      </span>
-                      {niceToHave.map((item) => (
-                        <span key={item} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface font-code-sm text-[12px]">
-                          {item}
-                          <button
-                            type="button"
-                            onClick={() => removeParam('nice', item)}
-                            className="text-on-surface-variant hover:text-error transition-colors"
-                            aria-label={`Remove ${item}`}
-                          >
-                            <span className="material-symbols-outlined text-[13px]">close</span>
-                          </button>
-                        </span>
-                      ))}
-                    </div>
-
-                    <span className="text-outline-variant/60 hidden lg:inline">|</span>
-
-                    {/* Must Not Have */}
+                    {/* Excluded / Must Not Have */}
                     <div className="flex items-center flex-wrap gap-2">
                       <span className="font-label-sm uppercase tracking-wider text-error font-semibold flex items-center gap-1.5 mr-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
-                        Must Not Have
+                        Excluded
                       </span>
                       {mustNotHave.map((item) => (
                         <span key={item} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-error-container/40 text-on-error-container font-code-sm text-[12px]">
@@ -305,18 +404,18 @@ export default function ShoppingAgentPage() {
 
                 <div className="flex items-center justify-between pt-4 border-t border-[#E7E7E3]">
                   <div className="flex items-center gap-2 text-on-surface-variant font-code-sm text-code-sm">
-                    <span className="material-symbols-outlined text-[16px] text-secondary">memory</span>
-                    <span>AST Lexer ready • 7 parameters compiled</span>
+                    <span className="material-symbols-outlined text-[16px] text-secondary">tune</span>
+                    <span>Provider: {selectedSource} • Simulated Deterministic Fixtures</span>
                   </div>
                   <button
                     id="search-btn"
                     type="button"
                     onClick={handleSearch}
                     disabled={searching}
-                    className="h-10 px-5 rounded-lg bg-primary-container hover:bg-primary text-on-primary transition-all flex items-center gap-2 font-label-md text-label-md shadow-sm"
+                    className="h-10 px-5 rounded-lg bg-primary-container hover:bg-primary text-on-primary transition-all flex items-center gap-2 font-label-md text-label-md shadow-sm cursor-pointer"
                   >
                     <span className="material-symbols-outlined text-[18px]">travel_explore</span>
-                    <span>{searching ? 'Executing Lexer...' : 'Execute Autonomous Search'}</span>
+                    <span>{searching ? 'Querying Adapter...' : 'Run Demo Product Search'}</span>
                   </button>
                 </div>
               </div>
@@ -327,37 +426,47 @@ export default function ShoppingAgentPage() {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#E7E7E3]">
                 <div className="flex items-center gap-3">
                   <h2 className="section-title">
-                    Candidate Evaluation
+                    Candidate Products &amp; Policy Evaluation
                   </h2>
                   <span className="font-label-sm text-label-sm px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface">
-                    {displayCandidates.length} Products Evaluated
+                    {candidates.length} Scanned
                   </span>
                 </div>
-                <div className="flex items-center gap-2 font-code-sm text-code-sm text-on-surface-variant">
-                  <span>Clearance Gateway:</span>
-                  <span className="text-on-surface font-medium">Deterministic Rule Arbiter (Zero-Assent)</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setComparisonModalOpen(true)}
+                    className="btn-secondary text-xs"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">compare_arrows</span>
+                    <span>Side-by-Side Comparison</span>
+                  </button>
+                  <span className="font-mono text-xs text-secondary">
+                    Gate: Mandate #{currentMandate.id}
+                  </span>
                 </div>
               </div>
 
+              {/* Candidates List */}
               <div className="divide-y divide-[#E7E7E3]">
-                {displayCandidates.map((cand) => {
+                {candidates.map((cand) => {
                   const isMatch = cand.verdict === 'FULL_MATCH_ELIGIBLE' || cand.verdict === 'ELIGIBLE';
-                  const isReview = cand.verdict === 'NEEDS_HUMAN_REVIEW' || cand.price > 3000 && cand.price <= 5000;
-                  const isBlocked = cand.verdict === 'BLOCKED_BY_POLICY' || cand.verdict === 'DEALBREAKER_REJECTED' || cand.price > 5000;
+                  const isReview = cand.verdict === 'NEEDS_HUMAN_REVIEW' || (cand.price > (currentMandate.requiresCoSignerOver || 3000) && cand.price <= (currentMandate.singlePurchaseLimit || 5000));
+                  const isBlocked = cand.verdict === 'BLOCKED_BY_POLICY' || cand.price > (currentMandate.singlePurchaseLimit || 5000) || currentMandate.status === 'REVOKED';
 
                   return (
                     <article
                       key={cand.id}
                       className={`py-6 transition-colors hover:bg-surface-container-low/40 rounded-xl px-4 -mx-4 ${
-                        isBlocked ? 'opacity-85' : ''
+                        isBlocked ? 'opacity-90 bg-red-50/10' : ''
                       }`}
                     >
                       <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
                         
-                        {/* Product Visual & Basic Info */}
+                        {/* Visual & Basic Info */}
                         <div className="flex items-start gap-4 min-w-0 lg:w-4/12">
                           <div className={`w-20 h-20 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-[#E7E7E3] ${
-                            isBlocked ? 'grayscale-[30%]' : ''
+                            isBlocked ? 'grayscale-[20%]' : ''
                           }`}>
                             <img
                               src={cand.image}
@@ -368,15 +477,20 @@ export default function ShoppingAgentPage() {
                           </div>
                           <div className="space-y-1 min-w-0">
                             <div className="flex items-center gap-2">
-                              {isMatch ? (
-                                <span className="inline-flex items-center gap-1 font-label-sm text-[11px] text-secondary font-semibold uppercase tracking-wider">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                                  Eligible for Auto-Purchase
+                              {currentMandate.status === 'REVOKED' ? (
+                                <span className="inline-flex items-center gap-1 font-label-sm text-[11px] text-error font-semibold uppercase tracking-wider">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
+                                  Mandate Revoked
+                                </span>
+                              ) : isMatch ? (
+                                <span className="inline-flex items-center gap-1 font-label-sm text-[11px] text-emerald-700 font-semibold uppercase tracking-wider">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                  Auto-Purchase Eligible
                                 </span>
                               ) : isReview ? (
                                 <span className="inline-flex items-center gap-1 font-label-sm text-[11px] text-secondary font-semibold uppercase tracking-wider">
                                   <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse"></span>
-                                  Needs Human Review
+                                  Needs Human Approval
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 font-label-sm text-[11px] text-error font-semibold uppercase tracking-wider">
@@ -397,39 +511,31 @@ export default function ShoppingAgentPage() {
                             <p className={`font-code-sm text-code-sm font-semibold ${isBlocked ? 'text-error' : 'text-primary'}`}>
                               ₹{cand.price.toLocaleString()}.00{' '}
                               <span className="font-normal text-on-surface-variant text-[11px]">
-                                {isMatch
-                                  ? `(29.9% of ₹5,000 mandate cap)`
-                                  : isReview
-                                  ? `(Exceeds ₹3,000 auto-cap)`
-                                  : `(Exceeds ceiling ₹5,000)`}
+                                {cand.source}
                               </span>
                             </p>
 
                             <p className="font-body-sm text-[12px] text-on-surface-variant">
-                              Model: {cand.model || 'RZ01-0385'} • {cand.stockNote || 'Verified Stock'}
+                              Model: {cand.model || 'Standard'} • {cand.stockNote || 'Verified Stock'}
                             </p>
                           </div>
                         </div>
 
-                        {/* Specs & Policy Clearance Notes */}
+                        {/* Specs & Clearance Reason */}
                         <div className="space-y-2 lg:w-5/12">
-                          <div className="flex items-center gap-4 text-body-sm">
-                            <span className="font-label-sm text-[11px] uppercase tracking-wider text-on-surface-variant font-semibold">
-                              Specs
+                          <div className="flex items-center gap-3 text-body-sm">
+                            <span className="font-label-sm text-[11px] uppercase tracking-wider text-secondary font-semibold">
+                              Specs:
                             </span>
-                            <div className="flex flex-wrap items-center gap-3 font-code-sm text-code-sm">
+                            <div className="flex flex-wrap items-center gap-2 font-code-sm text-code-sm">
                               {cand.specs?.map((sp, idx) => (
                                 <span
                                   key={idx}
-                                  className={`inline-flex items-center gap-1 ${
-                                    sp.pass ? 'text-on-surface' : 'text-error'
+                                  className={`inline-flex items-center gap-1 text-xs ${
+                                    sp.pass ? 'text-primary' : 'text-error font-semibold'
                                   }`}
                                 >
-                                  <span
-                                    className={`material-symbols-outlined text-[15px] ${
-                                      sp.pass ? 'text-secondary' : 'text-error'
-                                    }`}
-                                  >
+                                  <span className="material-symbols-outlined text-[14px]">
                                     {sp.pass ? 'check' : 'close'}
                                   </span>
                                   {sp.label}
@@ -438,68 +544,71 @@ export default function ShoppingAgentPage() {
                             </div>
                           </div>
 
-                          <p className="font-body-sm text-body-sm text-on-surface leading-snug">
-                            {isMatch ? (
-                              <>
-                                <span className="font-medium text-secondary">Policy clearance verified:</span>{' '}
-                                {cand.clearanceNote}
-                              </>
-                            ) : isReview ? (
-                              <>
-                                <span className="font-medium text-secondary">Clause §4.2 escalation:</span>{' '}
-                                {cand.clearanceNote}
-                              </>
-                            ) : (
-                              <>
-                                <span className="font-medium text-error">Strict mandate rejection:</span>{' '}
-                                {cand.clearanceNote}
-                              </>
-                            )}
-                          </p>
+                          <div className={`p-2.5 rounded-lg text-xs leading-relaxed ${
+                            isBlocked
+                              ? 'bg-red-50 text-error border border-red-200'
+                              : isReview
+                              ? 'bg-surface-container text-on-surface border border-[#E7E7E3]'
+                              : 'bg-emerald-50/60 text-emerald-900 border border-emerald-200/60'
+                          }`}>
+                            <strong className="block mb-0.5">
+                              {isBlocked ? 'Policy Violation Reason:' : isReview ? 'Escalation Reason:' : 'Policy Clearance Decision:'}
+                            </strong>
+                            <span>{cand.clearanceNote}</span>
+                          </div>
 
-                          <span className={`block font-code-sm text-[11px] ${isBlocked ? 'text-error' : 'text-on-surface-variant'}`}>
-                            {cand.proofToken}
-                          </span>
+                          <div className="flex items-center justify-between text-[11px] text-secondary font-mono pt-1">
+                            <span>{cand.proofToken}</span>
+                            <button
+                              onClick={() => {
+                                setSelectedCandidateForModal(cand);
+                                setComparisonModalOpen(true);
+                              }}
+                              className="hover:underline text-primary cursor-pointer"
+                              type="button"
+                            >
+                              Inspect Details →
+                            </button>
+                          </div>
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col items-start lg:items-end justify-center lg:w-3/12 space-y-1.5 flex-shrink-0">
-                          {isMatch ? (
+                        <div className="flex flex-col items-start lg:items-end justify-center lg:w-3/12 space-y-2 flex-shrink-0">
+                          {isBlocked ? (
                             <button
                               type="button"
-                              onClick={() => handleIssueRequest(cand.id)}
-                              disabled={submittedRequest === cand.id}
-                              className="w-full sm:w-auto h-9 px-4 rounded-lg bg-primary-container hover:bg-primary text-on-primary font-label-md text-label-md transition-all flex items-center justify-center gap-2 shadow-sm font-medium"
+                              disabled
+                              className="w-full sm:w-auto h-9 px-4 rounded-lg bg-surface-container text-error font-label-md text-label-md flex items-center justify-center gap-1.5 opacity-70 cursor-not-allowed font-medium"
                             >
-                              <span className="material-symbols-outlined text-[16px]">bolt</span>
-                              <span>{submittedRequest === cand.id ? 'Redirecting...' : 'Issue Purchase Request'}</span>
-                            </button>
-                          ) : isReview ? (
-                            <button
-                              type="button"
-                              onClick={() => handleIssueRequest(cand.id)}
-                              className="w-full sm:w-auto h-9 px-4 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-all flex items-center justify-center gap-2 shadow-sm font-medium"
-                            >
-                              <span className="material-symbols-outlined text-[16px]">verified_user</span>
-                              <span>Submit for Signoff</span>
+                              <span className="material-symbols-outlined text-[16px]">block</span>
+                              <span>Blocked (No Bypass)</span>
                             </button>
                           ) : (
                             <button
                               type="button"
-                              disabled
-                              className="w-full sm:w-auto h-9 px-4 rounded-lg bg-surface-container text-on-surface-variant font-label-md text-label-md flex items-center justify-center gap-2 cursor-not-allowed opacity-60 font-medium"
+                              onClick={() => handleIssueRequest(cand.id)}
+                              disabled={submittedRequest === cand.id}
+                              className="btn-primary w-full sm:w-auto h-9 px-4"
                             >
-                              <span className="material-symbols-outlined text-[16px]">block</span>
-                              <span>Blocked by Policy</span>
+                              <span className="material-symbols-outlined text-[16px]">
+                                {isMatch ? 'bolt' : 'verified_user'}
+                              </span>
+                              <span>
+                                {submittedRequest === cand.id
+                                  ? 'Routing...'
+                                  : isMatch
+                                  ? 'Issue Purchase Request'
+                                  : 'Open for Human Approval'}
+                              </span>
                             </button>
                           )}
 
-                          <span className={`font-code-sm text-[11px] ${isBlocked ? 'text-error' : 'text-on-surface-variant'}`}>
+                          <span className="text-[11px] font-mono text-secondary">
                             {isMatch
-                              ? 'Instant gateway clearance'
+                              ? 'Single-use sandbox voucher ready'
                               : isReview
-                              ? 'Requires manual authorization'
-                              : 'No bypass available'}
+                              ? 'Routes to Approval Center'
+                              : 'Mandate invariant locked'}
                           </span>
                         </div>
                       </div>
@@ -508,84 +617,101 @@ export default function ShoppingAgentPage() {
                 })}
               </div>
             </section>
-
-            {/* Deterministic Policy Enforcement Stream */}
-            <section className="space-y-4 pt-4 border-t border-[#E7E7E3]">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <div className="space-y-0.5">
-                  <h3 className="section-title">
-                    Deterministic Policy Enforcement Stream
-                  </h3>
-                  <p className="font-body-sm text-body-sm text-on-surface-variant">
-                    Real-time execution log of AST node comparisons and cryptographic validation proofs.
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 font-code-sm text-code-sm text-on-surface-variant">
-                  <span className="font-mono">HASH: 9c41..b2e8</span>
-                  <span className="text-outline-variant">·</span>
-                  <span>PCI-DSS 4.0 §3.2</span>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-left font-body-sm text-body-sm">
-                  <thead>
-                    <tr className="text-on-surface-variant font-label-sm uppercase tracking-wider border-b border-[#E7E7E3]">
-                      <th className="py-2.5 pr-4 font-semibold text-[11px]">Timestamp</th>
-                      <th className="py-2.5 px-4 font-semibold text-[11px]">Evaluated Entity</th>
-                      <th className="py-2.5 px-4 font-semibold text-[11px]">Checked Constraint</th>
-                      <th className="py-2.5 px-4 font-semibold text-[11px]">Raw Metric</th>
-                      <th className="py-2.5 px-4 font-semibold text-[11px]">Engine Arbiter</th>
-                      <th className="py-2.5 pl-4 font-semibold text-[11px] text-right">Verdict</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#E7E7E3] font-code-sm text-[13px]">
-                    <tr className="hover:bg-surface-container-low/40 transition-colors">
-                      <td className="py-3 pr-4 text-on-surface-variant font-mono">14:02:41.109</td>
-                      <td className="py-3 px-4 font-semibold text-on-surface">Razer DeathAdder</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Mandate Price Auto-Ceiling</td>
-                      <td className="py-3 px-4">₹1,499.00 &lt; ₹3,000.00</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Policy-Rule-882 (Numeric)</td>
-                      <td className="py-3 pl-4 text-right">
-                        <span className="inline-flex items-center gap-1 text-secondary font-medium font-label-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                          <span>CLEAR</span>
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-surface-container-low/40 transition-colors">
-                      <td className="py-3 pr-4 text-on-surface-variant font-mono">14:02:41.144</td>
-                      <td className="py-3 px-4 font-semibold text-on-surface">Logitech G502 HERO</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Discretionary Auto-Threshold</td>
-                      <td className="py-3 px-4">₹3,895.00 &gt; ₹3,000.00</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Escalation-Rule-401</td>
-                      <td className="py-3 pl-4 text-right">
-                        <span className="inline-flex items-center gap-1 text-secondary font-medium font-label-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                          <span>HOLD_FOR_HUMAN</span>
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="hover:bg-surface-container-low/40 transition-colors">
-                      <td className="py-3 pr-4 text-on-surface-variant font-mono">14:02:41.198</td>
-                      <td className="py-3 px-4 font-semibold text-on-surface">Logitech MX Master 3S</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Merchant Verification List</td>
-                      <td className="py-3 px-4">techbazaar.in ∉ [Allowlist]</td>
-                      <td className="py-3 px-4 text-on-surface-variant">Vendor-Security-Guard</td>
-                      <td className="py-3 pl-4 text-right">
-                        <span className="inline-flex items-center gap-1 text-error font-medium font-label-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
-                          <span>VETO_DENIED</span>
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
           </div>
         </main>
       </div>
+
+      {/* Side-by-Side Candidate Comparison Modal */}
+      {comparisonModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-surface-container-lowest rounded-2xl max-w-4xl w-full p-6 sm:p-8 border border-[#E7E7E3] shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button
+              onClick={() => setComparisonModalOpen(false)}
+              className="absolute top-6 right-6 text-secondary hover:text-primary p-1 rounded-full hover:bg-surface-container transition-colors cursor-pointer"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-[#E7E7E3]">
+              <span className="material-symbols-outlined text-secondary text-[22px]">compare_arrows</span>
+              <div>
+                <h3 className="font-title-md text-lg font-bold text-primary">Product Candidate Comparison Matrix</h3>
+                <p className="text-xs text-on-surface-variant">Compare price, merchant legitimacy, specifications, and gateway clearance status</p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto flex-1">
+              <table className="w-full text-left text-xs border border-[#E7E7E3] rounded-lg">
+                <thead className="bg-surface-container-low font-mono uppercase text-[11px] text-secondary">
+                  <tr>
+                    <th className="p-3 border-b border-[#E7E7E3]">Product Candidate</th>
+                    <th className="p-3 border-b border-[#E7E7E3]">Merchant</th>
+                    <th className="p-3 border-b border-[#E7E7E3]">Price (INR)</th>
+                    <th className="p-3 border-b border-[#E7E7E3]">Source Adapter</th>
+                    <th className="p-3 border-b border-[#E7E7E3]">Policy Verdict</th>
+                    <th className="p-3 border-b border-[#E7E7E3] text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E7E7E3]">
+                  {candidates.map((c) => (
+                    <tr key={c.id} className="hover:bg-surface-container-low/40">
+                      <td className="p-3 font-semibold text-primary max-w-xs">{c.title}</td>
+                      <td className="p-3 font-mono">{c.merchant}</td>
+                      <td className="p-3 font-mono font-bold">₹{c.price.toLocaleString()}</td>
+                      <td className="p-3 text-secondary font-mono">{c.source}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold ${
+                          c.verdict.includes('BLOCKED') || c.verdict.includes('REJECTED')
+                            ? 'bg-red-50 text-error border border-red-200'
+                            : c.verdict.includes('REVIEW')
+                            ? 'bg-amber-50 text-amber-800 border border-amber-200'
+                            : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                        }`}>
+                          {c.verdict}
+                        </span>
+                      </td>
+                      <td className="p-3 text-right">
+                        {!c.verdict.includes('BLOCKED') && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setComparisonModalOpen(false);
+                              handleIssueRequest(c.id);
+                            }}
+                            className="btn-outline text-xs px-2 py-1"
+                          >
+                            Select
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-[#E7E7E3] flex justify-between items-center text-xs text-secondary font-mono">
+              <span>Channel3 ProductProvider Schema v1.0 • Simulated Catalog Fixtures</span>
+              <button
+                onClick={() => setComparisonModalOpen(false)}
+                className="btn-secondary text-xs"
+                type="button"
+              >
+                Close Matrix
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Feedback */}
+      {toastMessage && (
+        <div className="fixed bottom-8 right-8 z-50 bg-primary text-white px-4 py-3 rounded-xl shadow-2xl font-mono text-xs flex items-center gap-2 border border-white/10">
+          <span className="material-symbols-outlined text-emerald-400 text-[16px]">info</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 }

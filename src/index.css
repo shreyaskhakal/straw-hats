@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --bg-page: #F5F5F3;
+    --surface-card: #FFFFFF;
+    --surface-elevated: #F9F9F7;
+    --text-primary: #242424;
+    --text-secondary: #737373;
+    --border-color: #E7E7E3;
+    --accent: #A99A80;
+  }
+
+  .dark {
+    --bg-page: #141414;
+    --surface-card: #1D1D1D;
+    --surface-elevated: #252525;
+    --text-primary: #F5F5F5;
+    --text-secondary: #B8B8B8;
+    --border-color: #353535;
+    --accent: #C2B49A;
+  }
+
   html, body {
     margin: 0;
     padding: 0;
@@ -11,9 +31,62 @@
     overflow-y: auto !important;
     overflow-x: hidden !important;
     position: static !important;
-    background-color: #fafaf8;
-    color: #141514;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .dark body {
+    background-color: #141414;
+    color: #F5F5F5;
+  }
+
+  .dark .bg-background {
+    background-color: #141414 !important;
+  }
+
+  .dark .bg-surface {
+    background-color: #1D1D1D !important;
+  }
+
+  .dark .bg-surface-container-lowest,
+  .dark .bg-white {
+    background-color: #1D1D1D !important;
+  }
+
+  .dark .bg-surface-container-low,
+  .dark .bg-surface-container {
+    background-color: #252525 !important;
+  }
+
+  .dark .bg-surface-container-high {
+    background-color: #2C2C2C !important;
+  }
+
+  .dark .text-primary,
+  .dark .text-charcoal,
+  .dark .text-on-surface,
+  .dark .text-black {
+    color: #F5F5F5 !important;
+  }
+
+  .dark .text-secondary,
+  .dark .text-on-surface-variant,
+  .dark .text-\[\#5A5D5E\],
+  .dark .text-\[\#888B8C\] {
+    color: #B8B8B8 !important;
+  }
+
+  .dark .border-\[\#E7E7E3\],
+  .dark .border-outline-variant\/30,
+  .dark .border-outline-variant\/40,
+  .dark .border-\[\#EDEDEA\] {
+    border-color: #353535 !important;
+  }
+
+  .dark .divide-\[\#E7E7E3\] > :not([hidden]) ~ :not([hidden]) {
+    border-color: #353535 !important;
   }
 
   h1, h2, h3, h4, h5, h6 {

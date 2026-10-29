@@ -128,6 +128,84 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Notice & PayPal Sandbox Status Strip */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div className="md:col-span-8 p-4 rounded-xl bg-surface-container-low border border-[#E7E7E3] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                <span className="text-on-surface font-medium truncate">
+                  <strong className="text-primary font-semibold">PayPal Sandbox Status:</strong> Connected (Client Mock / Orders v2 Ready)
+                </span>
+              </div>
+              <span className="font-mono text-[11px] text-secondary bg-surface-container-lowest px-2.5 py-1 rounded-md border border-[#E7E7E3] shrink-0">
+                Env: api-m.sandbox.paypal.com (Simulated)
+              </span>
+            </div>
+
+            <div className="md:col-span-4 p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-900 dark:text-amber-300 flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px]">info</span>
+                <span className="font-medium">Deterministic Demo Values</span>
+              </div>
+              <span className="font-mono text-[10px] uppercase font-bold tracking-wider">Demo Mode</span>
+            </div>
+          </div>
+
+          {/* Quick Action Navigation Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <Link
+              to="/mandates"
+              className="p-3.5 rounded-xl bg-surface-container-lowest border border-[#E7E7E3] hover:border-primary/40 hover:shadow-sm transition-all flex items-center gap-3 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <span className="material-symbols-outlined text-[17px]">add_circle</span>
+              </div>
+              <div className="min-w-0">
+                <span className="text-[12.5px] font-semibold text-primary block truncate">Create Mandate</span>
+                <span className="text-[10px] text-secondary block font-mono">Set spending rules</span>
+              </div>
+            </Link>
+
+            <Link
+              to="/agent"
+              className="p-3.5 rounded-xl bg-surface-container-lowest border border-[#E7E7E3] hover:border-primary/40 hover:shadow-sm transition-all flex items-center gap-3 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <span className="material-symbols-outlined text-[17px]">smart_toy</span>
+              </div>
+              <div className="min-w-0">
+                <span className="text-[12.5px] font-semibold text-primary block truncate">Shopping Agent</span>
+                <span className="text-[10px] text-secondary block font-mono">Run product search</span>
+              </div>
+            </Link>
+
+            <Link
+              to="/requests"
+              className="p-3.5 rounded-xl bg-surface-container-lowest border border-[#E7E7E3] hover:border-primary/40 hover:shadow-sm transition-all flex items-center gap-3 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <span className="material-symbols-outlined text-[17px]">gavel</span>
+              </div>
+              <div className="min-w-0">
+                <span className="text-[12.5px] font-semibold text-primary block truncate">Inspect Purchases</span>
+                <span className="text-[10px] text-secondary block font-mono">{stats.pendingApprovalsCount} pending gates</span>
+              </div>
+            </Link>
+
+            <Link
+              to="/security"
+              className="p-3.5 rounded-xl bg-surface-container-lowest border border-[#E7E7E3] hover:border-primary/40 hover:shadow-sm transition-all flex items-center gap-3 group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                <span className="material-symbols-outlined text-[17px]">security</span>
+              </div>
+              <div className="min-w-0">
+                <span className="text-[12.5px] font-semibold text-primary block truncate">Security Center</span>
+                <span className="text-[10px] text-secondary block font-mono">Kill-switch &amp; checks</span>
+              </div>
+            </Link>
+          </div>
+
           {/* Hero Typographic Metric Cards */}
           <section aria-label="Gateway Metrics Overview">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

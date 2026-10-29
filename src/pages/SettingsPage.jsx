@@ -3,9 +3,11 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import ArbitrationModal from '../components/ArbitrationModal';
 import { api } from '../api/client';
+import { useTheme } from '../context/ThemeContext';
 import avatarElenaImg from '../assets/avatar-elena.jpg';
 
 export default function SettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [guideOpen, setGuideOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -18,7 +20,7 @@ export default function SettingsPage() {
   const [discretionaryBaseline, setDiscretionaryBaseline] = useState('3,000');
   const [multiSigThreshold, setMultiSigThreshold] = useState('50,000');
   const [hardMandateCap, setHardMandateCap] = useState('1,50,000');
-  const [selectedTheme, setSelectedTheme] = useState('light'); // 'light' | 'dark'
+  const [selectedTheme, setSelectedTheme] = useState(theme || 'light');
 
   // Preferences toggles
   const [compactDensity, setCompactDensity] = useState(true);
@@ -535,9 +537,13 @@ export default function SettingsPage() {
                     <div className="grid grid-cols-2 gap-3.5">
                       <button
                         type="button"
-                        onClick={() => setSelectedTheme('light')}
+                        onClick={() => {
+                          setSelectedTheme('light');
+                          setTheme('light');
+                          triggerToast('Light Sovereign palette active.');
+                        }}
                         className={`p-3.5 rounded-xl bg-surface-container-low flex items-center gap-3 text-left transition-all cursor-pointer ${
-                          selectedTheme === 'light'
+                          theme === 'light'
                             ? 'border-2 border-primary bg-surface-container-lowest shadow-sm'
                             : 'border border-outline-variant/30 hover:bg-surface-container-high'
                         }`}
@@ -555,10 +561,11 @@ export default function SettingsPage() {
                         type="button"
                         onClick={() => {
                           setSelectedTheme('dark');
-                          triggerToast('Obsidian Dark sovereign palette selected for session.');
+                          setTheme('dark');
+                          triggerToast('Obsidian Dark sovereign palette active.');
                         }}
                         className={`p-3.5 rounded-xl bg-surface-container-low flex items-center gap-3 text-left transition-all cursor-pointer ${
-                          selectedTheme === 'dark'
+                          theme === 'dark'
                             ? 'border-2 border-primary bg-surface-container-lowest shadow-sm'
                             : 'border border-outline-variant/30 hover:bg-surface-container-high'
                         }`}

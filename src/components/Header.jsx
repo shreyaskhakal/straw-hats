@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Header({ pageTitle = 'Overview Ledger', onOpenGuide }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const { theme, toggleTheme } = useTheme();
 
   const notifications = [
     { id: 1, title: 'High-Value Escalation', desc: 'Logitech MX Master 3S exceeds ₹5k ceiling', time: '14m ago', unread: true },
@@ -94,6 +97,19 @@ export default function Header({ pageTitle = 'Overview Ledger', onOpenGuide }) {
             </div>
           )}
         </div>
+
+        {/* Theme Toggle (Light / Dark Mode) */}
+        <button
+          onClick={toggleTheme}
+          aria-label={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          title={theme === 'dark' ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          className="w-8 h-8 rounded-lg flex items-center justify-center text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors cursor-pointer"
+          type="button"
+        >
+          <span className="material-symbols-outlined text-[18px]">
+            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+          </span>
+        </button>
 
         {/* Guide Trigger */}
         <button

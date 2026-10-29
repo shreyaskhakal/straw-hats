@@ -303,33 +303,33 @@ export default function LandingPage() {
                 </div>
 
                 {/* Monumental Headline */}
-                <h1 className="animate-hero-headline font-display text-[30px] xs:text-[36px] sm:text-[48px] md:text-[56px] lg:text-[64px] leading-[1.12] sm:leading-[1.1] font-bold text-on-primary tracking-[-0.035em] mb-5 sm:mb-6 max-w-4xl break-words">
-                  Deterministic Web &amp; Policy Clearance That Makes Autonomous Agents Safe to Spend
+                <h1 className="animate-hero-headline font-display text-[32px] xs:text-[38px] sm:text-[50px] md:text-[60px] lg:text-[68px] leading-[1.1] sm:leading-[1.08] font-bold text-on-primary tracking-[-0.035em] mb-5 sm:mb-6 max-w-4xl break-words">
+                  Give Your AI the Power to Buy. Keep the Power to Decide.
                 </h1>
 
                 {/* Subtitle */}
-                <p className="animate-hero-subtitle font-body-lg text-body-md sm:text-body-lg text-on-primary-container max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal">
-                  Set immutable spending limits, inspect shopping carts in zero-knowledge sandboxes, and eliminate rogue multi-agent payment leakage before card credentials ever touch the wire.
+                <p className="animate-hero-subtitle font-body-lg text-body-md sm:text-body-lg text-on-primary-container max-w-3xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal">
+                  Mandate Gateway allows users to set spending boundaries and require human approval before an AI shopping agent proceeds with a purchase. Deterministic policy enforcement, real-time cart auditing, and intended PayPal sandbox payment integration.
                 </p>
 
                 {/* Dual Pill CTA Buttons */}
                 <div className="animate-hero-ctas flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 w-full sm:w-auto">
                   <Link
-                    to="/mandates"
+                    to="/agent"
                     className="btn-ripple w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-4 pl-2 pr-6 py-2 rounded-full bg-surface-container-lowest text-primary hover:bg-surface-container-lowest/90 font-label-md text-label-md transition-all shadow-[0_12px_32px_rgba(255,255,255,0.18)] hover:scale-[1.02] cursor-pointer"
                   >
                     <span className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md shrink-0">
-                      <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+                      <span className="material-symbols-outlined text-[18px]">smart_toy</span>
                     </span>
-                    <span className="font-semibold tracking-tight text-sm whitespace-nowrap">Deploy Mandate Enclave</span>
+                    <span className="font-semibold tracking-tight text-sm whitespace-nowrap">Try Autonomous Shopping Agent</span>
                   </Link>
-                  <a
-                    className="btn-ripple w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest/5 hover:bg-surface-container-lowest/10 border border-white/15 text-on-primary font-label-md text-label-md transition-all whitespace-nowrap"
-                    href="#policy-decisions"
+                  <Link
+                    to="/mandates"
+                    className="btn-ripple w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-surface-container-lowest/10 hover:bg-surface-container-lowest/20 border border-white/20 text-on-primary font-label-md text-label-md transition-all whitespace-nowrap"
                   >
-                    <span>Explore Policy Engine</span>
-                    <span className="material-symbols-outlined text-[16px]">north_east</span>
-                  </a>
+                    <span>Configure Mandates</span>
+                    <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  </Link>
                 </div>
               </div>
 
@@ -570,6 +570,114 @@ export default function LandingPage() {
                     <span className="material-symbols-outlined text-[16px]">timer</span>
                     <span>180s Automatic Token Evaporation</span>
                   </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Dedicated Section: Mandate-to-Purchase Workflow & PayPal Sandbox Integration */}
+          <section className="w-full py-16 sm:py-24 bg-surface-container-lowest border-y border-[#E7E7E3] relative" id="paypal-workflow">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[#E7E7E3] pb-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span className="font-label-sm text-label-sm uppercase tracking-[0.2em] text-secondary font-semibold">
+                      Payment Architecture
+                    </span>
+                  </div>
+                  <h2 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl font-bold text-primary tracking-tight">
+                    Mandate-to-Purchase Workflow with PayPal Sandbox
+                  </h2>
+                </div>
+                <p className="font-body-md text-sm text-on-surface-variant max-w-lg leading-relaxed">
+                  How autonomous agent product discovery maps to verified PayPal sandbox settlement through deterministic policy arbitration.
+                </p>
+              </div>
+
+              {/* 5-Step Visual Flow */}
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div className="p-5 rounded-2xl bg-surface-container-low/50 border border-[#E7E7E3] flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="font-mono text-[11px] font-bold text-secondary uppercase tracking-wider">Step 01</span>
+                    <h3 className="font-title-md text-[15px] font-semibold text-primary">User Mandate</h3>
+                    <p className="text-[12px] text-on-surface-variant leading-relaxed">
+                      User configures spending ceiling, allowed merchants, and auto-approval limits.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E7E7E3]/60 font-mono text-[10px] text-secondary">
+                    Input: Plain English Rules
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-surface-container-low/50 border border-[#E7E7E3] flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="font-mono text-[11px] font-bold text-secondary uppercase tracking-wider">Step 02</span>
+                    <h3 className="font-title-md text-[15px] font-semibold text-primary">AI Discovery</h3>
+                    <p className="text-[12px] text-on-surface-variant leading-relaxed">
+                      Shopping agent searches authorized marketplaces (via Channel3 adapter) for candidates.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E7E7E3]/60 font-mono text-[10px] text-secondary">
+                    Filter: Whitelisted Sellers
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-surface-container-low/50 border border-[#E7E7E3] flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="font-mono text-[11px] font-bold text-secondary uppercase tracking-wider">Step 03</span>
+                    <h3 className="font-title-md text-[15px] font-semibold text-primary">Policy Decision</h3>
+                    <p className="text-[12px] text-on-surface-variant leading-relaxed">
+                      Gateway deterministically evaluates candidate. Items over threshold require approval.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E7E7E3]/60 font-mono text-[10px] text-secondary">
+                    Engine: Zero-Implicit-Assent
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-surface-container-low/50 border border-[#E7E7E3] flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="font-mono text-[11px] font-bold text-secondary uppercase tracking-wider">Step 04</span>
+                    <h3 className="font-title-md text-[15px] font-semibold text-primary">User Approval</h3>
+                    <p className="text-[12px] text-on-surface-variant leading-relaxed">
+                      User inspects cart evidence in Approval Center and confirms high-value orders.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E7E7E3]/60 font-mono text-[10px] text-secondary">
+                    Guard: 1-Click Biometric
+                  </div>
+                </div>
+
+                <div className="p-5 rounded-2xl bg-surface-container-low/50 border border-[#E7E7E3] flex flex-col justify-between">
+                  <div className="space-y-2">
+                    <span className="font-mono text-[11px] font-bold text-secondary uppercase tracking-wider">Step 05</span>
+                    <h3 className="font-title-md text-[15px] font-semibold text-primary">PayPal Sandbox</h3>
+                    <p className="text-[12px] text-on-surface-variant leading-relaxed">
+                      Single-use sandbox order token released. Capture verified and logged to audit trail.
+                    </p>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-[#E7E7E3]/60 font-mono text-[10px] text-emerald-700 font-semibold">
+                    Settlement: Sandbox Verified
+                  </div>
+                </div>
+              </div>
+
+              {/* PayPal Sandbox Disclosure Box */}
+              <div className="p-6 rounded-2xl bg-surface-container border border-outline-variant/40 space-y-3">
+                <div className="flex items-center gap-2 text-primary font-semibold text-[14px]">
+                  <span className="material-symbols-outlined text-[20px] text-secondary">handshake</span>
+                  <span>PayPal Sandbox Integration Intent &amp; Project Disclaimer</span>
+                </div>
+                <p className="text-[13px] text-on-surface-variant leading-relaxed">
+                  Mandate Gateway is an independent hackathon prototype designed to bridge AI shopping autonomy with institutional payment safety.
+                  Official PayPal APIs (Orders v2 and Payments v2) in the Sandbox environment provide the intended payment settlement layer.
+                  This demo is strictly an independent product architecture and does not claim official PayPal affiliation or corporate ownership.
+                </p>
+                <div className="flex flex-wrap items-center gap-4 pt-1 font-mono text-[11px] text-secondary">
+                  <span>• Target Environment: api-m.sandbox.paypal.com</span>
+                  <span>• Re-authorization: Server-Side Before Capture</span>
+                  <span>• Zero Raw Card Exposure</span>
                 </div>
               </div>
             </div>

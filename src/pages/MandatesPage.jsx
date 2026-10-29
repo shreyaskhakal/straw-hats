@@ -8,14 +8,37 @@ export default function MandatesPage() {
   const [mandates, setMandates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [sliderVal, setSliderVal] = useState(3000);
-  const [intentText, setIntentText] = useState(
-    'Allow my shopping agent to buy computer accessories and ergonomic gear from approved merchants (Amazon India, Croma, Reliance Digital) for up to ₹5,000 per single order, with a ₹25,000 monthly total budget, until 30 November. Flag anything above ₹3,000 for my manual review.'
-  );
-  const [merchants, setMerchants] = useState(['Amazon India', 'Croma Electronics', 'Reliance Digital']);
-  const [newMerchantInput, setNewMerchantInput] = useState('');
   const [signing, setSigning] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Multi-step form state
+  const [step, setStep] = useState(1); // 1: Identity, 2: Financial Limits, 3: Merchant & Boundaries, 4: Review & Sign
+  const [errors, setErrors] = useState({});
+
+  // Step 1: Identity & Purpose
+  const [mandateName, setMandateName] = useState('Engineering Hardware & Labs');
+  const [mandatePurpose, setMandatePurpose] = useState('Procure authorized test devices, peripherals, and workstation hardware for development teams.');
+  const [assignedAgent, setAssignedAgent] = useState('Claude Shopping v3.5');
+
+  // Step 2: Financial Limits & Timing
+  const [singlePurchaseLimit, setSinglePurchaseLimit] = useState(5000);
+  const [dailyLimit, setDailyLimit] = useState(25000);
+  const [autoApproveLimit, setAutoApproveLimit] = useState(3000);
+  const [currency, setCurrency] = useState('INR');
+  const [validityDate, setValidityDate] = useState('2026-12-31');
+
+  // Step 3: Merchant & Product Boundaries
+  const [allowedMerchants, setAllowedMerchants] = useState(['Amazon India', 'Croma Retail', 'Reliance Digital']);
+  const [newAllowedInput, setNewAllowedInput] = useState('');
+  const [blockedMerchants, setBlockedMerchants] = useState(['TechBazaar.in', 'Unauthorized-Wholesale', 'QuickResell.io']);
+  const [newBlockedInput, setNewBlockedInput] = useState('');
+  const [allowedCategories, setAllowedCategories] = useState(['Computer Peripherals', 'Keyboards & Mice', 'Monitors & Displays']);
+  const [newCatInput, setNewCatInput] = useState('');
+  const [prohibitedProducts, setProhibitedProducts] = useState(['Refurbished Stock', 'Gift Cards', 'Crypto Mining Hardware']);
+  const [newProhibitInput, setNewProhibitInput] = useState('');
+
+  // Emergency Revocation Mode Toggle for new mandate
+  const [allowEmergencyRevocation, setAllowEmergencyRevocation] = useState(true);
 
   useEffect(() => {
     loadMandates();
@@ -49,60 +72,114 @@ export default function MandatesPage() {
 
   const setPreset = (type) => {
     if (type === 'office') {
-      setIntentText('Allow my shopping agent to buy computer accessories and ergonomic gear from approved merchants (Amazon India, Croma, Reliance Digital) for up to ₹5,000 per single order, with a ₹25,000 monthly total budget, until 30 November. Flag anything above ₹3,000 for my manual review.');
-      setSliderVal(3000);
-      setMerchants(['Amazon India', 'Croma Electronics', 'Reliance Digital']);
+      setMandateName('Home Office & Ergonomics');
+      setMandatePurpose('Equip team with ergonomic peripherals and desk accessories from certified vendors.');
+      setAssignedAgent('Claude Shopping v3.5');
+      setSinglePurchaseLimit(5000);
+      setDailyLimit(25000);
+      setAutoApproveLimit(3000);
+      setCurrency('INR');
+      setAllowedMerchants(['Amazon India', 'Croma Retail', 'Reliance Digital']);
+      setBlockedMerchants(['TechBazaar.in', 'RefurbMarket.in']);
+      setAllowedCategories(['Computer Peripherals', 'Ergonomic Furniture']);
+      setProhibitedProducts(['Refurbished Stock', 'Open Box']);
     } else if (type === 'software') {
-      setIntentText('Permit automated DevOps SaaS renewals, cloud instances, and CI runners on GitHub, AWS, and Cloudflare up to ₹12,000/mo. Require biometric sign-off for single invoices exceeding ₹4,000.');
-      setSliderVal(4000);
-      setMerchants(['GitHub', 'AWS', 'DigitalOcean', 'Cloudflare']);
-    } else if (type === 'groceries') {
-      setIntentText('Office pantry recurring weekly orders from Blinkit, Zepto, and BigBasket up to ₹3,500/week. Auto-clear snacks, coffee beans, and milk under ₹1,500.');
-      setSliderVal(1500);
-      setMerchants(['Blinkit', 'Zepto', 'BigBasket']);
+      setMandateName('DevOps CI & Cloud SaaS');
+      setMandatePurpose('Permit automated renewals of cloud compute nodes and CI runners.');
+      setAssignedAgent('AutoProcure Daemon');
+      setSinglePurchaseLimit(4000);
+      setDailyLimit(15000);
+      setAutoApproveLimit(2500);
+      setCurrency('INR');
+      setAllowedMerchants(['GitHub', 'AWS Cloud', 'DigitalOcean', 'Cloudflare']);
+      setBlockedMerchants(['Unverified-Host.ru', 'CryptoProxy']);
+      setAllowedCategories(['Developer Tooling', 'Compute Infrastructure']);
+      setProhibitedProducts(['Unregistered Registrars']);
     } else if (type === 'learning') {
-      setIntentText('Technical books, Springer papers, and ACM library subscriptions up to ₹2,000 per purchase, total monthly cap ₹6,000. Ban used and marketplace sellers.');
-      setSliderVal(2000);
-      setMerchants(['Amazon India', 'Bookswagon', 'ACM Digital Library']);
+      setMandateName('Research Publications & Books');
+      setMandatePurpose('Subscriptions to academic repositories and technical reference texts.');
+      setAssignedAgent('Perplexity Buy v1.2');
+      setSinglePurchaseLimit(2000);
+      setDailyLimit(6000);
+      setAutoApproveLimit(1500);
+      setCurrency('INR');
+      setAllowedMerchants(['Amazon India', 'Bookswagon', 'ACM Digital Library']);
+      setBlockedMerchants(['TorrentSites', 'UnofficialResellers']);
+      setAllowedCategories(['Technical Books', 'Journal Subscriptions']);
+      setProhibitedProducts(['Course Bundles', 'Physical Merchandise']);
     }
-    showToast(`Preset "${type}" loaded into compiler.`);
+    showToast(`Loaded preset "${type}" into form builder.`);
   };
 
-  const handleAddMerchant = () => {
-    if (!newMerchantInput.trim()) return;
-    if (!merchants.includes(newMerchantInput.trim())) {
-      setMerchants([...merchants, newMerchantInput.trim()]);
+  // Add / Remove helpers
+  const addItem = (list, setList, input, setInput) => {
+    if (!input.trim()) return;
+    if (!list.includes(input.trim())) {
+      setList([...list, input.trim()]);
     }
-    setNewMerchantInput('');
+    setInput('');
   };
 
-  const handleRemoveMerchant = (m) => {
-    setMerchants(merchants.filter((item) => item !== m));
+  const removeItem = (list, setList, item) => {
+    setList(list.filter((x) => x !== item));
+  };
+
+  // Validation
+  const validateStep = (s) => {
+    const newErrors = {};
+    if (s === 1) {
+      if (!mandateName.trim()) newErrors.mandateName = 'Mandate name is required';
+      if (!mandatePurpose.trim()) newErrors.mandatePurpose = 'Mandate purpose is required';
+    } else if (s === 2) {
+      if (!singlePurchaseLimit || singlePurchaseLimit <= 0) newErrors.singlePurchaseLimit = 'Enter a valid single purchase limit';
+      if (!dailyLimit || dailyLimit < singlePurchaseLimit) newErrors.dailyLimit = 'Daily limit must be greater than or equal to single purchase limit';
+      if (!autoApproveLimit || autoApproveLimit > singlePurchaseLimit) newErrors.autoApproveLimit = 'Auto-approve threshold cannot exceed single purchase limit';
+      if (!validityDate) newErrors.validityDate = 'Select validity expiration date';
+    } else if (s === 3) {
+      if (allowedMerchants.length === 0) newErrors.allowedMerchants = 'At least one allowed merchant is required';
+      if (allowedCategories.length === 0) newErrors.allowedCategories = 'At least one category is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateStep(step)) {
+      setStep((prev) => Math.min(prev + 1, 4));
+    }
+  };
+
+  const handleBack = () => {
+    setStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleDeployMandate = async () => {
-    if (!intentText.trim()) {
-      showToast('Please enter a spending intent text first.');
-      return;
-    }
-    if (merchants.length === 0) {
-      showToast('Please whitelist at least one merchant domain.');
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
+      showToast('Please correct form validation errors before saving.');
       return;
     }
     setSigning(true);
     try {
       await api.createMandate({
-        name: 'Synthesized Mandate Node',
-        category: 'Hardware & Peripherals',
-        plainTextRule: intentText.trim(),
-        budgetCeiling: 25000,
-        singlePurchaseLimit: 5000,
-        autoApproveLimit: sliderVal,
-        allowedMerchants: merchants,
-        agents: ['Claude Shopping'],
+        name: mandateName.trim(),
+        purpose: mandatePurpose.trim(),
+        category: allowedCategories[0] || 'Hardware & Peripherals',
+        budgetCeiling: Number(dailyLimit),
+        singlePurchaseLimit: Number(singlePurchaseLimit),
+        autoApproveLimit: Number(autoApproveLimit),
+        currency,
+        expiry: validityDate,
+        allowedMerchants,
+        blockedMerchants,
+        allowedCategories,
+        prohibitedProducts,
+        agents: [assignedAgent],
+        allowEmergencyRevocation,
+        plainTextRule: `${mandateName}: ${mandatePurpose}. Cap per order: ${currency} ${singlePurchaseLimit}. Auto-approved under: ${currency} ${autoApproveLimit}. Allowed: [${allowedMerchants.join(', ')}]. Blocked: [${blockedMerchants.join(', ')}].`
       });
-      showToast('Mandate cryptographically signed and deployed to SGX Enclave!');
+      showToast('Mandate synthesized and registered in gateway session!');
       loadMandates();
+      setStep(1);
       document.getElementById('policies-section')?.scrollIntoView({ behavior: 'smooth' });
     } catch (err) {
       console.error(err);
@@ -112,17 +189,47 @@ export default function MandatesPage() {
     }
   };
 
+  const compiledRulesSpec = {
+    $schema: 'https://mandate.gw/schemas/policy-v2.json',
+    mandate_name: mandateName,
+    purpose: mandatePurpose,
+    assigned_agent: assignedAgent,
+    currency,
+    limits: {
+      single_purchase_cap: singlePurchaseLimit,
+      daily_spending_cap: dailyLimit,
+      unattended_approval_threshold: autoApproveLimit,
+      escalation_policy: 'HUMAN_APPROVAL_REQUIRED_ABOVE_THRESHOLD'
+    },
+    temporal: {
+      valid_until: validityDate,
+      timezone: 'UTC'
+    },
+    boundaries: {
+      allowed_merchants: allowedMerchants,
+      blocked_merchants: blockedMerchants,
+      allowed_categories: allowedCategories,
+      prohibited_products_keywords: prohibitedProducts
+    },
+    emergency: {
+      allow_instant_revocation: allowEmergencyRevocation,
+      kill_switch_compliance: 'ENFORCED'
+    },
+    environment: 'FRONTEND_DEMO_SANDBOX'
+  };
+
   return (
-    <div className="bg-background min-h-screen text-on-surface">
+    <div className="bg-background min-h-screen text-on-surface antialiased">
       <Sidebar mandateCount={mandates.length} />
-      <Header pageTitle="Autonomous Clearance Rules" onOpenGuide={() => setGuideOpen(true)} />
+      <Header pageTitle="Mandates Builder" onOpenGuide={() => setGuideOpen(true)} />
       <ArbitrationModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
 
       {/* Main Viewport */}
       <div className="pl-0 md:pl-64 transition-all duration-200">
-        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          {/* 1. Editorial Page Header */}
-          <section className="mb-10 pb-6 border-b border-outline-variant/30">
+        <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 space-y-12">
+          
+          {/* 1. Page Header */}
+          <section className="pb-6 border-b border-outline-variant/30">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
               <div className="space-y-1 max-w-2xl">
                 <span className="page-eyebrow block">
@@ -132,7 +239,7 @@ export default function MandatesPage() {
                   Spending Mandates
                 </h1>
                 <p className="page-subtitle">
-                  Deterministic, tamper-proof execution boundaries translating natural intent into immutable ledger clearance rules.
+                  Define user-controlled authorization boundaries for AI shopping agents. Configure limits, approved merchants, and approval triggers.
                 </p>
               </div>
               <div className="flex items-center gap-3 flex-shrink-0">
@@ -142,13 +249,12 @@ export default function MandatesPage() {
                   type="button"
                 >
                   <span className="material-symbols-outlined text-[16px]">tune</span>
-                  <span>Policy Builder</span>
+                  <span>Open Builder</span>
                 </button>
                 <button
                   className="btn-primary"
                   onClick={() => {
                     document.getElementById('builder-section')?.scrollIntoView({ behavior: 'smooth' });
-                    document.getElementById('intent-textarea')?.focus();
                   }}
                   type="button"
                 >
@@ -160,83 +266,86 @@ export default function MandatesPage() {
           </section>
 
           {/* 2. Existing Active Mandates */}
-          <section className="mb-16" id="policies-section">
-            <div className="flex items-baseline justify-between mb-6 pb-2 border-b border-outline-variant/30">
+          <section id="policies-section" className="space-y-4">
+            <div className="flex items-baseline justify-between pb-2 border-b border-outline-variant/30">
               <div>
-                <h2 className="section-title">Active Policies</h2>
-                <p className="font-body-sm text-[13px] text-on-surface-variant mt-0.5">Enforced on-wire across autonomous shopper runtimes</p>
+                <h2 className="section-title">Active Enforced Mandates</h2>
+                <p className="text-[13px] text-on-surface-variant mt-0.5">
+                  Currently active policies governing autonomous shopping agent checkouts
+                </p>
               </div>
               <div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant">
-                <span>{mandates.length} ENFORCED</span>
+                <span>{mandates.length} ENROLLED</span>
                 <span className="text-[#c4c7c7]">•</span>
-                <span className="text-secondary font-medium">ALL HEALTHY</span>
+                <span className="text-secondary font-medium">SIMULATED SANDBOX</span>
               </div>
             </div>
 
-            {/* Open List Container */}
-            <div className="border-t border-[#e7e7e3]">
+            {/* Mandates Table / List */}
+            <div className="border-t border-[#e7e7e3] divide-y divide-[#e7e7e3]">
               {mandates.map((m) => {
                 const isRevoked = m.status === 'REVOKED';
                 return (
                   <div
                     key={m.id}
-                    className={`py-5 border-b border-[#e7e7e3] transition-colors ${
-                      isRevoked ? 'opacity-60 bg-neutral-50/50' : 'hover:bg-white/40'
+                    className={`py-4 transition-colors ${
+                      isRevoked ? 'opacity-60 bg-surface-container-low/50' : 'hover:bg-surface-container-lowest/60'
                     }`}
                   >
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                      <div className="md:col-span-4">
+                      <div className="md:col-span-4 min-w-0">
                         <div className="flex items-center gap-2.5">
-                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isRevoked ? 'bg-error' : 'bg-charcoal'}`} />
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isRevoked ? 'bg-error' : 'bg-emerald-600'}`} />
                           <div className="min-w-0">
-                            <span className="font-display font-semibold text-[15px] text-charcoal block leading-snug truncate">
+                            <span className="font-title-md font-semibold text-[14.5px] text-primary block leading-snug truncate">
                               {m.name}
                             </span>
-                            <span className="font-mono text-[11px] text-on-surface-variant">
-                              #{m.id} • Instant ≤ ₹{m.singlePurchaseLimit?.toLocaleString() || '3,000'}
+                            <span className="font-mono text-[11px] text-secondary">
+                              #{m.id} • Single Max: ₹{m.singlePurchaseLimit?.toLocaleString() || '3,000'} • Auto ≤ ₹{m.requiresCoSignerOver?.toLocaleString() || '3,000'}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="md:col-span-3">
-                        <span className="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Scope</span>
-                        <span className="text-xs text-charcoal truncate block">
+                      <div className="md:col-span-3 min-w-0">
+                        <span className="text-[10px] text-secondary block font-mono uppercase tracking-wider">Whitelisted Merchants</span>
+                        <span className="text-xs text-on-surface truncate block mt-0.5">
                           {Array.isArray(m.allowedMerchants) ? m.allowedMerchants.join(', ') : m.allowedMerchants}
                         </span>
                       </div>
 
                       <div className="md:col-span-2">
-                        <span className="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Budget</span>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="font-mono text-sm font-semibold text-charcoal">
+                        <span className="text-[10px] text-secondary block font-mono uppercase tracking-wider">Budget Utilization</span>
+                        <div className="flex items-baseline gap-1 mt-0.5">
+                          <span className="font-mono text-xs font-semibold text-primary">
                             ₹{m.utilized?.toLocaleString()}
                           </span>
-                          <span className="font-mono text-[11px] text-on-surface-variant">
+                          <span className="font-mono text-[10px] text-secondary">
                             / ₹{m.budgetCeiling?.toLocaleString()}
                           </span>
                         </div>
                       </div>
 
                       <div className="md:col-span-2">
-                        <span className="text-xs text-on-surface-variant block font-mono uppercase tracking-wider mb-0.5">Agent / Expiry</span>
-                        <span className="text-xs text-charcoal block">
-                          {Array.isArray(m.agents) ? m.agents.join(', ') : 'Claude 3.5 Sonnet'}
+                        <span className="text-[10px] text-secondary block font-mono uppercase tracking-wider">Assigned Agent</span>
+                        <span className="text-xs text-primary font-medium block truncate mt-0.5">
+                          {Array.isArray(m.agents) ? m.agents.join(', ') : 'Claude Shopping v3.5'}
                         </span>
-                        <span className="font-mono text-[11px] text-secondary">
-                          {isRevoked ? 'Paused by User' : `Exp. ${m.expiry || '30 Nov 2026'}`}
+                        <span className="font-mono text-[10px] text-secondary">
+                          {isRevoked ? 'Emergency Revoked' : `Valid: ${m.expiry || '31 Dec 2026'}`}
                         </span>
                       </div>
 
-                      <div className="md:col-span-1 flex items-center justify-end gap-1">
+                      <div className="md:col-span-1 flex items-center justify-end">
                         <button
                           onClick={() => handleRevoke(m.id)}
-                          className={`text-xs font-mono uppercase tracking-wider px-2 py-1 rounded transition-colors cursor-pointer ${
+                          className={`text-[11px] font-mono uppercase tracking-wider px-2.5 py-1 rounded transition-colors cursor-pointer ${
                             isRevoked
-                              ? 'text-emerald-700 hover:text-emerald-900 border border-emerald-300'
-                              : 'text-charcoal hover:text-error border border-[#e7e7e3] hover:border-error'
+                              ? 'text-emerald-700 hover:text-emerald-900 border border-emerald-300 bg-emerald-50'
+                              : 'text-error hover:bg-error hover:text-white border border-error/30'
                           }`}
                           type="button"
+                          title={isRevoked ? 'Resume policy' : 'Emergency revoke spending policy'}
                         >
                           {isRevoked ? 'Resume' : 'Revoke'}
                         </button>
@@ -248,221 +357,518 @@ export default function MandatesPage() {
             </div>
           </section>
 
-          {/* 3. Guided Policy Builder */}
+          {/* 3. Multi-Step Functional Mandates Builder */}
           <section className="pt-6" id="builder-section">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#e7e7e3]">
+            <div className="pb-6 border-b border-[#e7e7e3] flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary font-medium block mb-2">Policy Compiler</span>
-                <h2 className="font-display text-2xl md:text-3xl font-semibold text-charcoal tracking-tight">Draft New Mandate</h2>
-                <p className="text-sm text-on-surface-variant mt-1.5">State your authorization boundaries in plain language; review the synthesized rules below.</p>
+                <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-secondary font-semibold block mb-1">
+                  Interactive Policy Creator
+                </span>
+                <h2 className="font-headline-lg text-2xl md:text-3xl font-semibold text-primary tracking-tight">
+                  Mandate Configuration Wizard
+                </h2>
+                <p className="text-sm text-on-surface-variant mt-1">
+                  Complete each configuration step to synthesize deterministic checkout boundaries.
+                </p>
               </div>
 
-              {/* Minimalist Stepper */}
-              <div className="flex items-center gap-6 text-xs font-mono">
-                <div className="flex items-center gap-2 text-charcoal font-semibold">
-                  <span className="w-5 h-5 rounded-full bg-charcoal text-white flex items-center justify-center text-[11px]">1</span>
-                  <span>INTENT</span>
-                </div>
-                <div className="w-8 h-px bg-[#e7e7e3]" />
-                <div className="flex items-center gap-2 text-charcoal font-semibold">
-                  <span className="w-5 h-5 rounded-full bg-[#a99a80] text-white flex items-center justify-center text-[11px]">2</span>
-                  <span>PARAMETERS</span>
-                </div>
-                <div className="w-8 h-px bg-[#e7e7e3]" />
-                <div className="flex items-center gap-2 text-on-surface-variant">
-                  <span className="w-5 h-5 rounded-full border border-[#c4c7c7] flex items-center justify-center text-[11px]">3</span>
-                  <span>SIGN &amp; DEPLOY</span>
-                </div>
+              {/* Wizard Steps Header */}
+              <div className="flex items-center gap-2 sm:gap-4 text-xs font-mono">
+                <button
+                  onClick={() => setStep(1)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
+                    step === 1 ? 'bg-primary text-white font-semibold' : 'bg-surface-container text-on-surface-variant'
+                  }`}
+                  type="button"
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">1</span>
+                  <span>Identity</span>
+                </button>
+
+                <button
+                  onClick={() => validateStep(1) && setStep(2)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
+                    step === 2 ? 'bg-primary text-white font-semibold' : 'bg-surface-container text-on-surface-variant'
+                  }`}
+                  type="button"
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">2</span>
+                  <span>Limits</span>
+                </button>
+
+                <button
+                  onClick={() => validateStep(1) && validateStep(2) && setStep(3)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
+                    step === 3 ? 'bg-primary text-white font-semibold' : 'bg-surface-container text-on-surface-variant'
+                  }`}
+                  type="button"
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">3</span>
+                  <span>Merchants</span>
+                </button>
+
+                <button
+                  onClick={() => validateStep(1) && validateStep(2) && validateStep(3) && setStep(4)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors cursor-pointer ${
+                    step === 4 ? 'bg-primary text-white font-semibold' : 'bg-surface-container text-on-surface-variant'
+                  }`}
+                  type="button"
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">4</span>
+                  <span>Review</span>
+                </button>
               </div>
             </div>
 
-            {/* Builder Body */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 pt-10 items-start">
-              {/* Left Column (7 cols) */}
-              <div className="lg:col-span-7 space-y-12">
-                {/* STEP 1: Plain Language Intent */}
-                <div>
-                  <div className="flex items-baseline justify-between mb-3">
-                    <label className="font-mono text-xs uppercase tracking-wider text-charcoal font-medium" htmlFor="intent-textarea">
-                      01 / Natural Language Spending Intent
-                    </label>
-                    <span className="font-mono text-[11px] text-secondary">NLP Parser Active</span>
-                  </div>
-                  <div className="relative">
-                    <textarea
-                      className="w-full bg-white border border-[#e7e7e3] focus:border-charcoal rounded-xl p-5 text-sm md:text-base text-charcoal leading-relaxed outline-none transition-colors resize-none placeholder:text-on-surface-variant/60 font-body-md shadow-sm"
-                      id="intent-textarea"
-                      rows={4}
-                      value={intentText}
-                      onChange={(e) => setIntentText(e.target.value)}
-                    />
-                    <div className="flex items-center justify-between mt-2 px-1">
-                      <span className="font-mono text-[11px] text-on-surface-variant">Parsed 4 limits, {merchants.length} merchants, 2 categories</span>
-                      <button
-                        className="font-mono text-xs text-charcoal hover:text-secondary font-medium transition-colors inline-flex items-center gap-1 cursor-pointer"
-                        onClick={() => showToast('Rules re-parsed and validated successfully')}
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-[15px]">sync</span>
-                        <span>Recompile Rules</span>
-                      </button>
-                    </div>
-                  </div>
+            {/* Presets Row */}
+            <div className="pt-4 flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[11px] text-secondary uppercase tracking-wider mr-1">Load Preset:</span>
+              <button onClick={() => setPreset('office')} className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-surface-container-lowest hover:border-primary text-xs text-primary transition-colors cursor-pointer" type="button">Office Hardware</button>
+              <button onClick={() => setPreset('software')} className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-surface-container-lowest hover:border-primary text-xs text-primary transition-colors cursor-pointer" type="button">DevOps SaaS</button>
+              <button onClick={() => setPreset('learning')} className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-surface-container-lowest hover:border-primary text-xs text-primary transition-colors cursor-pointer" type="button">Research Books</button>
+            </div>
 
-                  {/* Presets */}
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[11px] text-on-surface-variant uppercase tracking-wider mr-1">Presets:</span>
-                    <button className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm cursor-pointer" onClick={() => setPreset('office')} type="button">Home Office</button>
-                    <button className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm cursor-pointer" onClick={() => setPreset('software')} type="button">SaaS Subscriptions</button>
-                    <button className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm cursor-pointer" onClick={() => setPreset('groceries')} type="button">Office Pantry</button>
-                    <button className="px-3 py-1 rounded-full border border-[#e7e7e3] bg-white hover:border-charcoal text-xs text-charcoal transition-colors font-body-sm cursor-pointer" onClick={() => setPreset('learning')} type="button">Research &amp; Books</button>
-                  </div>
-                </div>
-
-                {/* STEP 2: Synthesized Constraints */}
-                <div className="pt-4 border-t border-[#e7e7e3] space-y-10">
-                  <div>
-                    <span className="font-mono text-xs uppercase tracking-wider text-charcoal font-medium block mb-1">
-                      02 / Synthesized Constraints
-                    </span>
-                    <p className="text-xs text-on-surface-variant">Deterministic boundaries compiled from the natural intent prompt.</p>
-                  </div>
-
-                  {/* Financial Thresholds Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 py-2">
-                    <div className="space-y-1">
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Single Order Cap</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-display text-2xl font-semibold text-charcoal">₹ 5,000</span>
-                        <span className="font-mono text-[11px] text-secondary">INR</span>
-                      </div>
-                      <span className="text-xs text-on-surface-variant">Hard stop rejection</span>
+            {/* Builder Form Body */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-8 items-start">
+              {/* Form Content Column (7 cols) */}
+              <div className="lg:col-span-7 bg-surface-container-lowest border border-[#e7e7e3] rounded-2xl p-6 sm:p-8 space-y-6 shadow-sm">
+                
+                {/* STEP 1: Identity & Assigned Agent */}
+                {step === 1 && (
+                  <div className="space-y-6">
+                    <div>
+                      <span className="font-mono text-xs uppercase tracking-wider text-secondary font-semibold block">Step 1 of 4</span>
+                      <h3 className="text-xl font-semibold text-primary mt-0.5">Mandate Identity &amp; Agent Assignment</h3>
+                      <p className="text-xs text-on-surface-variant mt-1">Specify who this mandate belongs to and what it allows.</p>
                     </div>
 
-                    <div className="space-y-1">
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Monthly Budget</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-display text-2xl font-semibold text-charcoal">₹ 25,000</span>
-                        <span className="font-mono text-[11px] text-secondary">/ 30d</span>
-                      </div>
-                      <span className="text-xs text-on-surface-variant">Resets 01 Dec 2026</span>
-                    </div>
-
-                    <div className="space-y-1">
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant block">Currency</span>
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-display text-2xl font-semibold text-charcoal">INR</span>
-                        <span className="font-mono text-[11px] text-secondary">₹</span>
-                      </div>
-                      <span className="text-xs text-on-surface-variant">Strict domestic settlement</span>
-                    </div>
-                  </div>
-
-                  {/* Human Review Slider */}
-                  <div className="py-4 border-y border-[#e7e7e3]">
-                    <div className="flex items-baseline justify-between mb-4">
-                      <div>
-                        <span className="font-mono text-[11px] uppercase tracking-wider text-charcoal font-medium block">Approval Escalation Trigger</span>
-                        <span className="text-xs text-on-surface-variant">Transactions above this value require explicit biometric sign-off</span>
-                      </div>
-                      <span className="font-mono text-base font-semibold text-charcoal">₹ {sliderVal.toLocaleString()}</span>
-                    </div>
-                    <div className="py-2">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-primary block" htmlFor="mandate-name">
+                        Mandate Name *
+                      </label>
                       <input
-                        className="w-full cursor-pointer accent-neutral-900"
-                        id="threshold-slider"
-                        max="5000"
-                        min="1000"
-                        step="250"
-                        type="range"
-                        value={sliderVal}
-                        onChange={(e) => setSliderVal(Number(e.target.value))}
+                        id="mandate-name"
+                        type="text"
+                        value={mandateName}
+                        onChange={(e) => setMandateName(e.target.value)}
+                        placeholder="e.g. Ergonomic Office Peripherals Q4"
+                        className="input-standard"
                       />
-                      <div className="flex justify-between items-center font-mono text-[11px] text-on-surface-variant mt-3 flex-wrap gap-2">
-                        <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-secondary" />₹0 – ₹{sliderVal.toLocaleString()}: Auto-Approved</span>
-                        <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-charcoal" />₹{(sliderVal + 1).toLocaleString()} – ₹5,000: Push Verification</span>
-                        <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-error" />&gt; ₹5,000: Blocked</span>
+                      {errors.mandateName && <p className="text-error text-[11px]">{errors.mandateName}</p>}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-primary block" htmlFor="mandate-purpose">
+                        Business Purpose &amp; Procurement Scope *
+                      </label>
+                      <textarea
+                        id="mandate-purpose"
+                        rows={3}
+                        value={mandatePurpose}
+                        onChange={(e) => setMandatePurpose(e.target.value)}
+                        placeholder="Describe what purchases this AI agent is allowed to make..."
+                        className="w-full px-3.5 py-2.5 rounded-lg border border-outline-variant/30 bg-surface-container-low text-on-surface text-[13.5px] font-body-md focus:outline-none focus:border-primary"
+                      />
+                      {errors.mandatePurpose && <p className="text-error text-[11px]">{errors.mandatePurpose}</p>}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-primary block" htmlFor="assigned-agent">
+                        Assigned AI Shopping Agent
+                      </label>
+                      <select
+                        id="assigned-agent"
+                        value={assignedAgent}
+                        onChange={(e) => setAssignedAgent(e.target.value)}
+                        className="select-standard w-full"
+                      >
+                        <option value="Claude Shopping v3.5">Claude Shopping (Anthropic v3.5 Sonnet)</option>
+                        <option value="Perplexity Buy v1.2">Perplexity Buy (Sonar / Online Search)</option>
+                        <option value="AutoProcure Daemon">AutoProcure Background Daemon</option>
+                        <option value="Custom Agent / OpenAPI">Custom Agent (API Token Delegated)</option>
+                      </select>
+                      <span className="text-[11px] text-secondary font-mono block">
+                        Assigned agent will authenticate with its corresponding Agent Passport token.
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: Financial Limits & Timing */}
+                {step === 2 && (
+                  <div className="space-y-6">
+                    <div>
+                      <span className="font-mono text-xs uppercase tracking-wider text-secondary font-semibold block">Step 2 of 4</span>
+                      <h3 className="text-xl font-semibold text-primary mt-0.5">Financial Boundaries &amp; Validity Window</h3>
+                      <p className="text-xs text-on-surface-variant mt-1">Configure ceilings and define the auto-approval threshold.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-primary block" htmlFor="currency">
+                          Settlement Currency
+                        </label>
+                        <select
+                          id="currency"
+                          value={currency}
+                          onChange={(e) => setCurrency(e.target.value)}
+                          className="select-standard w-full font-mono"
+                        >
+                          <option value="INR">INR (₹) - Indian Rupee</option>
+                          <option value="USD">USD ($) - US Dollar</option>
+                          <option value="EUR">EUR (€) - Euro</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-primary block" htmlFor="validity-date">
+                          Mandate Expiration Date *
+                        </label>
+                        <input
+                          id="validity-date"
+                          type="date"
+                          value={validityDate}
+                          onChange={(e) => setValidityDate(e.target.value)}
+                          className="input-standard font-mono"
+                        />
+                        {errors.validityDate && <p className="text-error text-[11px]">{errors.validityDate}</p>}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-primary block" htmlFor="single-cap">
+                          Max Amount per Purchase ({currency}) *
+                        </label>
+                        <input
+                          id="single-cap"
+                          type="number"
+                          value={singlePurchaseLimit}
+                          onChange={(e) => setSinglePurchaseLimit(Number(e.target.value))}
+                          className="input-standard font-mono"
+                        />
+                        <span className="text-[10px] text-secondary">Hard stop ceiling for single checkout</span>
+                        {errors.singlePurchaseLimit && <p className="text-error text-[11px]">{errors.singlePurchaseLimit}</p>}
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-primary block" htmlFor="daily-cap">
+                          Daily / Monthly Spending Limit ({currency}) *
+                        </label>
+                        <input
+                          id="daily-cap"
+                          type="number"
+                          value={dailyLimit}
+                          onChange={(e) => setDailyLimit(Number(e.target.value))}
+                          className="input-standard font-mono"
+                        />
+                        <span className="text-[10px] text-secondary">Cumulative ceiling across all orders</span>
+                        {errors.dailyLimit && <p className="text-error text-[11px]">{errors.dailyLimit}</p>}
+                      </div>
+                    </div>
+
+                    {/* Auto-Authorization Slider */}
+                    <div className="p-4 rounded-xl bg-surface-container-low border border-[#e7e7e3] space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-semibold text-primary block">Automatic Approval Threshold</span>
+                          <span className="text-[11px] text-on-surface-variant">Orders below this amount clear instantly; orders above require human approval.</span>
+                        </div>
+                        <span className="font-mono text-sm font-bold text-primary">
+                          {currency} {autoApproveLimit.toLocaleString()}
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="500"
+                        max={singlePurchaseLimit}
+                        step="250"
+                        value={autoApproveLimit}
+                        onChange={(e) => setAutoApproveLimit(Number(e.target.value))}
+                        className="w-full accent-neutral-900 cursor-pointer"
+                      />
+                      <div className="flex justify-between font-mono text-[10px] text-secondary">
+                        <span>≤ {currency} {autoApproveLimit.toLocaleString()}: Auto-Cleared</span>
+                        <span>&gt; {currency} {autoApproveLimit.toLocaleString()}: Requires User Sign-Off</span>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {/* Whitelisted Merchants */}
-                  <div className="space-y-3">
-                    <div className="flex items-baseline justify-between">
-                      <span className="font-mono text-[11px] uppercase tracking-wider text-on-surface-variant">Whitelisted Merchants ({merchants.length})</span>
-                      <div className="flex items-center gap-2">
+                {/* STEP 3: Merchant & Boundaries */}
+                {step === 3 && (
+                  <div className="space-y-6">
+                    <div>
+                      <span className="font-mono text-xs uppercase tracking-wider text-secondary font-semibold block">Step 3 of 4</span>
+                      <h3 className="text-xl font-semibold text-primary mt-0.5">Merchant &amp; Product Boundaries</h3>
+                      <p className="text-xs text-on-surface-variant mt-1">Specify whitelisted vs blocked merchants, plus prohibited keywords.</p>
+                    </div>
+
+                    {/* Allowed Merchants */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-primary flex items-center justify-between">
+                        <span>Allowed Merchants ({allowedMerchants.length}) *</span>
+                        <span className="text-[10px] text-emerald-700 font-mono">Whitelisted</span>
+                      </label>
+                      <div className="flex gap-2">
                         <input
                           type="text"
-                          placeholder="Vendor domain or name..."
-                          value={newMerchantInput}
-                          onChange={(e) => setNewMerchantInput(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleAddMerchant()}
-                          className="px-2 py-1 text-xs border border-[#e7e7e3] rounded bg-white outline-none"
+                          placeholder="Add merchant (e.g. Amazon India, Croma)..."
+                          value={newAllowedInput}
+                          onChange={(e) => setNewAllowedInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addItem(allowedMerchants, setAllowedMerchants, newAllowedInput, setNewAllowedInput)}
+                          className="input-standard text-xs"
                         />
                         <button
-                          onClick={handleAddMerchant}
-                          className="font-mono text-xs text-charcoal hover:text-secondary font-medium transition-colors cursor-pointer"
                           type="button"
+                          onClick={() => addItem(allowedMerchants, setAllowedMerchants, newAllowedInput, setNewAllowedInput)}
+                          className="btn-secondary text-xs shrink-0"
                         >
-                          + Add
+                          Add
                         </button>
                       </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {allowedMerchants.map((m) => (
+                          <span key={m} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-medium">
+                            <span>{m}</span>
+                            <button onClick={() => removeItem(allowedMerchants, setAllowedMerchants, m)} className="text-emerald-700 hover:text-emerald-900" type="button">
+                              <span className="material-symbols-outlined text-[14px]">close</span>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                      {errors.allowedMerchants && <p className="text-error text-[11px]">{errors.allowedMerchants}</p>}
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {merchants.map((m) => (
-                        <span key={m} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-[#e7e7e3] text-xs text-charcoal shadow-2xs">
-                          <span>{m}</span>
+
+                    {/* Blocked Merchants */}
+                    <div className="space-y-2 pt-2 border-t border-[#e7e7e3]">
+                      <label className="text-xs font-semibold text-primary flex items-center justify-between">
+                        <span>Blocked Merchants ({blockedMerchants.length})</span>
+                        <span className="text-[10px] text-error font-mono">Hard Stop</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Add blocked seller/domain..."
+                          value={newBlockedInput}
+                          onChange={(e) => setNewBlockedInput(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addItem(blockedMerchants, setBlockedMerchants, newBlockedInput, setNewBlockedInput)}
+                          className="input-standard text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => addItem(blockedMerchants, setBlockedMerchants, newBlockedInput, setNewBlockedInput)}
+                          className="btn-secondary text-xs shrink-0"
+                        >
+                          Block
+                        </button>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {blockedMerchants.map((b) => (
+                          <span key={b} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-red-50 text-error border border-red-200 text-xs font-medium">
+                            <span>{b}</span>
+                            <button onClick={() => removeItem(blockedMerchants, setBlockedMerchants, b)} className="text-error hover:text-red-900" type="button">
+                              <span className="material-symbols-outlined text-[14px]">close</span>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Allowed Categories & Prohibited Products */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#e7e7e3]">
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-primary block">Allowed Categories *</label>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            placeholder="e.g. Peripherals..."
+                            value={newCatInput}
+                            onChange={(e) => setNewCatInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addItem(allowedCategories, setAllowedCategories, newCatInput, setNewCatInput)}
+                            className="input-standard text-xs"
+                          />
                           <button
-                            onClick={() => handleRemoveMerchant(m)}
-                            className="text-on-surface-variant hover:text-charcoal cursor-pointer"
                             type="button"
+                            onClick={() => addItem(allowedCategories, setAllowedCategories, newCatInput, setNewCatInput)}
+                            className="btn-outline text-xs"
                           >
-                            <span className="material-symbols-outlined text-[14px]">close</span>
+                            +
                           </button>
-                        </span>
-                      ))}
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {allowedCategories.map((c) => (
+                            <span key={c} className="text-[11px] px-2 py-0.5 rounded bg-surface-container text-on-surface flex items-center gap-1">
+                              {c}
+                              <button onClick={() => removeItem(allowedCategories, setAllowedCategories, c)} className="text-secondary hover:text-error" type="button">×</button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold text-primary block">Prohibited Products / Keywords</label>
+                        <div className="flex gap-1.5">
+                          <input
+                            type="text"
+                            placeholder="e.g. Refurbished..."
+                            value={newProhibitInput}
+                            onChange={(e) => setNewProhibitInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && addItem(prohibitedProducts, setProhibitedProducts, newProhibitInput, setNewProhibitInput)}
+                            className="input-standard text-xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => addItem(prohibitedProducts, setProhibitedProducts, newProhibitInput, setNewProhibitInput)}
+                            className="btn-outline text-xs"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {prohibitedProducts.map((p) => (
+                            <span key={p} className="text-[11px] px-2 py-0.5 rounded bg-error-container/40 text-on-error-container flex items-center gap-1">
+                              {p}
+                              <button onClick={() => removeItem(prohibitedProducts, setProhibitedProducts, p)} className="text-error hover:text-black" type="button">×</button>
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Emergency Revocation Switch */}
+                    <div className="pt-3 border-t border-[#e7e7e3] flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-semibold text-primary block">Instant Emergency Revocation</span>
+                        <span className="text-[11px] text-on-surface-variant">Allows 1-click revocation from dashboard or kill-switch</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={allowEmergencyRevocation}
+                        onChange={(e) => setAllowEmergencyRevocation(e.target.checked)}
+                        className="w-4 h-4 accent-neutral-900 cursor-pointer"
+                      />
                     </div>
                   </div>
+                )}
+
+                {/* STEP 4: Review Screen */}
+                {step === 4 && (
+                  <div className="space-y-6">
+                    <div>
+                      <span className="font-mono text-xs uppercase tracking-wider text-secondary font-semibold block">Step 4 of 4</span>
+                      <h3 className="text-xl font-semibold text-primary mt-0.5">Review &amp; Verify Policy Contract</h3>
+                      <p className="text-xs text-on-surface-variant mt-1">Review the exact synthesized parameters before activating this mandate.</p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-surface-container-low border border-[#e7e7e3] space-y-3 text-xs">
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Mandate Name</span>
+                        <span className="font-semibold text-primary">{mandateName}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Assigned Agent</span>
+                        <span className="font-mono font-medium text-primary">{assignedAgent}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Max Single Order</span>
+                        <span className="font-mono font-bold text-primary">{currency} {singlePurchaseLimit.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Daily Budget Cap</span>
+                        <span className="font-mono font-bold text-primary">{currency} {dailyLimit.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Auto-Approve Threshold</span>
+                        <span className="font-mono font-medium text-emerald-700">≤ {currency} {autoApproveLimit.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Valid Until</span>
+                        <span className="font-mono text-primary">{validityDate}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-[#e7e7e3] pb-2">
+                        <span className="text-secondary font-medium">Whitelisted Merchants</span>
+                        <span className="text-right text-primary max-w-xs truncate">{allowedMerchants.join(', ')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-secondary font-medium">Blocked Merchants</span>
+                        <span className="text-right text-error max-w-xs truncate">{blockedMerchants.join(', ')}</span>
+                      </div>
+                    </div>
+
+                    {/* Disclaimer Box */}
+                    <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs space-y-1">
+                      <div className="font-semibold flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-[16px]">info</span>
+                        <span>Frontend Demo Simulation Notice</span>
+                      </div>
+                      <p className="leading-relaxed text-[11.5px]">
+                        This frontend demo validates and stores rules in the local mock layer. These rules cannot be enforced against real-world card payments or live merchant checkouts until the Express backend and PayPal API bridge are connected.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Form Stepper Navigation Buttons */}
+                <div className="pt-4 border-t border-[#e7e7e3] flex items-center justify-between">
+                  {step > 1 ? (
+                    <button
+                      type="button"
+                      onClick={handleBack}
+                      className="btn-secondary"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+                      <span>Back</span>
+                    </button>
+                  ) : <div />}
+
+                  {step < 4 ? (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="btn-primary"
+                    >
+                      <span>Continue to Step {step + 1}</span>
+                      <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={signing}
+                      onClick={handleDeployMandate}
+                      className="btn-primary px-6"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">verified</span>
+                      <span>{signing ? 'Signing...' : 'Activate Mandate'}</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Right Column (5 cols): Compiled Artifact Box */}
-              <div className="lg:col-span-5 sticky top-24">
-                <div className="bg-[#141514] text-white rounded-2xl p-6 md:p-8 space-y-6 shadow-2xl border border-white/10">
-                  <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                    <div className="flex items-center gap-2.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 font-semibold">
-                        SGX Compiled Artifact
+              {/* Right Column: Live Compiled Rules Artifact (5 cols) */}
+              <div className="lg:col-span-5 sticky top-24 space-y-4">
+                <div className="bg-[#141514] text-white rounded-2xl p-6 space-y-4 shadow-xl border border-white/10 font-mono text-xs">
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="font-semibold uppercase tracking-wider text-emerald-400 text-[11px]">
+                        Exact Synthesized Rules
                       </span>
                     </div>
-                    <span className="font-mono text-[11px] text-white/50">v4.2-attested</span>
+                    <span className="text-[10px] text-white/50">schema: v2.0-json</span>
                   </div>
 
-                  <div className="space-y-4 font-mono text-xs">
-                    <div className="p-4 rounded-xl bg-white/5 border border-white/5 space-y-2">
-                      <div className="text-white/60 text-[11px]">// Cryptographic Policy Node</div>
-                      <div className="text-secondary-fixed-dim">UUID: 89f41b2a-7c90-413e-a89f</div>
-                      <div>MAX_SINGLE: ₹5,000</div>
-                      <div>MONTHLY_CAP: ₹25,000</div>
-                      <div>HITL_THRESHOLD: ₹{sliderVal.toLocaleString()}</div>
-                      <div>VENDORS: [{merchants.join(', ')}]</div>
-                      <div className="text-emerald-400">STATE: COMPILED_READY</div>
-                    </div>
-                  </div>
-
-                  <button
-                    disabled={signing}
-                    onClick={handleDeployMandate}
-                    className="w-full py-3.5 rounded-xl bg-white text-black font-semibold text-xs uppercase tracking-wider hover:bg-neutral-200 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-[17px]">lock</span>
-                    <span>{signing ? 'Signing with Enclave...' : 'Sign with Sovereign Enclave'}</span>
-                  </button>
-                  <p className="text-[11px] text-white/40 text-center font-mono">
-                    Zero-knowledge proof generated and registered to immutable ledger.
+                  <p className="text-[11px] text-white/70 font-sans">
+                    These are the exact rules that will apply to candidate products evaluated by the policy engine:
                   </p>
+
+                  <pre className="p-3.5 rounded-xl bg-white/5 border border-white/5 text-secondary-fixed-dim text-[11px] overflow-x-auto max-h-[380px] leading-relaxed">
+                    {JSON.stringify(compiledRulesSpec, null, 2)}
+                  </pre>
+
+                  <div className="pt-2 text-[10.5px] text-white/40 leading-relaxed font-sans">
+                    Deterministic gate: In unattended mode, items under {currency} {autoApproveLimit.toLocaleString()} pass immediately. Items above threshold require human confirmation.
+                  </div>
                 </div>
               </div>
             </div>
@@ -470,7 +876,7 @@ export default function MandatesPage() {
         </main>
       </div>
 
-      {/* Toast */}
+      {/* Toast Feedback */}
       {toastMessage && (
         <div className="fixed bottom-8 right-8 z-50 bg-primary text-white px-4 py-3 rounded-xl shadow-2xl font-mono text-xs flex items-center gap-2 border border-white/10">
           <span className="material-symbols-outlined text-emerald-400 text-[16px]">check_circle</span>

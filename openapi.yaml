@@ -1,0 +1,900 @@
+openapi: 3.0.3
+info:
+  title: Mandate Gateway API
+  description: >
+    Production-ready API specification for Mandate Gateway — a sovereign,
+    user-controlled authorization and deterministic policy clearance layer for AI shopping agents.
+    Users define spending mandates, AI agents discover product candidates, purchase requests
+    are deterministically verified against invariants, sensitive orders require human approval,
+    and PayPal Sandbox provides simulated checkout order settlement.
+  version: 2.4.0
+  contact:
+    name: Mandate Gateway Engineering
+    url: https://github.com/shreyaskhakal/straw-hats
+servers:
+  - url: http://localhost:5000/api
+    description: Local Express Backend Server
+  - url: /api
+    description: Relative API proxy (Vercel Preview / Demo Mock Fallback)
+tags:
+  - name: Health & System
+    description: Service availability, diagnostics, and sandbox mode status
+  - name: Session & Auth
+    description: Operator authentication, passkey session verification, and logout
+  - name: Dashboard
+    description: Aggregated telemetry, mandate utilization, and pending order inbox
+  - name: Mandates
+    description: User-defined budget ceilings, merchant whitelists, and autonomous parameters
+  - name: Shopping Agent
+    description: Natural language brief synthesis, spec extraction, and candidate evaluation
+  - name: Deterministic Policy
+    description: Mathematical rule enforcement, invariant verification, and block/clear verdicts
+  - name: Purchase Requests
+    description: Full 7-stage order lifecycle, HITL clearances, rejections, and dispute evidence packs
+  - name: Payment Methods
+    description: Connected sandbox payment rails, ephemeral virtual tokenizers, and spending caps
+  - name: Agent Passports
+    description: Cryptographic agent identity minting, SHA-256 digest credentials, and verification
+  - name: Activity & Audit
+    description: Tamper-evident Merkle-tree event logs, formula injection-safe CSV and JSON exports
+  - name: Security & Resilience
+    description: Adversarial attack suite (15 vectors), scam message analyzer, and emergency kill-switch
+  - name: Settings
+    description: Sovereign signer configuration, default limits, currency, and webhook relays
+
+paths:
+  /health:
+    get:
+      tags: [Health & System]
+      summary: System health check
+      operationId: getHealth
+      responses:
+        '200':
+          description: System operational status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "UP" }
+                  service: { type: string, example: "Mandate Gateway Core Engine" }
+                  version: { type: string, example: "2.4.0" }
+                  mode: { type: string, example: "SANDBOX_SIMULATED" }
+                  killSwitchActive: { type: boolean, example: false }
+                  timestamp: { type: string, format: date-time }
+
+  /session:
+    get:
+      tags: [Session & Auth]
+      summary: Retrieve authenticated operator session
+      operationId: getSession
+      responses:
+        '200':
+          description: Authenticated operator session details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionUser'
+
+  /login:
+    post:
+      tags: [Session & Auth]
+      summary: Operator authentication challenge
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passphrase: { type: string, example: "sovereign-vault-passphrase" }
+                rememberTerminal: { type: boolean, default: true }
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  user: { $ref: '#/components/schemas/SessionUser' }
+
+  /logout:
+    post:
+      tags: [Session & Auth]
+      summary: Terminate operator session
+      operationId: logout
+      responses:
+        '200':
+          description: Session terminated
+
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: Retrieve overview metrics, active mandates, and pending inbox
+      operationId: getDashboard
+      responses:
+        '200':
+          description: Dashboard summary data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  stats:
+                    type: object
+                    properties:
+                      activeMandates: { type: integer, example: 4 }
+                      totalMandates: { type: integer, example: 4 }
+                      totalCeiling: { type: number, example: 82500 }
+                      totalUtilized: { type: number, example: 33700 }
+                      pendingApprovalsCount: { type: integer, example: 2 }
+                      clearedOrdersCount: { type: integer, example: 14 }
+                      blockedViolationsCount: { type: integer, example: 3 }
+                  mandates:
+                    type: array
+                    items: { $ref: '#/components/schemas/Mandate' }
+                  pendingRequests:
+                    type: array
+                    items: { $ref: '#/components/schemas/PurchaseRequest' }
+
+  /mandates:
+    get:
+      tags: [Mandates]
+      summary: List all spending mandates
+      operationId: getMandates
+      responses:
+        '200':
+          description: List of spending mandates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  mandates:
+                    type: array
+                    items: { $ref: '#/components/schemas/Mandate' }
+    post:
+      tags: [Mandates]
+      summary: Create new spending mandate
+      operationId: createMandate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMandateRequest'
+      responses:
+        '201':
+          description: Mandate created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  mandate: { $ref: '#/components/schemas/Mandate' }
+
+  /mandates/{id}/revoke:
+    post:
+      tags: [Mandates]
+      summary: Emergency revocation of spending mandate
+      operationId: revokeMandate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "M-902" }
+      responses:
+        '200':
+          description: Mandate revoked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  mandate: { $ref: '#/components/schemas/Mandate' }
+
+  /agent/parse-brief:
+    post:
+      tags: [Shopping Agent]
+      summary: Synthesize natural language shopping query into structured AST brief
+      operationId: parseBrief
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string, example: "Buy me an ergonomic wired gaming mouse under ₹5000 from Amazon or Croma" }
+      responses:
+        '200':
+          description: Parsed brief structure with extracted constraints
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  structuredBrief:
+                    type: object
+                    properties:
+                      category: { type: string, example: "Peripherals & Hardware" }
+                      mustHaves:
+                        type: array
+                        items: { type: string }
+                      dealbreakers:
+                        type: array
+                        items: { type: string }
+                      confidenceScore: { type: number, example: 98 }
+                      astCompiledAt: { type: string, format: date-time }
+
+  /agent/evaluate-candidates:
+    post:
+      tags: [Shopping Agent]
+      summary: Evaluate candidate products against synthesized brief requirements
+      operationId: evaluateCandidates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                brief: { type: object }
+      responses:
+        '200':
+          description: Product candidate evaluations with specs and verdicts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  candidates:
+                    type: array
+                    items: { $ref: '#/components/schemas/CandidateProduct' }
+
+  /policy/evaluate:
+    post:
+      tags: [Deterministic Policy]
+      summary: Deterministically verify purchase request against active mandate invariants
+      operationId: evaluatePolicy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [request]
+              properties:
+                request: { type: object }
+      responses:
+        '200':
+          description: Policy evaluation decision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  evaluation:
+                    type: object
+                    properties:
+                      verdict: { type: string, enum: [AUTO_CLEAR, REQUIRE_HITL, BLOCK], example: "REQUIRE_HITL" }
+                      decisionType: { type: string, example: "CEILING_EXCEEDED" }
+                      reasons:
+                        type: array
+                        items: { type: string }
+                      violations:
+                        type: array
+                        items: { type: string }
+                      passedChecks:
+                        type: array
+                        items: { type: string }
+
+  /requests:
+    get:
+      tags: [Purchase Requests]
+      summary: List all purchase requests across 7 lifecycle stages
+      operationId: getRequests
+      responses:
+        '200':
+          description: List of purchase requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  requests:
+                    type: array
+                    items: { $ref: '#/components/schemas/PurchaseRequest' }
+    post:
+      tags: [Purchase Requests]
+      summary: Submit new purchase request from shopping agent
+      operationId: createRequest
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemTitle, amount, merchant, mandateId]
+              properties:
+                itemTitle: { type: string, example: "Logitech MX Master 3S" }
+                amount: { type: number, example: 8495 }
+                currency: { type: string, default: "INR" }
+                merchant: { type: string, example: "Amazon India" }
+                mandateId: { type: string, example: "M-902" }
+                agentName: { type: string, example: "Claude Shopping" }
+                agentId: { type: string, example: "pass_claude_shop" }
+                listingUrl: { type: string, example: "https://amazon.in/dp/B0B11D7T9M" }
+      responses:
+        '201':
+          description: Purchase request initialized and verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  request: { $ref: '#/components/schemas/PurchaseRequest' }
+
+  /requests/{id}/approve:
+    post:
+      tags: [Purchase Requests]
+      summary: Operator human sign-off approving order clearance
+      operationId: approveRequest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "PR-1082" }
+      responses:
+        '200':
+          description: Request approved and simulated PayPal Sandbox token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  request: { $ref: '#/components/schemas/PurchaseRequest' }
+
+  /requests/{id}/reject:
+    post:
+      tags: [Purchase Requests]
+      summary: Operator declines purchase request
+      operationId: rejectRequest
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "PR-1082" }
+      responses:
+        '200':
+          description: Request declined
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  request: { $ref: '#/components/schemas/PurchaseRequest' }
+
+  /requests/{id}/dispute-pack:
+    get:
+      tags: [Purchase Requests]
+      summary: Retrieve complete Proof-of-Intent Dispute Pack evidence bundle
+      operationId: getDisputePack
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "PR-1079" }
+      responses:
+        '200':
+          description: Comprehensive cryptographic dispute evidence bundle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  disputePack: { $ref: '#/components/schemas/DisputePack' }
+
+  /payment-methods:
+    get:
+      tags: [Payment Methods]
+      summary: List all enrolled payment methods and sandbox rails
+      operationId: getPaymentMethods
+      responses:
+        '200':
+          description: List of payment methods
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  paymentMethods:
+                    type: array
+                    items: { $ref: '#/components/schemas/PaymentMethod' }
+
+  /payment-methods/connect:
+    post:
+      tags: [Payment Methods]
+      summary: Connect a new simulated payment rail
+      operationId: connectPaymentRail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, type]
+              properties:
+                name: { type: string, example: "PayPal Sandbox Merchant Desk" }
+                type: { type: string, example: "PAYPAL_SANDBOX" }
+                identifier: { type: string, example: "sb-biz@business.example.com" }
+                autoApproveCap: { type: string, example: "₹5,000 INR" }
+      responses:
+        '201':
+          description: Rail connected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  paymentMethod: { $ref: '#/components/schemas/PaymentMethod' }
+
+  /payment-methods/{id}/toggle-freeze:
+    post:
+      tags: [Payment Methods]
+      summary: Freeze or unfreeze payment rail
+      operationId: toggleFreezePaymentMethod
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "pm_paypal_sandbox" }
+      responses:
+        '200':
+          description: Rail freeze status toggled
+
+  /payment-methods/{id}/limits:
+    post:
+      tags: [Payment Methods]
+      summary: Update spending limits on payment rail
+      operationId: updatePaymentLimits
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "pm_paypal_sandbox" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                autoApproveCap: { type: string, example: "₹5,000" }
+                spendingLimit: { type: number, example: 150000 }
+      responses:
+        '200':
+          description: Limits updated
+
+  /passports:
+    get:
+      tags: [Agent Passports]
+      summary: List all minted agent passports
+      operationId: getPassports
+      responses:
+        '200':
+          description: List of agent passports
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  passports:
+                    type: array
+                    items: { $ref: '#/components/schemas/AgentPassport' }
+    post:
+      tags: [Agent Passports]
+      summary: Mint new cryptographic agent passport
+      operationId: createPassport
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agentName, spendingCeiling]
+              properties:
+                agentName: { type: string, example: "Gemini Shopping Ultra v1.0" }
+                spendingCeiling: { type: number, example: 25000 }
+                allowedCategories:
+                  type: array
+                  items: { type: string }
+      responses:
+        '201':
+          description: Passport minted and verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  passport: { $ref: '#/components/schemas/AgentPassport' }
+
+  /passports/{id}/revoke:
+    post:
+      tags: [Agent Passports]
+      summary: Repudiate agent passport and revoke checkout rights
+      operationId: revokePassport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string, example: "pass_claude_shop" }
+      responses:
+        '200':
+          description: Passport revoked
+
+  /passports/verify/{token}:
+    get:
+      tags: [Agent Passports]
+      summary: Public merchant-facing endpoint to verify an agent passport token
+      operationId: verifyMerchantToken
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string, example: "0x7F9A88C29BF004123B81EF1088C42109E2FA90A1BC334188" }
+      responses:
+        '200':
+          description: Verification response for merchants
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified: { type: boolean, example: true }
+                  status: { type: string, example: "ACTIVE_AUTHORIZED" }
+                  agentName: { type: string, example: "Claude Shopping" }
+                  authorizedBy: { type: string, example: "Elena Vance (Sovereign Owner)" }
+                  spendingCeiling: { type: number, example: 50000 }
+                  merchantAdvice: { type: string, example: "Trusted Autonomous Agent: You may allow this checkout session without anti-bot blocks." }
+        '403':
+          description: Token invalid, expired, or revoked
+
+  /activity:
+    get:
+      tags: [Activity & Audit]
+      summary: Retrieve verifiable chronological audit log
+      operationId: getActivity
+      responses:
+        '200':
+          description: Audit activity events
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  activity:
+                    type: array
+                    items: { $ref: '#/components/schemas/AuditEvent' }
+
+  /activity/export:
+    get:
+      tags: [Activity & Audit]
+      summary: Export audit records sanitized against spreadsheet formula injection attacks
+      operationId: exportActivity
+      parameters:
+        - name: format
+          in: query
+          required: false
+          schema: { type: string, enum: [json, csv], default: "csv" }
+      responses:
+        '200':
+          description: Sanitized audit export
+
+  /security/attacks:
+    get:
+      tags: [Security & Resilience]
+      summary: List all 15 adversarial attack test vectors
+      operationId: getAttacks
+      responses:
+        '200':
+          description: List of adversarial attack vectors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  attacks:
+                    type: array
+                    items: { $ref: '#/components/schemas/AttackVector' }
+
+  /security/run-attacks:
+    post:
+      tags: [Security & Resilience]
+      summary: Execute automated adversarial resilience test suite
+      operationId: runAttacks
+      responses:
+        '200':
+          description: Test suite execution results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  totalTests: { type: integer, example: 15 }
+                  passedCount: { type: integer, example: 15 }
+                  defenseRate: { type: string, example: "100.0%" }
+                  results:
+                    type: array
+                    items: { type: object }
+
+  /security/check-message:
+    post:
+      tags: [Security & Resilience]
+      summary: Analyze suspect message or invoice for phishing / prompt injection
+      operationId: checkScamMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message: { type: string, example: "URGENT: Payment received for invoice #9018. Click http://techbazaar.in/confirm" }
+      responses:
+        '200':
+          description: Risk analysis result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  risk: { type: string, enum: [LOW, HIGH, CRITICAL], example: "CRITICAL" }
+                  analysis: { type: string, example: "FAKED PAYMENT CONFIRMATION: The message claims funds were credited, but no corresponding transaction ID exists in the Gateway ledger." }
+
+  /security/kill-switch:
+    get:
+      tags: [Security & Resilience]
+      summary: Retrieve global kill switch status
+      operationId: getKillSwitch
+      responses:
+        '200':
+          description: Kill switch state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  killSwitch:
+                    type: object
+                    properties:
+                      active: { type: boolean, example: false }
+                      activatedAt: { type: string, nullable: true }
+                      reason: { type: string, nullable: true }
+
+  /security/kill-switch/toggle:
+    post:
+      tags: [Security & Resilience]
+      summary: Toggle global emergency kill switch
+      operationId: toggleKillSwitch
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason: { type: string, example: "Manual Emergency Halt Triggered via Security Center" }
+      responses:
+        '200':
+          description: Kill switch state toggled
+
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Retrieve operator settings and preferences
+      operationId: getSettings
+      responses:
+        '200':
+          description: Current settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: true }
+                  settings: { $ref: '#/components/schemas/Settings' }
+    post:
+      tags: [Settings]
+      summary: Update operator settings
+      operationId: saveSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+      responses:
+        '200':
+          description: Settings updated
+
+components:
+  schemas:
+    SessionUser:
+      type: object
+      properties:
+        id: { type: string, example: "usr_elena_vance" }
+        name: { type: string, example: "Elena Vance" }
+        email: { type: string, example: "elena.vance@sovereign-vault.internal" }
+        role: { type: string, example: "Sovereign Account (Demo)" }
+        isAuthenticated: { type: boolean, example: true }
+        terminalVersion: { type: string, example: "Node v2.4 (Frontend Demo)" }
+        compliance: { type: string, example: "Simulated PCI-DSS 4.0 Enclave" }
+
+    Mandate:
+      type: object
+      properties:
+        id: { type: string, example: "M-902" }
+        name: { type: string, example: "Office Hardware Q4" }
+        category: { type: string, example: "Hardware & Peripherals" }
+        agents:
+          type: array
+          items: { type: string }
+        allowedMerchants:
+          type: array
+          items: { type: string }
+        budgetCeiling: { type: number, example: 50000 }
+        utilized: { type: number, example: 18200 }
+        currency: { type: string, example: "INR" }
+        singlePurchaseLimit: { type: number, example: 5000 }
+        requiresCoSignerOver: { type: number, example: 8000 }
+        status: { type: string, enum: [ACTIVE, REVOKED, EXPIRED], example: "ACTIVE" }
+        expiry: { type: string, example: "2026-12-31" }
+        plainTextRule: { type: string, example: "Buy approved office peripherals on Amazon India and Croma. Cap single transactions at ₹5,000." }
+
+    CreateMandateRequest:
+      type: object
+      required: [name, category, budgetCeiling, singlePurchaseLimit, allowedMerchants]
+      properties:
+        name: { type: string, example: "Peripherals Q1" }
+        category: { type: string, example: "Hardware & Peripherals" }
+        agents:
+          type: array
+          items: { type: string }
+        allowedMerchants:
+          type: array
+          items: { type: string }
+        budgetCeiling: { type: number, example: 40000 }
+        singlePurchaseLimit: { type: number, example: 5000 }
+        requiresCoSignerOver: { type: number, example: 8000 }
+        currency: { type: string, default: "INR" }
+        expiry: { type: string, example: "2026-12-31" }
+
+    PurchaseRequest:
+      type: object
+      properties:
+        id: { type: string, example: "PR-1082" }
+        itemTitle: { type: string, example: "Logitech MX Master 3S Wireless Performance Mouse" }
+        merchant: { type: string, example: "Amazon India" }
+        agentName: { type: string, example: "Claude Shopping" }
+        agentId: { type: string, example: "pass_claude_shop" }
+        amount: { type: number, example: 8495 }
+        currency: { type: string, example: "INR" }
+        mandateId: { type: string, example: "M-902" }
+        mandateName: { type: string, example: "Office Hardware Q4" }
+        status:
+          type: string
+          enum: [DRAFT, PENDING_HITL, AUTO_CLEARED, APPROVED, REJECTED, BLOCKED, EXPIRED, COMPLETED]
+          example: "PENDING_HITL"
+        triggerReason: { type: string, example: "High-Value Ceiling Trigger: Peripheral ceiling is ₹5,000. Exceeds limit by ₹3,495." }
+        decisionType: { type: string, example: "HITL_ESCALATION" }
+        createdAt: { type: string, format: date-time }
+        paypalOrder:
+          type: object
+          properties:
+            orderId: { type: string, example: "MOCK-PP-ORD-889104" }
+            status: { type: string, example: "AWAITING_PAYER_APPROVAL" }
+            singleUseToken: { type: string, example: "tok_sandbox_e391a84f09" }
+            captureId: { type: string, example: "CAP-990184719" }
+
+    DisputePack:
+      type: object
+      properties:
+        packId: { type: string, example: "DSP-PACK-PR-1079" }
+        generatedAt: { type: string, format: date-time }
+        transactionId: { type: string, example: "PP-ORD-662910" }
+        captureId: { type: string, example: "CAP-990184719" }
+        itemTitle: { type: string, example: "Dell UltraSharp 4K DisplayPort Cable" }
+        amount: { type: string, example: "₹1,299 INR" }
+        mandateBound: { type: string, example: "Office Hardware Q4 (#M-902)" }
+        quoteEvidenceChain:
+          type: array
+          items: { type: object }
+
+    PaymentMethod:
+      type: object
+      properties:
+        id: { type: string, example: "pm_paypal_sandbox" }
+        type: { type: string, example: "PAYPAL_SANDBOX" }
+        name: { type: string, example: "PayPal Sandbox Business Vault" }
+        identifier: { type: string, example: "sb-biz-vault491@business.example.com" }
+        clientId: { type: string, example: "BAAv88201...99XJ" }
+        status: { type: string, example: "ACTIVE" }
+        balance: { type: string, example: "$12,450.00 USD (Sandbox Simulated)" }
+        autoApproveCap: { type: string, example: "₹5,000 INR" }
+        mode: { type: string, example: "SANDBOX" }
+        frozen: { type: boolean, example: false }
+
+    AgentPassport:
+      type: object
+      properties:
+        id: { type: string, example: "PASS-CLAUDE-981A" }
+        agentName: { type: string, example: "Claude Shopping" }
+        tokenPrefix: { type: string, example: "0x7F9A...3B81" }
+        fullToken: { type: string, example: "0x7F9A88C29BF004123B81EF1088C42109E2FA90A1BC334188" }
+        status: { type: string, enum: [ACTIVE, REVOKED, EXPIRED], example: "ACTIVE" }
+        spendingCeiling: { type: number, example: 50000 }
+        allowedCategories:
+          type: array
+          items: { type: string }
+
+    AuditEvent:
+      type: object
+      properties:
+        id: { type: string, example: "EVT-902-1" }
+        timestamp: { type: string, example: "2026-10-24, 21:40:00 IST" }
+        type: { type: string, example: "DISCRETIONARY_PENDING" }
+        summary: { type: string, example: "Discretionary Purchase Awaiting Approval" }
+        amount: { type: string, example: "₹8,495" }
+        agent: { type: string, example: "Claude Shopping v3.5" }
+        hash: { type: string, example: "sha256:90fa8120bba47162981041b39812cc9a" }
+
+    AttackVector:
+      type: object
+      properties:
+        id: { type: string, example: "ATK-01" }
+        name: { type: string, example: "Prompt Injection via Description" }
+        category: { type: string, example: "PROMPT_INJECTION" }
+        riskLevel: { type: string, example: "CRITICAL" }
+        expectedVerdict: { type: string, example: "BLOCKED" }
+
+    Settings:
+      type: object
+      properties:
+        defaultAutoApproveLimit: { type: number, example: 3000 }
+        requireCoSignerThreshold: { type: number, example: 50000 }
+        hardMandateCap: { type: number, example: 150000 }
+        currency: { type: string, example: "INR" }
+        nodeMode: { type: string, example: "sandbox" }
+        webhookEndpoint: { type: string, example: "https://api.sovereign.io/webhooks/mandate-events" }
+        compactDensity: { type: boolean, example: true }
+        indianNumbering: { type: boolean, example: true }
+        immediatePush: { type: boolean, example: true }
+        dailyDigest: { type: boolean, example: true }
+        anomalyAlerts: { type: boolean, example: true }

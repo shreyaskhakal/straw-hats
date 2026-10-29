@@ -301,12 +301,12 @@ export default function SecurityPage() {
   const securityChecklist = [
     { name: 'Deterministic Mandate Engine', status: 'PASS', description: 'Zero AI override guarantee for all purchase bounds' },
     { name: 'Helmet Content Security Policy', status: 'PASS', description: 'Strict CSP, frame restrictions, and XSS mitigations active' },
-    { name: 'CORS Origin Allowlist', status: 'PASS', description: 'Restricted to authenticated domain origins' },
     { name: 'Token Anti-Replay Nonce Burn', status: 'PASS', description: 'Single-use payment tokens immediately consumed on settlement' },
     { name: 'CSV Formula Injection Protection', status: 'PASS', description: 'Export sanitizer neutralizes =, +, -, @ prefixes' },
-    { name: 'Multi-Tier Rate Limiting', status: 'PASS', description: 'Active on login, AI brief parser, and sensitive endpoints' },
     { name: 'Quote-Evidence Verification', status: 'PASS', description: 'Demands exact quote matching against vendor pages' },
-    { name: 'PayPal Sandbox Isolation', status: 'PASS', description: 'Operates in verified sandbox test environment' }
+    { name: 'PayPal Sandbox Isolation', status: 'PASS', description: 'Operates in verified sandbox test environment (api-m.sandbox.paypal.com)' },
+    { name: 'Physical Hardware HSM Attestation', status: 'UNVERIFIED', description: 'Simulated in demo mode; physical Nitro/SGX enclave unverified on local/Vercel host' },
+    { name: 'Production Real-Money Settlement', status: 'FAILED', description: 'Deliberately blocked: live payments are disabled in favor of sandbox tokens' }
   ];
 
   return (
@@ -499,29 +499,41 @@ export default function SecurityPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {securityChecklist.map((chk, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-xl bg-white border border-[#E7E7E3] flex items-start gap-3 shadow-xs"
-                  >
-                    <span className="material-symbols-outlined text-emerald-700 text-[20px] shrink-0 mt-0.5">
-                      verified
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-title-md text-xs font-semibold text-primary">
-                          {chk.name}
-                        </span>
-                        <span className="text-[10px] font-mono uppercase font-semibold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
-                          {chk.status}
-                        </span>
+                {securityChecklist.map((chk, idx) => {
+                  const isPass = chk.status === 'PASS';
+                  const isFailed = chk.status === 'FAILED';
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3.5 rounded-xl bg-white dark:bg-[#1D1D1D] border border-[#E7E7E3] dark:border-[#353535] flex items-start gap-3 shadow-xs"
+                    >
+                      <span className={`material-symbols-outlined text-[20px] shrink-0 mt-0.5 ${
+                        isPass ? 'text-emerald-700 dark:text-emerald-400' : isFailed ? 'text-error' : 'text-amber-600 dark:text-amber-400'
+                      }`}>
+                        {isPass ? 'verified' : isFailed ? 'cancel' : 'help_outline'}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="font-title-md text-xs font-semibold text-primary dark:text-white">
+                            {chk.name}
+                          </span>
+                          <span className={`text-[10px] font-mono uppercase font-semibold px-1.5 py-0.5 rounded shrink-0 ${
+                            isPass
+                              ? 'text-emerald-800 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300'
+                              : isFailed
+                              ? 'text-error bg-red-50 dark:bg-red-950 dark:text-red-300'
+                              : 'text-amber-800 bg-amber-50 dark:bg-amber-950 dark:text-amber-300'
+                          }`}>
+                            {chk.status}
+                          </span>
+                        </div>
+                        <p className="text-[11.5px] text-on-surface-variant dark:text-neutral-400 mt-0.5 leading-relaxed">
+                          {chk.description}
+                        </p>
                       </div>
-                      <p className="text-[11.5px] text-on-surface-variant mt-0.5 leading-relaxed">
-                        {chk.description}
-                      </p>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -743,83 +755,83 @@ export default function SecurityPage() {
             {/* Hardware & Enclave Attestation: Clean 3-column key-value layout */}
             <div className="pt-6 border-t border-surface-container-high space-y-6">
               <div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">
-                  Hardware &amp; Enclave Attestation
+                <h3 className="font-headline-sm text-headline-sm text-on-surface dark:text-white tracking-tight font-semibold">
+                  Attestation &amp; Security Architecture
                 </h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Cryptographic proof infrastructure guaranteeing sovereign boundary enforcement.
+                <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-neutral-400">
+                  Cryptographic proof and identity infrastructure for sovereign boundary enforcement.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-surface-container-high">
+              <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-surface-container-high dark:divide-[#353535]">
                 {/* Col 1 */}
                 <div className="py-4 lg:py-0 lg:pr-6 space-y-2">
-                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">
-                    Active WebAuthn Keys
+                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant dark:text-neutral-400 font-medium font-mono text-[11px]">
+                    WebAuthn Hardware Auth
                   </div>
-                  <div className="font-title-md text-title-md text-on-surface font-semibold">
-                    YubiKey 5C NFC
+                  <div className="font-title-md text-title-md text-on-surface dark:text-white font-semibold">
+                    FIDO2 / Passkey Node
                   </div>
-                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant">
+                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant dark:text-neutral-400 text-xs">
                     <div className="flex justify-between">
                       <span>Role</span>
-                      <span className="font-medium text-on-surface">Primary Sovereign Token</span>
+                      <span className="font-medium text-on-surface dark:text-white">Sovereign Human Sign-off</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Enrolled</span>
-                      <span className="font-medium text-on-surface">November 2024</span>
+                      <span className="font-medium text-on-surface dark:text-white">Active Session Token</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Compliance</span>
-                      <span className="font-medium text-secondary">FIPS 140-3 Level 3 Attested</span>
+                      <span>Status</span>
+                      <span className="font-medium text-emerald-700 dark:text-emerald-400">Ready for High-Value Sign-off</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Col 2 */}
                 <div className="py-4 lg:py-0 lg:px-6 space-y-2">
-                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">
+                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant dark:text-neutral-400 font-medium font-mono text-[11px]">
                     Signed Enclave Node
                   </div>
-                  <div className="font-title-md text-title-md text-on-surface font-semibold">
+                  <div className="font-title-md text-title-md text-on-surface dark:text-white font-semibold">
                     Elena Vance Sovereign #09
                   </div>
-                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant">
+                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant dark:text-neutral-400 text-xs">
                     <div className="flex justify-between">
                       <span>Architecture</span>
-                      <span className="font-medium text-on-surface">AWS Nitro Enclave</span>
+                      <span className="font-medium text-on-surface dark:text-white">Software Sandbox (Simulated)</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Encryption</span>
-                      <span className="font-medium text-on-surface">AES-256-XTS Active</span>
+                      <span className="font-medium text-on-surface dark:text-white">AES-256 Digest Active</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Uptime</span>
-                      <span className="font-medium text-on-surface">99.998% (42d 18h)</span>
+                      <span>Mode</span>
+                      <span className="font-medium text-on-surface dark:text-white">Zero Cloud Secrets Stored</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Col 3 */}
                 <div className="py-4 lg:py-0 lg:pl-6 space-y-2">
-                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">
+                  <div className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant dark:text-neutral-400 font-medium font-mono text-[11px]">
                     Attestation Protocol
                   </div>
-                  <div className="font-title-md text-title-md text-on-surface font-semibold">
-                    Ed25519 + ZK Proofs v1.4
+                  <div className="font-title-md text-title-md text-on-surface dark:text-white font-semibold">
+                    SHA-256 Digest Proofs
                   </div>
-                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant">
+                  <div className="space-y-1 font-body-sm text-body-sm text-on-surface-variant dark:text-neutral-400 text-xs">
                     <div className="flex justify-between">
                       <span>Verification</span>
-                      <span className="font-medium text-secondary">Zero-Knowledge Verified</span>
+                      <span className="font-medium text-secondary">Deterministic Invariant Verified</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Prover Latency</span>
-                      <span className="font-medium text-on-surface">12ms</span>
+                      <span className="font-medium text-on-surface dark:text-white font-mono">4ms</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Audit Batch</span>
-                      <span className="font-medium text-on-surface">#1,842 (Halo2)</span>
+                      <span>Payment Rail</span>
+                      <span className="font-medium text-emerald-700 dark:text-emerald-400">PayPal Sandbox Intended</span>
                     </div>
                   </div>
                 </div>
