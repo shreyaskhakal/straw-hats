@@ -91,8 +91,8 @@ export default function Sidebar({ pendingCount = 2, mandateCount = 4 }) {
               className={({ isActive }) =>
                 `flex items-center justify-between px-3 py-2 rounded-lg text-[13px] transition-all ${
                   isActive
-                    ? 'bg-[#141514] text-white font-medium shadow-sm'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high font-normal'
+                    ? 'bg-[#141514] text-white dark:bg-[#2C2C2C] dark:text-white font-medium shadow-sm'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high dark:hover:bg-[#252525] font-normal'
                 }`
               }
             >

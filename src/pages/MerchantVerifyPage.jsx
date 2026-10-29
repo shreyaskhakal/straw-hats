@@ -103,7 +103,7 @@ export default function MerchantVerifyPage() {
         {loading ? (
           <div className="p-12 text-center text-secondary text-body-md bg-surface-container-low rounded-2xl border border-outline-variant/30 space-y-3">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <div>Verifying cryptographic agent passport via Intel SGX Enclave...</div>
+            <div>Verifying agent passport digest in simulated sandbox...</div>
           </div>
         ) : error ? (
           <div className="bg-surface-container-lowest rounded-2xl border border-error/40 p-8 shadow-sm text-center space-y-4">

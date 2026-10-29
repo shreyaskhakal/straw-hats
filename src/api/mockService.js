@@ -27,6 +27,17 @@ export async function dispatchMockRequest(endpoint, options = {}) {
     };
   }
 
+  // Demo State Reset
+  if (url === '/demo/reset') {
+    demoStore.reset();
+    return {
+      success: true,
+      message: 'Demo state successfully reset to initial seed baseline',
+      isDemoData: true,
+      timestamp: new Date().toISOString()
+    };
+  }
+
   // 2. Session & Auth
   if (url === '/session') {
     return { success: true, user: state.user, isDemoData: true };
@@ -449,7 +460,7 @@ export async function dispatchMockRequest(endpoint, options = {}) {
       allowedCategories: body.allowedCategories || ['Hardware & Peripherals'],
       ordersCompleted: 0,
       disputes: 0,
-      enclaveAttestation: 'Intel SGX Enclave #TDX-DEMO (Hardware Signed)',
+      enclaveAttestation: 'Software Sandbox Attestation (Simulated SHA-256 Digest)',
       isDemoData: true,
     };
     state.passports.unshift(newPass);

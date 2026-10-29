@@ -81,8 +81,9 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  // System Health
+  // System Health & Demo State
   getHealth: () => request('/health'),
+  resetDemoState: () => request('/demo/reset', { method: 'POST' }),
 
   // Session
   getSession: () => request('/session'),

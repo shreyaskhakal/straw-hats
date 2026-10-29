@@ -142,7 +142,7 @@ export default function LandingPage() {
         "ephemeral_card_ttl_sec": 180
       },
       "attestation": {
-        "hardware_enclave": "Intel SGX Enclave v4.2",
+        "hardware_enclave": "Software Sandbox Attestation (Simulated SHA-256)",
         "root_signature": "0x48a1f729b7c8942a03cf81b9e"
       }
     }, null, 2);
@@ -376,7 +376,7 @@ export default function LandingPage() {
                     </div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest/10 border border-white/10 font-code-sm text-code-sm text-on-primary shrink-0">
                       <span className="material-symbols-outlined text-[14px]">lock</span>
-                      <span>SGX Isolated</span>
+                      <span>Sandbox Isolated</span>
                     </div>
                   </div>
 
@@ -482,7 +482,7 @@ export default function LandingPage() {
                   Active Pipeline
                 </span>
                 <span className="font-body-sm text-body-sm text-on-primary-container">
-                  Autonomous Checkout Enclave #SGX-7719
+                  Autonomous Checkout Sandbox #DEMO-7719
                 </span>
                 <span className="hidden md:inline font-mono text-[11px] text-secondary-fixed-dim">
                   {liveClock}
@@ -991,7 +991,7 @@ export default function LandingPage() {
                     </div>
                     <div className="text-on-primary-container text-[11px] mt-0.5">
                       {activeDecision === 'clearance' && 'Dissolves in 180 seconds'}
-                      {activeDecision === 'hitl' && 'Holding basket in SGX state'}
+                      {activeDecision === 'hitl' && 'Holding basket in sandbox state'}
                       {activeDecision === 'block' && 'Zero credential release'}
                     </div>
                   </div>
@@ -1019,9 +1019,9 @@ export default function LandingPage() {
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-on-primary mb-5 shadow-inner">
                     <span className="material-symbols-outlined text-[20px]">memory</span>
                   </div>
-                  <h4 className="font-title-md text-title-md font-semibold text-on-primary mb-2">Intel SGX &amp; SEV Enclaves</h4>
+                  <h4 className="font-title-md text-title-md font-semibold text-on-primary mb-2">Hardware Enclave Ready (Simulated for Demo)</h4>
                   <p className="font-body-sm text-body-sm text-on-primary-container leading-relaxed">
-                    Code and sensitive card payloads run inside encrypted hardware enclaves unreachable even by host operating systems.
+                    Designed for Confidential Computing (SGX/SEV) in production. Evaluated via deterministic software sandbox and SHA-256 digests in demo.
                   </p>
                 </div>
                 <div className="tilt-card rounded-3xl bg-surface-container-lowest/[0.04] p-6 border border-white/10 backdrop-blur-md hover:border-white/25 transition-all">
@@ -1173,7 +1173,7 @@ export default function LandingPage() {
             <div className="mt-4 flex items-center justify-between py-2 px-3 rounded-lg bg-surface-container font-code-sm text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
-                <span className="text-on-surface font-mono">Format: SGX_POLICY_V2</span>
+                <span className="text-on-surface font-mono">Format: MANDATE_POLICY_V2</span>
               </div>
               <button
                 onClick={handleCopyJson}
@@ -1206,7 +1206,7 @@ export default function LandingPage() {
     "ephemeral_card_ttl_sec": 180
   },
   "attestation": {
-    "hardware_enclave": "Intel SGX Enclave v4.2",
+    "hardware_enclave": "Software Sandbox Attestation (Simulated SHA-256)",
     "root_signature": "0x48a1f729b7c8942a03cf81b9e"
   }
 }`}</pre>

@@ -72,6 +72,7 @@ Mandate Gateway is built with a **Frontend-First delivery model**:
 - **OpenAPI 3.0.3 Contract (`openapi.yaml`)**: Standardized specification covering all endpoints, parameters, request bodies, and responses for future Express backend deployment.
 - **Postman Collection v2.1.0 (`postman_collection.json`)**: Pre-configured collection with all 12 modules, realistic mock payloads, and environment variables.
 - **Vercel SPA Routing (`vercel.json`)**: Configured with single-page application URL rewrites to `/index.html` ensuring direct deep-linking on all routes.
+- **Resettable Demo State**: Evaluators and judges can click the "Reset Demo" button in the global header bar at any time to instantly restore all mandates, purchase requests, payment cards, and security states back to the original baseline seed data.
 
 ---
 

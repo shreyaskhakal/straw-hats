@@ -123,6 +123,10 @@ async function run() {
     // Security Attacks Suite
     const attacks = await dispatchMockRequest('/security/attacks');
     assert(attacks.success && attacks.attacks.length >= 5, 'GET /security/attacks returns resilience test vectors');
+
+    // Demo State Reset
+    const reset = await dispatchMockRequest('/demo/reset', { method: 'POST' });
+    assert(reset.success && reset.message.includes('initial seed baseline'), 'POST /demo/reset resets demo state to initial seed baseline');
   });
 
   // 4. Direct Navigation & SPA Fallback Route Resolution

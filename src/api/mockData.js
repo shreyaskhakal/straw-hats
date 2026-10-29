@@ -346,7 +346,7 @@ const initialDemoState = {
       allowedCategories: ['Hardware & Peripherals'],
       ordersCompleted: 14,
       disputes: 0,
-      enclaveAttestation: 'AWS Nitro SGX Enclave #TDX-9914 (Hardware Signed)',
+      enclaveAttestation: 'Software Sandbox Attestation (Simulated SHA-256 Digest)',
       isDemoData: true,
     },
     {

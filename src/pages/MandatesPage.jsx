@@ -65,6 +65,24 @@ export default function MandatesPage() {
     }
   };
 
+  const handleEditMandate = (m) => {
+    setMandateName(m.name || '');
+    setMandatePurpose(m.plainTextRule || '');
+    if (m.agents && m.agents.length) setAssignedAgent(m.agents[0]);
+    if (m.singlePurchaseLimit) setSinglePurchaseLimit(m.singlePurchaseLimit);
+    if (m.budgetCeiling) setDailyLimit(m.budgetCeiling);
+    if (m.requiresCoSignerOver) setAutoApproveLimit(m.requiresCoSignerOver);
+    if (m.allowedMerchants) {
+      setAllowedMerchants(Array.isArray(m.allowedMerchants) ? m.allowedMerchants : [m.allowedMerchants]);
+    }
+    if (m.allowedCategories) {
+      setAllowedCategories(Array.isArray(m.allowedCategories) ? m.allowedCategories : [m.allowedCategories]);
+    }
+    setStep(1);
+    document.getElementById('builder-section')?.scrollIntoView({ behavior: 'smooth' });
+    showToast(`Loaded mandate #${m.id} into builder for editing.`);
+  };
+
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -336,7 +354,15 @@ export default function MandatesPage() {
                         </span>
                       </div>
 
-                      <div className="md:col-span-1 flex items-center justify-end">
+                      <div className="md:col-span-1 flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleEditMandate(m)}
+                          className="text-[11px] font-mono uppercase tracking-wider px-2 py-1 rounded text-primary hover:bg-surface-container border border-outline-variant/30 transition-colors cursor-pointer"
+                          type="button"
+                          title="Load mandate parameters into builder for editing"
+                        >
+                          Edit
+                        </button>
                         <button
                           onClick={() => handleRevoke(m.id)}
                           className={`text-[11px] font-mono uppercase tracking-wider px-2.5 py-1 rounded transition-colors cursor-pointer ${

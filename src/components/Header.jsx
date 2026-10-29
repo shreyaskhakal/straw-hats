@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
+import { api } from '../api/client';
 
 export default function Header({ pageTitle = 'Overview Ledger', onOpenGuide }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [resetting, setResetting] = useState(false);
 
   const { theme, toggleTheme } = useTheme();
+
+  const handleResetDemo = async () => {
+    if (resetting) return;
+    setResetting(true);
+    try {
+      await api.resetDemoState();
+      window.dispatchEvent(new CustomEvent('mandate-gateway-demo-reset'));
+      window.location.reload();
+    } catch (err) {
+      console.warn('Reset demo error:', err);
+      setResetting(false);
+    }
+  };
 
   const notifications = [
     { id: 1, title: 'High-Value Escalation', desc: 'Logitech MX Master 3S exceeds ₹5k ceiling', time: '14m ago', unread: true },
@@ -44,6 +59,16 @@ export default function Header({ pageTitle = 'Overview Ledger', onOpenGuide }) {
         <span className="sm:hidden ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono bg-amber-500/10 text-amber-800 border border-amber-500/20 shrink-0" title="Frontend preview operating with simulated sandbox rails">
           Demo
         </span>
+        <button
+          onClick={handleResetDemo}
+          disabled={resetting}
+          className="ml-1 sm:ml-2 px-2 py-0.5 rounded text-[10px] font-mono border border-[#E7E7E3] hover:border-primary/40 bg-surface hover:bg-surface-container text-secondary hover:text-primary transition-all flex items-center gap-1 shrink-0 cursor-pointer shadow-2xs"
+          title="Reset all mandates, requests, and security states back to default seed data"
+          type="button"
+        >
+          <span className={`material-symbols-outlined text-[12px] ${resetting ? 'animate-spin' : ''}`}>restart_alt</span>
+          <span className="hidden md:inline">{resetting ? 'Resetting...' : 'Reset Demo'}</span>
+        </button>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4 shrink-0">
